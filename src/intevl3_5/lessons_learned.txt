@@ -1,0 +1,43 @@
+To increase image resolution for more detailed answers, modify the max_num and input_size parameters in the load_image function. InternVL3 supports up to 128 tiles during inference, significantly higher than the default 12 tiles.
+
+first 12 after 128:
+(.venv) PS E:\00_SW\01_RAG> & E:/00_SW/01_RAG/.venv/Scripts/python.exe e:/00_SW/01_RAG/src/intevl3_5/InternVL3_2B_reduced.py
+FlashAttention2 is not installed.
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+The image is a bar chart titled "Table 6. Number of extracted features in GZ-I." It compares the number of features extracted using different methods for  both 64x and 128x images. 
+
+- **DAE** method shows 256 features for both 64x and 128x images.
+- **CAE Greyscale** and **CAE Colour** both use 512 features for both image sizes.
+- **WND-CHARM Greyscale** and **WND-CHARM Colour** use 2,919 features for  64x images and 2,048 for 128x images.
+
+The chart uses orange bars for 64x images and purple bars for 128x images. The y-axis represents the number of features, ranging from 0 to 50,000. The x-axis lists the feature extraction methods.
+
+---------------------------------------0---------------------------------------------
+
+(.venv) PS E:\00_SW\01_RAG> & E:/00_SW/01_RAG/.venv/Scripts/python.exe e:/00_SW/01_RAG/src/intevl3_5/InternVL3_2B_reduced.py
+FlashAttention2 is not installed.
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+The image is a bar chart titled "Table 6. Number of extracted features in GZ-I." It compares the number of features extracted using different methods for  both 64x images and 128x images.
+
+### Methods and Features:
+- **DAE**
+- **CAE Greyscale**
+- **CAE Colour**
+- **WND-CHARM Greyscale**
+- **WND-CHARM Colour**
+
+### Number of Features:
+- **64x images:**
+  256 features for DAE,  2512 for CAE Greyscale, 2512 for CAE Colour, 2,919 for WND-CHARM Greyscale, and 4,059 for WND-CHARM Colour.
+- **128x images:**
+  - 256 features for DAE, 2,048 for CAE Greyscale, 2,048 for CAE Colour, 2,919 for WND-CHARM Greyscale, and 4,209 for WND-CHARM Colour.
+
+### Run Time (in seconds):
+- The x-axis represents the run time in seconds, ranging from 0 to 5000.
+
+### Visualization:
+- The chart uses orange bars for 64x images and purple bars for 128x images.
+- The height of the bars indicates the number of features extracted.
+- The WND-CHARM methods have significantly more features compared to the other methods, especially noticeable in the 128x images category.
+
+Overall, the chart shows that the WND-CHARM methods yield a much higher number of features compared to the other methods, especially for the 128x images category.

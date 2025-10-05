@@ -1,5 +1,6 @@
 from llama_cpp import Llama
 from typing import Optional, Dict, Any
+import json
 
 
 class LlamaInference:
