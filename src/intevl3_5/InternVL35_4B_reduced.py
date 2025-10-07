@@ -95,9 +95,9 @@ def load_image(image_file, input_size=448, max_num=12):
 # Load and process image with HIGHER RESOLUTION
 # Increased max_num from 12 to 36 for more detail (can go up to 128)
 pixel_values = load_image(
-    ".//data/images/figure.png", 
+    ".//data/images/table.png", 
     input_size=448,  # Keep at 448 (standard tile size)
-    max_num=36       # Increased from 12 to 36 for more tiles
+    max_num=64       # Increased from 12 to 64 for more tiles
 ).to(torch.bfloat16).to(device)
 
 
