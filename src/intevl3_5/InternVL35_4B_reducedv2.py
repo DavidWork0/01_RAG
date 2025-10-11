@@ -23,7 +23,7 @@ def initialize_model():
     return model, device
 
 
-def inference_internvl3_5_2b(model, device, picture_dir=None):
+def inference_internvl3_5_4b(model, device, picture_dir=None):
 
     ############### IMAGE LOADING ###############
     # Making a list about the images in the folder
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     start_time = time.time()
     picture_dir = ".//data/images/"  # Directory containing multiple images
     model, device = initialize_model()
-    results = inference_internvl3_5_2b(model, device, picture_dir)
+    results = inference_internvl3_5_4b(model, device, picture_dir)
     print("\n\nFinal Results:")
     for image_name, description in results.items():
         print(f"Image: {image_name}\nDescription: {description}\n")
