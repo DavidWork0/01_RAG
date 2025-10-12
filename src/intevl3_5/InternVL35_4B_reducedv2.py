@@ -23,7 +23,7 @@ def initialize_model():
     return model, device
 
 
-def inference_internvl3_5_4b(model, device, picture_dir=None):
+def inference_internvl3_5_4b_picture_directory(model, device, picture_dir=None):
 
     ############### IMAGE LOADING ###############
     # Making a list about the images in the folder
@@ -37,7 +37,6 @@ def inference_internvl3_5_4b(model, device, picture_dir=None):
         picture_file = ".//data/images/barchart.png"
         
     ############### MODEL LOADING & IMAGE PREPROCESSING ###############
-
 
     tokenizer = AutoTokenizer.from_pretrained(
         LOCAL_MODEL_PATH, 
@@ -109,8 +108,7 @@ def inference_internvl3_5_4b(model, device, picture_dir=None):
 
     # Initialize results dictionary
     results = {}
-    # Load and process image with HIGHER RESOLUTION
-    # Increased max_num from 12 to 36 for more detail (can go up to 128)
+
     question = "Describe the image in detail."
 
     for idx, picture_file in enumerate(image_files):
@@ -118,7 +116,7 @@ def inference_internvl3_5_4b(model, device, picture_dir=None):
         pixel_values = load_image(
             picture_file,
             input_size=448,  # Keep at 448 (standard tile size)
-            max_num=36       # Increased from 12 to 36 for more tiles
+            max_num=12       # Increased from 12 to 36 for more tiles AFTER TESTING WITH 36 WITH A LOT OF PICTURES WAS OK BUT WITH SOME IT STARTED TO CONSUME 60+ GB RAM+VRAM !!DIPLOMA 
         ).to(torch.bfloat16).to(device)
 
         ############### INFERENCE ###############
@@ -132,11 +130,12 @@ def inference_internvl3_5_4b(model, device, picture_dir=None):
         # add responses to a dictionary together with the processed image name and return it
         image_name = os.path.basename(picture_file)
         results[image_name] = response
-        print(f"Completed processing for image: {image_name}\n")
+        print(f"Completed processing for image: {image_name}")
     
-    # Clear GPU memory
-    gc.collect()
-    torch.cuda.empty_cache()
+        # Clear GPU memory
+        gc.collect()
+        torch.cuda.empty_cache()
+
 
     return results
         
@@ -144,10 +143,11 @@ def inference_internvl3_5_4b(model, device, picture_dir=None):
 if __name__ == "__main__":
     start_time = time.time()
     picture_dir = ".//data/images/"  # Directory containing multiple images
+    #picture_dir = ".//data/output/extracted_images/Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder"  # Directory containing multiple images
     model, device = initialize_model()
-    results = inference_internvl3_5_4b(model, device, picture_dir)
+    descriptions = inference_internvl3_5_4b_picture_directory(model, device, picture_dir)
     print("\n\nFinal Results:")
-    for image_name, description in results.items():
+    for image_name, description in descriptions.items():
         print(f"Image: {image_name}\nDescription: {description}\n")
 
     end_time = time.time()

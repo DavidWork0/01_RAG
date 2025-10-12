@@ -16,10 +16,15 @@ Functions:
 - save_data(data, file_path): Save processed data to a specified file path
 """
 
+import time
 import fitz
 import os
 import re
+import gc, torch
+from intevl3_5.InternVL35_4B_reducedv2_single import initialize_model, inference_internvl3_5_4b_picture_path
 from typing import List, Dict, Tuple
+
+DUPLICATE_DETECTION_FOR_IMAGES = False  # Set to True to enable duplicate image detection Currently off as it's not reconstructing duplicates correctly
 
 
 def extract_text_with_image_placeholders(pdf_path: str, images_folder: str, 
@@ -164,7 +169,7 @@ def create_descriptions_file_template(images_folder: str, output_file: str):
     print(f"✓ Created descriptions template: {output_file}")
     print(f"  Process images and fill in descriptions!")
 
-def process_images_with_vl_model(images_folder: str, output_descriptions: str):
+def process_images_with_vl_model(images_folder: str, output_descriptions: str, model, device, tokenizer):
     """
     Process all images with your vision-language model and save descriptions.
     Replace this with your actual VL model (InternVL, LLaVA, etc.)
@@ -176,27 +181,33 @@ def process_images_with_vl_model(images_folder: str, output_descriptions: str):
     next_image_id
     Description text...
     """
+
     image_files = sorted([f for f in os.listdir(images_folder) 
                          if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    if not image_files:
+        print(f"No images found in {images_folder} to process.")
+        return
     
+
+    print(f"Processing {len(image_files)} images with vision-language model...")
     with open(output_descriptions, 'w', encoding='utf-8') as f:
         for img_file in image_files:
             image_id = os.path.splitext(img_file)[0]
             image_path = os.path.join(images_folder, img_file)
             
-            # TODO: Replace with your actual vision-language model
-            # Example:
-            # from your_model import describe_image
-            # description = describe_image(image_path)
+            # Call your inference function
+            response = inference_internvl3_5_4b_picture_path(model, device, tokenizer, image_path)
+
+            # Save to file
+            f.write(f"[IMAGE:{image_id}]\n")
+            f.write(f"{response}\n\n") #If something more is needed then response end can be signed as well
             
-            # Placeholder for demonstration
-            description = f"This is a placeholder description for {img_file}. Replace this with your VL model output."
+            print(f"Processed: {img_file}\n")
             
-            # Write in the format: image_id, then description, then blank line
-            f.write(f"{image_id}\n")
-            f.write(f"{description}\n\n")
-            
-            print(f"Processed: {img_file}")
+            # Clear GPU memory
+            gc.collect()
+            torch.cuda.empty_cache()
+
     
     print(f"\n✓ Saved descriptions: {output_descriptions}")
 
@@ -221,26 +232,24 @@ def parse_descriptions_file(descriptions_file: str) -> Dict[str, str]:
     
     for line in lines:
         line_stripped = line.strip()
-        
-        # Empty line indicates end of current description
-        if not line_stripped:
+
+        # Next placeholder indicates the end of current description
+        if line_stripped.startswith("[IMAGE:") and line_stripped != current_id:
+            #Save descriptions with current_id if exists and with content
             if current_id and current_description:
-                descriptions[current_id] = ' '.join(current_description).strip()
-                current_id = None
-                current_description = []
-        
-        # First non-empty line after blank is the image_id
-        elif current_id is None:
+                descriptions[current_id] = "\n".join(current_description).strip()
             current_id = line_stripped
-        
-        # Subsequent lines are description
-        else:
-            current_description.append(line_stripped)
-    
-    # Handle last entry if file doesn't end with blank line
+            current_description = []
+        elif not line_stripped.startswith("[IMAGE:"):
+            #Removing blank rows (\n) from description but keeping intentional blank rows
+            if line_stripped is not None and not line_stripped == "":
+                current_description.append(line_stripped)
+            else:
+                current_description.append('')
+
+    # Save last description
     if current_id and current_description:
-        descriptions[current_id] = ' '.join(current_description).strip()
-    
+        descriptions[current_id] = "\n".join(current_description).strip()
     return descriptions
 
 def merge_text_with_descriptions(text_with_placeholders: str, 
@@ -262,8 +271,9 @@ def merge_text_with_descriptions(text_with_placeholders: str,
     # Replace all placeholders with descriptions
     replaced_count = 0
     for image_id, description in descriptions.items():
-        placeholder = f"[IMAGE:{image_id}]"
+        placeholder = image_id
         if placeholder in text:
+            #Replace text till the next placeholder not just the first row
             text = text.replace(placeholder, description)
             replaced_count += 1
             print(f"Replaced: {placeholder}")
@@ -341,11 +351,16 @@ def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
     """
     Complete workflow for all PDFs in a directory.
     """
+
     # Setup directories
     images_dir = os.path.join(output_dir, "extracted_images")
     texts_dir = os.path.join(output_dir, "texts_with_placeholders")
     descriptions_dir = os.path.join(output_dir, "image_descriptions")
     merged_dir = os.path.join(output_dir, "final_merged")
+
+    #init model
+    #Only init once  and check if initialized then skip
+    model, device, tokenizer = initialize_model()
 
     rename_pdf_file_names(input_dir)
     
@@ -379,34 +394,38 @@ def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
             metadata = extract_text_with_image_placeholders(
                 pdf_path, pdf_images_dir, text_output
             )
+            if DUPLICATE_DETECTION_FOR_IMAGES:
+                # step 1.1: Detect duplicate images
+                duplicates = detect_duplicate_images(pdf_images_dir)
+                # TO MAKE THIS RIGHT I NEED TO PREPROCESS THE FILE NAMES TO BE ABLE TO GROUP THEM -> DONE
+                # step 1.2 Move duplicates to a specific folder. Each duplicate type set in its own subfolder 
+                if duplicates:
+                    duplicates_dir = os.path.join(pdf_images_dir, "duplicates")
+                    os.makedirs(duplicates_dir, exist_ok=True)
+                    for dup_files in duplicates.values():
+                        dup_set_dir = os.path.join(duplicates_dir, dup_files[0].split('.')[0])
+                        os.makedirs(dup_set_dir, exist_ok=True)
+                        for f in dup_files:
+                            src_path = os.path.join(pdf_images_dir, f)
+                            dst_path = os.path.join(dup_set_dir, f)
+                            os.rename(src_path, dst_path)
+                            # Remove duplicate from main folder
+                    print(f"Moved duplicate images to: {duplicates_dir}")
+            else:
+                print("Duplicate detection skipped.")
             
-            # step 1.1: Detect duplicate images
-            duplicates = detect_duplicate_images(pdf_images_dir)
-            # TO MAKE THIS RIGHT I NEED TO PREPROCESS THE FILE NAMES TO BE ABLE TO GROUP THEM -> DONE
-            # step 1.2 Move duplicates to a specific folder. Each duplicate type set in its own subfolder.
-            if duplicates:
-                duplicates_dir = os.path.join(pdf_images_dir, "duplicates")
-                os.makedirs(duplicates_dir, exist_ok=True)
-                for dup_files in duplicates.values():
-                    dup_set_dir = os.path.join(duplicates_dir, dup_files[0].split('.')[0])
-                    os.makedirs(dup_set_dir, exist_ok=True)
-                    for f in dup_files:
-                        src_path = os.path.join(pdf_images_dir, f)
-                        dst_path = os.path.join(dup_set_dir, f)
-                        os.rename(src_path, dst_path)
-                        # Remove duplicate from main folder
-                print(f"Moved duplicate images to: {duplicates_dir}")
-            
-            # ---------------------------------0----------------------------------
-
             # Step 2: Process images with VL model
             print("\nStep 2: Processing images with vision model...")
             #making the files for the descriptions
             descriptions_output = os.path.join(descriptions_dir, f"{pdf_name}_descriptions.txt")
-            process_images_with_vl_model(pdf_images_dir, descriptions_output)
-            
+
+            process_images_with_vl_model(pdf_images_dir, descriptions_output, model, device, tokenizer)
+
+            # ---------------------------------0----------------------------------
+
             # Step 3: Merge
             print("\nStep 3: Merging text and descriptions...")
+          
             merged_output = os.path.join(merged_dir, f"{pdf_name}_final.txt")
             merge_text_with_descriptions(text_output, descriptions_output, merged_output)
             
@@ -420,11 +439,37 @@ def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
     print(f"Final merged files: {merged_dir}")
 
 
-# Usage
-batch_process_pdfs_complete_workflow(
-    input_dir="./data/pdfs",
-    output_dir="./data/output"
-)
+if __name__ == "__main__":
+
+    import time
+
+    #Clear output directory before running
+    output_dir = "./data/output"
+    if os.path.exists(output_dir):
+        import shutil
+        shutil.rmtree(output_dir)
+        print(f"Cleared existing output directory: {output_dir}")
+    # Example usage of the complete workflow
+    # Adjust input_dir and output_dir as needed
+    input_dir = "./data/pdfs"
+    output_dir = "./data/output"
+    
+
+    #measure time
+    try:
+        start_time = time.time()
+    except:
+        i=1
+
+    batch_process_pdfs_complete_workflow(input_dir, output_dir)
+
+    try:
+        end_time = time.time()
+    except:
+        i=1
+    
+    print(f"Total processing time: {end_time - start_time:.2f} seconds")
+
 
 """
 # Example: Process a single PDF

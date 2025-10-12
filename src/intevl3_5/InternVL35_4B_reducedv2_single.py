@@ -4,12 +4,13 @@ import torch
 import torchvision.transforms as T
 from torchvision.transforms.functional import InterpolationMode
 import gc
+import os
 
 
-# Configuration
 LOCAL_MODEL_PATH = ".//models/huggingface/InternVL3_5-4B"
 
 def initialize_model():
+    print ("Init model func")
     # Load model and tokenizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -20,17 +21,17 @@ def initialize_model():
         use_flash_attn=False,
         trust_remote_code=True
     ).eval().to(device)
-    
-
-    return model, device
-
-def inference_internvl3_5_4b_single_picture(model, device, picture_path=None):
 
     tokenizer = AutoTokenizer.from_pretrained(
-            LOCAL_MODEL_PATH, 
-            trust_remote_code=True
-        )
-    
+        LOCAL_MODEL_PATH, 
+        trust_remote_code=True
+    )
+
+    return model, device, tokenizer
+
+
+def inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path=None):
+
     # Image preprocessing functions
     IMAGENET_MEAN = (0.485, 0.456, 0.406)
     IMAGENET_STD = (0.229, 0.224, 0.225)
@@ -96,24 +97,41 @@ def inference_internvl3_5_4b_single_picture(model, device, picture_path=None):
 
     # Load and process image with HIGHER RESOLUTION
     # Increased max_num from 12 to 36 for more detail (can go up to 128)
+    question = "Describe the image in detail."
+
+
+    print(f"Processing image : {picture_path}")
     pixel_values = load_image(
-        picture_path, 
+        picture_path,
         input_size=448,  # Keep at 448 (standard tile size)
-        max_num=64       # Increased from 12 to 64 for more tiles
+        max_num=12       # Increased from 12 to 36 for more tiles --> Increased from 12 to 36 for more tiles AFTER TESTING WITH 36 WITH A LOT OF PICTURES WAS OK BUT WITH SOME IT STARTED TO CONSUME 60+ GB RAM+VRAM !!DIPLOMA 
     ).to(torch.bfloat16).to(device)
 
-
+    ############### INFERENCE ###############
     # Generation config
     generation_config = dict(max_new_tokens=8192, do_sample=False)
 
-
     # Use chat method instead of generate
-    question = '<image>\ndescribe this image in detail'
     response = model.chat(tokenizer, pixel_values, question, generation_config)
-    print(response)
+
+    # Return the processed image name and response
+    image_name = os.path.basename(picture_path)
+    print(f"Completed processing for image: {image_name}")
+    
 
     return response
+        
 
-    # Clear GPU memory
-gc.collect()
-torch.cuda.empty_cache()
+"""
+if __name__ == "__main__":
+    import time
+    start_time = time.time()
+    picture_path = ".//data/images/barchart.png"  # Path to a single image
+    model, device = initialize_model()
+    description = inference_internvl3_5_4b_picture_path(model, device, picture_path)
+    print("\n\nFinal Description:")
+    print(description)
+    end_time = time.time()
+    print(f"\n-----------------------------------------------------\n\n Total image processing time: {end_time - start_time:.2f} seconds")
+
+"""
