@@ -358,8 +358,7 @@ def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
     descriptions_dir = os.path.join(output_dir, "image_descriptions")
     merged_dir = os.path.join(output_dir, "final_merged")
 
-    #init model
-    #Only init once  and check if initialized then skip
+    # Only init once and check if initialized then skip
     model, device, tokenizer = initialize_model()
 
     rename_pdf_file_names(input_dir)

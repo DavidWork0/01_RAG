@@ -122,16 +122,15 @@ def inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path
     return response
         
 
-"""
+
 if __name__ == "__main__":
     import time
     start_time = time.time()
     picture_path = ".//data/images/barchart.png"  # Path to a single image
-    model, device = initialize_model()
-    description = inference_internvl3_5_4b_picture_path(model, device, picture_path)
+    model, device, tokenizer = initialize_model()
+    description = inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path)
     print("\n\nFinal Description:")
     print(description)
     end_time = time.time()
     print(f"\n-----------------------------------------------------\n\n Total image processing time: {end_time - start_time:.2f} seconds")
 
-"""
