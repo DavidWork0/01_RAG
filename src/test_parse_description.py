@@ -1,4 +1,4 @@
-from data_handler import merge_text_with_descriptions
+from src.data_pipeline_pdf import merge_text_with_descriptions
 
 # make temporary test function to debugging
 import os
