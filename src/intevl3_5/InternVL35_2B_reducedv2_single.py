@@ -7,7 +7,7 @@ import gc
 import os
 
 
-LOCAL_MODEL_PATH = ".//models/huggingface/InternVL3_5-4B"
+LOCAL_MODEL_PATH = ".//models/huggingface/InternVL3_5-2B"
 
 def initialize_model():
     print ("Init model func")
@@ -30,7 +30,7 @@ def initialize_model():
     return model, device, tokenizer
 
 
-def inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path=None):
+def inference_internvl3_5_2b_picture_path(model, device, tokenizer, picture_path=None):
 
     # Image preprocessing functions
     IMAGENET_MEAN = (0.485, 0.456, 0.406)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     start_time = time.time()
     picture_path = ".//data/images/barchart.png"  # Path to a single image
     model, device, tokenizer = initialize_model()
-    description = inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path)
+    description = inference_internvl3_5_2b_picture_path(model, device, tokenizer, picture_path)
     print("\n\nFinal Description:")
     print(description)
     end_time = time.time()

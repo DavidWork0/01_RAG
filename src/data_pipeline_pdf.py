@@ -5,15 +5,6 @@ This module provides functions to load, preprocess, and save data.
 It supports pdf, jpg, png file formats.
 
 Author: Ats David
-
-Functions:
-- load_data(file_path): Load data from a specified file path.
-- depending on file type, process_data(data, file_type): Preprocess data based on its type (e.g., pdf, jpg, png).
--- extract_text_pictures_tables_from_pdf(pdf_path): Extract content from a PDF file, add signature identifier in the position of the images for later reconstruction with image description (text). return text, images{id, position}, ?tables {dataframe, position}?
-- picture description function for pdf images - describe_image(image_path): Generate a description for an image file.
---Text + text from pictures reconstruction.
-- Create vector database from processed data.
-- save_data(data, file_path): Save processed data to a specified file path
 """
 
 import time
