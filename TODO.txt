@@ -10,8 +10,9 @@ TEXT_MERGING_WITH_IMAGE_TEXT:
 CHUNKING:
 -From txt file fixed length and semantic : 1 chunk_qwen3_0_6B.py
 
-RETRIEVAL:
+RETRIEVAL (híbrig_rag_module_qwen3.py):
 -Needs to be understanded... : 0
+-add more sophisticated keyword score evaluation like TF-IDF (Weighted keyword importance) and Partial matching or fuzzy matching : 0
 
 RERANKING:
 -Needs to be done : 0

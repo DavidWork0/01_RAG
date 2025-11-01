@@ -449,15 +449,15 @@ if __name__ == "__main__":
     try:
         start_time = time.time()
     except:
-        i=1
+        i=1 #do nothing
 
     batch_process_pdfs_complete_workflow(input_dir, output_dir)
 
     try:
         end_time = time.time()
     except:
-        i=1
-    
+        i=1 #do nothing
+
     print(f"Total processing time: {end_time - start_time:.2f} seconds")
 
 

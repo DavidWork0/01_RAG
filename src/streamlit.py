@@ -24,13 +24,14 @@ import time
 import gc
 import re
 
+
+
 # Import the hybrid RAG module
 try:
-    from hybrid_rag_module_generated import HybridRAG
+    from hybrid_rag_module_qwen3 import HybridRAGQwen3_Module
 except ImportError as e:
     st.error(f"Error importing hybrid_rag_module: {e}")
     st.stop()
-
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -41,15 +42,15 @@ DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_10
 
 AVAILABLE_MODELS = [
     "InternVL3_5-2B-Q6_K",
-    "Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL"
+    #"Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL"
 ]
 
 MODEL_CONFIG = {
-    "Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL": {
-        "path": "models/llamacpp/Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL.gguf",
-        "key": "llm_qwen",
-        "n_ctx": 65536
-    },
+    #"Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL": {
+    #    "path": "models/llamacpp/Qwen2.5-VL-7B-Instruct-UD-Q4_K_XL.gguf",
+    #    "key": "llm_qwen",
+    #    "n_ctx": 65536
+    #},
     "InternVL3_5-2B-Q6_K": {
         "path": "models/llamacpp/InternVL3_5-2B-Q6_K.gguf",
         "key": "llm_internvl",
@@ -217,7 +218,7 @@ def get_default_db_path() -> str:
     proj_root = Path(__file__).resolve().parent.parent
     return str(proj_root / DEFAULT_DB_PATH)
 
-def load_rag_system(db_path: str) -> Optional[HybridRAG]:
+def load_rag_system(db_path: str) -> Optional[HybridRAGQwen3_Module]:
     """Load the Hybrid RAG system."""
     try:
         # Convert to absolute path if relative
@@ -238,7 +239,7 @@ def load_rag_system(db_path: str) -> Optional[HybridRAG]:
             return None
         
         with st.spinner("Loading RAG system..."):
-            rag = HybridRAG(
+            rag = HybridRAGQwen3_Module(
                 embedding_model="Qwen/Qwen3-Embedding-0.6B",
                 db_path=db_path_str,
                 device='cuda',
@@ -293,15 +294,23 @@ def generate_llm_response(
     max_tokens: int = 2048
 ) -> str:
     """Generate LLM response using retrieved context and conversation history."""
-    system_message = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base and the conversation history.
+    # if model name is internvl, use special prompt format
+    model_name = st.session_state.llm_loaded
+    if "InternVL" in model_name:
+        """Using InternVL thinking prompt format"""
+        print("Using InternVL thinking prompt format")
+        system_message = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base and the conversation history.
 
-Before providing your final answer, show your reasoning process inside <think></think> tags. Then provide your clear, accurate, and concise answer outside the tags.
+    Before providing your final answer, show your reasoning process inside <think></think> tags. Then provide your clear, accurate, and concise answer outside the tags.
 
-Example format:
-<think>
-Let me analyze the context... The key points are... Therefore...
-</think>
-Based on the analysis, the answer is..."""
+    Example format:
+    <think>
+    Let me analyze the context... The key points are... Therefore...
+    </think>
+    Based on the analysis, the answer is..."""
+    else:
+        print("Using standard prompt format")
+        system_message = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base and the conversation history."""
     
     # Build prompt with conversation history
     prompt = f"<|im_start|>system\n{system_message}<|im_end|>\n"

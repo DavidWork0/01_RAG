@@ -1,36 +1,3 @@
-"""
-Hybrid RAG Module
-=================
-This module provides a programmatic interface for Hybrid RAG (Retrieval-Augmented Generation).
-It returns structured results suitable for LLM consumption and Streamlit dashboards.
-
-Key Features:
-- Query, model, and top_k as input parameters
-- Returns all chunks with complete metadata
-- Designed for integration with LLMs and dashboards
-- Supports multiple embedding models
-- Hybrid search: semantic similarity + keyword matching
-
-Usage:
-    from hybrid_rag_module import HybridRAG
-    
-    rag = HybridRAG(
-        embedding_model="Qwen/Qwen3-Embedding-0.6B",
-        db_path="./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024"
-    )
-    
-    results = rag.search(
-        query="What are mechanical properties?",
-        top_k=10
-    )
-    
-    # Access results
-    for result in results:
-        print(f"Content: {result['content']}")
-        print(f"Source: {result['metadata']['source']}")
-        print(f"Similarity: {result['similarity_score']}")
-"""
-
 import os
 import sys
 from pathlib import Path
@@ -42,10 +9,21 @@ import torch
 import torch.nn.functional as F
 import time
 
+# Database Configuration
+DB_PATH = "./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024" 
+#DB_PATH = "./data/output/chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024"
+COLLECTION_NAME = "documents"
 
-# =============================================================================
-# EMBEDDING FUNCTION
-# =============================================================================
+# Embedding Model Configuration
+EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
+EMBEDDING_DIMENSION = 1024
+MODEL_CACHE_DIR = './models/huggingface'
+
+# Search Configuration
+DEFAULT_TOP_K = 25  # Number of results to retrieve
+SEMANTIC_WEIGHT = 0.75  # Weight for semantic similarity (0-1)
+KEYWORD_WEIGHT = 0.25   # Weight for keyword matching (0-1)
+
 
 class Qwen3EmbeddingFunction(EmbeddingFunction):
     """
@@ -106,12 +84,7 @@ class Qwen3EmbeddingFunction(EmbeddingFunction):
         
         return embeddings.cpu().numpy().tolist()
 
-
-# =============================================================================
-# HYBRID RAG CLASS
-# =============================================================================
-
-class HybridRAG:
+class HybridRAGQwen3_Module:
     """
     Hybrid RAG system that combines semantic search with keyword matching.
     
@@ -186,17 +159,19 @@ class HybridRAG:
         self._print(f"\n Loading embedding model...")
         start_time = time.time()
         
-        # Load tokenizer and model
+        # Load tokenizer and model (offline mode - no internet connection needed)
         tokenizer = AutoTokenizer.from_pretrained(
             self.embedding_model,
             cache_dir=self.model_cache_dir,
-            trust_remote_code=True
+            trust_remote_code=True,
+            local_files_only=True
         )
         
         model = AutoModel.from_pretrained(
             self.embedding_model,
             cache_dir=self.model_cache_dir,
             trust_remote_code=True,
+            local_files_only=True,
             torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32
         ).to(self.device)
         
@@ -249,7 +224,6 @@ class HybridRAG:
                 f"Error loading collection '{self.collection_name}': {str(e)}. "
                 f"Make sure the database was created with a compatible embedding model."
             )
-    
     def _extract_keywords(self, query: str) -> set:
         """
         Extract meaningful keywords from query.
@@ -293,7 +267,6 @@ class HybridRAG:
         doc_words = set(document.lower().split())
         keyword_matches = len(keywords.intersection(doc_words))
         
-
         # Normalize by number of keywords
         return keyword_matches / len(keywords)
     
@@ -324,7 +297,134 @@ class HybridRAG:
         
         return tf  # Returning TF as the score
 
+
+    def _perform_semantic_search(self, query: str, initial_k: int) -> Dict:
+        """
+        Step 1: Perform semantic search on the vector database.
+        
+        Args:
+            query: Search query text
+            initial_k: Number of initial results to retrieve
+            
+        Returns:
+            Dictionary containing semantic search results
+            
+        Raises:
+            RuntimeError: If database query fails
+        """
+        try:
+            semantic_results = self.collection.query(
+                query_texts=[query],
+                n_results=initial_k
+            )
+        except Exception as e:
+            raise RuntimeError(f"Error during database query: {str(e)}")
+        
+        return semantic_results
     
+    def _extract_query_keywords(self, query: str) -> set:
+        """
+        Step 2: Extract keywords from the search query.
+        
+        Args:
+            query: Search query text
+            
+        Returns:
+            Set of extracted keywords
+        """
+        keywords = self._extract_keywords(query)
+        self._print(f"   Keywords: {keywords if keywords else 'none'}")
+        return keywords
+    
+    def _score_and_combine_results(
+        self,
+        semantic_results: Dict,
+        keywords: set
+    ) -> List[Tuple]:
+        """
+        Step 3: Calculate keyword scores and combine with semantic scores.
+        
+        Args:
+            semantic_results: Results from semantic search
+            keywords: Extracted query keywords
+            
+        Returns:
+            List of tuples containing (doc, metadata, distance, keyword_score, combined_score)
+        """
+        scored_results = []
+        
+        for doc, meta, dist in zip(
+            semantic_results['documents'][0],
+            semantic_results['metadatas'][0],
+            semantic_results['distances'][0]
+        ):
+            # Calculate keyword match score
+            keyword_score = self._calculate_keyword_score_simple(doc, keywords)
+            
+            # Combine scores
+            # Note: Lower distance is better, higher keyword match is better
+            combined_score = (self.semantic_weight * dist) - (self.keyword_weight * keyword_score)
+            
+            scored_results.append((doc, meta, dist, keyword_score, combined_score))
+        
+        return scored_results
+    
+    def _rank_and_select_top_results(
+        self,
+        scored_results: List[Tuple],
+        top_k: int
+    ) -> List[Tuple]:
+        """
+        Step 4: Sort results by combined score and select top_k.
+        
+        Args:
+            scored_results: List of scored results
+            top_k: Number of top results to return
+            
+        Returns:
+            List of top_k results sorted by combined score
+        """
+        scored_results.sort(key=lambda x: x[4])  # Sort by combined_score
+        top_results = scored_results[:top_k]
+        return top_results
+    
+    def _format_results_for_output(
+        self,
+        top_results: List[Tuple],
+        return_distances: bool
+    ) -> List[Dict]:
+        """
+        Step 5: Format results into structured output dictionaries.
+        
+        Args:
+            top_results: List of top-ranked results
+            return_distances: Whether to include distance scores
+            
+        Returns:
+            List of formatted result dictionaries
+        """
+        formatted_results = []
+        
+        for rank, (doc, meta, dist, kw_score, comb_score) in enumerate(top_results, 1):
+            # Calculate similarity percentage (lower distance = higher similarity)
+            similarity = max(0, min(100, (1 - dist) * 100))
+            
+            result = {
+                'rank': rank,
+                'content': doc,
+                'metadata': meta,
+                'similarity_score': round(similarity, 2),
+                'keyword_score': round(kw_score, 4),
+                'combined_score': round(comb_score, 4)
+            }
+            
+            if return_distances:
+                result['distance'] = round(dist, 4)
+            
+            formatted_results.append(result)
+        
+        return formatted_results
+
     def search(
         self,
         query: str,
@@ -355,71 +455,30 @@ class HybridRAG:
         if not query or not query.strip():
             raise ValueError("Query cannot be empty")
         
-        self._print(f"\n🔍 Searching for: '{query}'")
+        self._print(f"\n Searching for: '{query}'")
         self._print(f"   Strategy: {int(self.semantic_weight*100)}% semantic + {int(self.keyword_weight*100)}% keyword")
         
         start_time = time.time()
         
-        # Step 1: Get more results initially for re-ranking
+        # Step 1: Perform semantic search
         initial_k = min(top_k * 3, 100)  # Get 3x results but cap at 100
-        
-        try:
-            semantic_results = self.collection.query(
-                query_texts=[query],
-                n_results=initial_k
-            )
-        except Exception as e:
-            raise RuntimeError(f"Error during database query: {str(e)}")
+        semantic_results = self._perform_semantic_search(query, initial_k)
         
         if not semantic_results['documents'][0]:
             self._print("⚠️  No results found in database")
             return []
         
         # Step 2: Extract keywords from query
-        keywords = self._extract_keywords(query)
-        self._print(f"   Keywords: {keywords if keywords else 'none'}")
+        keywords = self._extract_query_keywords(query)
         
         # Step 3: Score and combine results
-        scored_results = []
+        scored_results = self._score_and_combine_results(semantic_results, keywords)
         
-        for doc, meta, dist in zip(
-            semantic_results['documents'][0],
-            semantic_results['metadatas'][0],
-            semantic_results['distances'][0]
-        ):
-            # Calculate keyword match score
-            keyword_score = self._calculate_keyword_score_simple(doc, keywords)
-            
-            # Combine scores
-            # Note: Lower distance is better, higher keyword match is better
-            combined_score = (self.semantic_weight * dist) - (self.keyword_weight * keyword_score)
-            
-            scored_results.append((doc, meta, dist, keyword_score, combined_score))
-        
-        # Step 4: Sort by combined score and select top_k
-        scored_results.sort(key=lambda x: x[4])
-        top_results = scored_results[:top_k]
+        # Step 4: Rank and select top results
+        top_results = self._rank_and_select_top_results(scored_results, top_k)
         
         # Step 5: Format results for output
-        formatted_results = []
-        
-        for rank, (doc, meta, dist, kw_score, comb_score) in enumerate(top_results, 1):
-            # Calculate similarity percentage (lower distance = higher similarity)
-            similarity = max(0, min(100, (1 - dist) * 100))
-            
-            result = {
-                'rank': rank,
-                'content': doc,
-                'metadata': meta,
-                'similarity_score': round(similarity, 2),
-                'keyword_score': round(kw_score, 4),
-                'combined_score': round(comb_score, 4)
-            }
-            
-            if return_distances:
-                result['distance'] = round(dist, 4)
-            
-            formatted_results.append(result)
+        formatted_results = self._format_results_for_output(top_results, return_distances)
         
         elapsed = time.time() - start_time
         self._print(f"✓ Found {len(formatted_results)} results in {elapsed:.2f}s")
@@ -474,17 +533,16 @@ class HybridRAG:
             )
         
         return '\n'.join(context_parts)
-
-
+    
 # =============================================================================
-# CONVENIENCE FUNCTION
+# BELOW FUNCTION TO CREATE RAG SYSTEM and INTERACTIVE MODE when run directly
 # =============================================================================
 
 def create_rag_system(
     embedding_model: str = "Qwen/Qwen3-Embedding-0.6B",
     db_path: str = "./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024",
     **kwargs
-) -> HybridRAG:
+) -> HybridRAGQwen3_Module:
     """
     Convenience function to create a HybridRAG instance.
     
@@ -496,71 +554,67 @@ def create_rag_system(
     Returns:
         Initialized HybridRAG instance
     """
-    return HybridRAG(embedding_model=embedding_model, db_path=db_path, **kwargs)
+    return HybridRAGQwen3_Module(embedding_model=embedding_model, db_path=db_path, **kwargs)
 
 
 # =============================================================================
-# EXAMPLE USAGE (when run as script)
+# MAIN FUNCTION AND INTERACTIVE MODE
 # =============================================================================
 
 def main():
-    """
-    Example usage of the HybridRAG module.
-    """
-    import argparse
-    
-    parser = argparse.ArgumentParser(
-        description='Hybrid RAG Module - Example Usage',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python hybrid_rag_module.py -q "mechanical properties" -k 10
-  python hybrid_rag_module.py -q "study findings" --model "Qwen/Qwen3-Embedding-0.6B"
-  python hybrid_rag_module.py -q "methodology" --db "./data/output/my_db" -k 5
-        """
+    # Initialize the RAG system
+    rag_system = create_rag_system(
+        embedding_model=EMBEDDING_MODEL,
+        db_path=DB_PATH
     )
-    
-    parser.add_argument('-q', '--query', required=True, help='Search query')
-    parser.add_argument('-k', '--topk', type=int, default=25, help='Number of results (default: 25)')
-    parser.add_argument('--model', default="Qwen/Qwen3-Embedding-0.6B", help='Embedding model')
-    parser.add_argument('--db', default="./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024", 
-                       help='Database path')
-    parser.add_argument('--cpu', action='store_true', help='Force CPU usage')
-    parser.add_argument('--quiet', action='store_true', help='Suppress verbose output')
-    
-    args = parser.parse_args()
-    
-    # Create RAG system
-    rag = HybridRAG(
-        embedding_model=args.model,
-        db_path=args.db,
-        device='cpu' if args.cpu else None,
-        verbose=not args.quiet
-    )
-    
-    # Perform search
-    results = rag.search(query=args.query, top_k=args.topk)
-    
-    # Display results
-    print("\n" + "="*80)
-    print(f"SEARCH RESULTS ({len(results)} chunks)")
-    print("="*80 + "\n")
-    
-    for result in results:
-        print(f"[Rank {result['rank']}]")
-        print(f"  Source: {result['metadata']['source']}")
-        print(f"  Chunk: {result['metadata']['chunk_index']}")
-        print(f"  Similarity: {result['similarity_score']}%")
-        print(f"  Keyword Score: {result['keyword_score']}")
-        print(f"  Content Preview: {result['content'][:200]}...")
-        print()
-    
-    # Show LLM-formatted output
-    print("\n" + "="*80)
-    print("LLM-FORMATTED CONTEXT (Top 3)")
-    print("="*80 + "\n")
-    print(rag.format_for_llm(results, max_chunks=3))
 
+    # Start interactive mode
+    interactive_mode(rag_system.collection)
+
+# =============================================================================
+# INTERACTIVE MODE
+# =============================================================================
+
+def interactive_mode(collection):
+    rag_system = create_rag_system(
+        embedding_model=EMBEDDING_MODEL,
+        db_path=DB_PATH
+    )
+    
+    print("\n=== Hybrid RAG Interactive Search ===")
+    print("Type your query and press Enter. Type 'exit' to quit.\n")
+    
+    while True:
+        try:
+            query = input("Enter your search query: ").strip()
+            if query.lower() in {'exit', 'quit'}:
+                print("Exiting interactive mode.")
+                break
+            
+            results = rag_system.hybrid_search(query, top_k=5, return_distances=True)
+            
+            if not results:
+                print("No results found.\n")
+                continue
+            
+            print(f"\nTop {len(results)} results:\n")
+            for res in results:
+                print(f"Rank: {res['rank']}")
+                print(f"Similarity Score: {res['similarity_score']:.2f}%")
+                print(f"Distance: {res.get('distance', 'N/A')}")
+                print(f"Keyword Score: {res['keyword_score']:.4f}")
+                print(f"Combined Score: {res['combined_score']:.4f}")
+                print(f"Source: {res['metadata'].get('source', 'Unknown')}")
+                print(f"Chunk Index: {res['metadata'].get('chunk_index', 'N/A')}")
+                print(f"Content:\n{res['content']}\n")
+                print("-" * 60)
+            
+        except KeyboardInterrupt:
+            print("\nExiting interactive mode.")
+            break
+        except Exception as e:
+            print(f"\n❌ Error: {str(e)}")
+            continue
 
 if __name__ == "__main__":
     main()
