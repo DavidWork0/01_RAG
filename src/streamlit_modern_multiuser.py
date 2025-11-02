@@ -397,6 +397,9 @@ def display_message(message: Dict):
                                 label_visibility="collapsed"
                             )
 
+
+
+
 # =============================================================================
 # MAIN APPLICATION
 # =============================================================================
@@ -444,18 +447,22 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 input_container = st.container()
 
 with input_container:
+    # User input area and send button removed ctrll+enter for simplicity
     user_input = st.text_area(
         "Type your message...",
         value="",
         height=100,
-        placeholder="Ask me anything about your documents...",
+        max_chars=10000,
+        on_change=None,  # "" to reset input after sending but it rolls back to the top of the
+        placeholder="Ask me anything about documents...",
         key="message_input",
+        disabled=False,
         label_visibility="collapsed"
     )
     
     col1, col2 = st.columns([5, 1])
     with col2:
-        send_button = st.button("📤 Send", type="primary", use_container_width=True)
+        send_button = st.button("Send", type="primary", use_container_width=True)
 
 # Handle send button
 if send_button and user_input.strip():
@@ -501,8 +508,8 @@ if send_button and user_input.strip():
             
             # Add warning if no context
             final_answer = parsed_response['answer']
-            if no_relevant_context:
-                final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
+            #if no_relevant_context:
+                #final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
             
             # Add assistant message
             assistant_message = {
@@ -525,6 +532,6 @@ if send_button and user_input.strip():
 st.markdown(f"""
 <div style="text-align: center; padding: 20px; color: #8b949e; font-size: 0.9rem;">
     ✅ {st.session_state.model_name} ready | 💬 {len(st.session_state.chat_history)//2} exchanges | 
-    👤 Session: {st.session_state.session_id[:8]}...
+    👤 Session: {st.session_state.session_id[:]}
 </div>
 """, unsafe_allow_html=True)

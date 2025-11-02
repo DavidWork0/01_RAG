@@ -591,7 +591,7 @@ def interactive_mode(collection):
                 print("Exiting interactive mode.")
                 break
             
-            results = rag_system.hybrid_search(query, top_k=5, return_distances=True)
+            results = rag_system.search(query, top_k=5, return_distances=True)
             
             if not results:
                 print("No results found.\n")
