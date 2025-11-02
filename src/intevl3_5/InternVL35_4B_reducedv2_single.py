@@ -16,7 +16,7 @@ def initialize_model():
 
     model = AutoModel.from_pretrained(
         LOCAL_MODEL_PATH,
-        dtype=torch.bfloat16,  # Changed from 'dtype' to 'torch_dtype'
+        torch_dtype=torch.bfloat16,  # Changed from 'dtype' to 'torch_dtype'
         low_cpu_mem_usage=True,
         use_flash_attn=False,
         trust_remote_code=True

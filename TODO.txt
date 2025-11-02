@@ -1,0 +1,41 @@
+DATA:
+-pdf extraction : 1 data_pipeline_pdf.py
+
+IMAGE_TO_TEXT:
+-InternVL35_2B_reducedv2_single.py and InternVL35_4B_reducedv2_single.py : 1 data_pipeline_pdf.py
+
+TEXT_MERGING_WITH_IMAGE_TEXT:
+-From txt file and with placeholders : 1 data_pipeline_pdf.py
+
+CHUNKING:
+-From txt file fixed length and semantic : 1 chunk_qwen3_0_6B.py
+
+RETRIEVAL (híbrig_rag_module_qwen3.py):
+-Needs to be understanded... : 0
+-add more sophisticated keyword score evaluation like TF-IDF (Weighted keyword importance) and Partial matching or fuzzy matching : 0
+
+RERANKING:
+-Needs to be done : 0
+
+LLM ANSWER GENERATION FROM CHUNKS:
+-Needs to be done : 0
+
+FRONTEND DEVELOPMENT
+-Needs to be done : 0
+
+
+
+-------------------------------------SIDE_ACTIVITIES----------------------------------------
+
+METRICS SYSTEM (meaure times elapsed adding project to neptune AI):
+-Needs to be done : 0
+
+AFTER PDF PARSE TXT CLEARING FROM JUNK:
+-Needs to be done : 0
+-Formula handler : 0
+
+TESTS DEVELOPED FOR src
+-Needs to be done : 0
+
+CHUNK_REFINEMENT:
+-Refine chunks : 0

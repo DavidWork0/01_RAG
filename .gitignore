@@ -401,7 +401,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 dir_to_ignore/
-models
 required_programs
-data/output
-data/pdfs

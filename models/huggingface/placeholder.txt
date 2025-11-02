@@ -1,0 +1,1 @@
+This is a placeholder for git commit folder struct. put your models here in the a folder. The models needs to be the same what the project using.
