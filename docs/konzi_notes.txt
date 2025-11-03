@@ -1,3 +1,0 @@
-- konzultációs napló majd a végén kitöltve Susik Márta feladatlap lepecsételt és (November közepétől lehet zaklatni) majd konzulens is aláírta. Ez a 3 lap kell a fedlap után bescanelve.
--Statisztikai jellemzők a feldolgozott adatról egy leírás (pl. a céges pdf-ek hány %-a tartalmaz barchartot stb.) Jellemző features. Hogy alkalmazás specifikus legyen. Áltlagosan mennyi szöveg dokumentum stb. Várható adattartalomra. Tesztadatkészlet leírása (mennyiség stb jellemzők) Néhány (3-5) 
--Susik Márta céges konzulens cserélése ha az új külső konzulens beleegyezett(Imola bírálat?) -> Bírálat január elejére
