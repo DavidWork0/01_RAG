@@ -403,3 +403,4 @@ FodyWeavers.xsd
 dir_to_ignore/
 required_programs
 models
+docs/konzi_notes.txt
