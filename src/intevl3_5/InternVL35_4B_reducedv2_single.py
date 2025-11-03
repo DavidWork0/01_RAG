@@ -7,7 +7,10 @@ import gc
 import os
 
 
-LOCAL_MODEL_PATH = ".//models/huggingface/InternVL3_5-4B"
+# Get the absolute path to the models directory
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+LOCAL_MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "huggingface", "InternVL3_5-4B")
 
 def initialize_model():
     print ("Init model func")
@@ -126,7 +129,7 @@ def inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path
 if __name__ == "__main__":
     import time
     start_time = time.time()
-    picture_path = ".//data/images/barchart.png"  # Path to a single image
+    picture_path = os.path.join(PROJECT_ROOT, "data", "images", "barchart.png")  # Path to a single image
     model, device, tokenizer = initialize_model()
     description = inference_internvl3_5_4b_picture_path(model, device, tokenizer, picture_path)
     print("\n\nFinal Description:")

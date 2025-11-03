@@ -34,7 +34,11 @@ Currently the POC is done and working. **The performace is below the expected**.
         -
         -
       *OUTPUTS: localhost with inference window
+      
+## Run tests: 
+  $env:PYTHONIOENCODING="utf-8" ; .venv\Scripts\python.exe tests\test_generated.py
 
+## Misc
 ----FOR LATER MODULES---
     **.py:** 
       *INPUTS: 

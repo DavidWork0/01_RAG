@@ -7,6 +7,9 @@ IMAGE_TO_TEXT:
 TEXT_MERGING_WITH_IMAGE_TEXT:
 -From txt file and with placeholders : 1 data_pipeline_pdf.py
 
+Cleaning_txt files(pre_chunking.py):
+-Cleaned common things : 1
+
 CHUNKING:
 -From txt file fixed length and semantic : 1 chunk_qwen3_0_6B.py
 
@@ -31,7 +34,7 @@ METRICS SYSTEM (meaure times elapsed adding project to neptune AI):
 -Needs to be done : 0
 
 AFTER PDF PARSE TXT CLEARING FROM JUNK:
--Needs to be done : 0
+-Needs to be done : 1 (pre_chunking.py)
 -Formula handler : 0
 
 TESTS DEVELOPED FOR src

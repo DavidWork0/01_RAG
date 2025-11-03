@@ -15,7 +15,7 @@ import gc, torch
 from intevl3_5.InternVL35_4B_reducedv2_single import initialize_model, inference_internvl3_5_4b_picture_path
 from typing import List, Dict, Tuple
 
-DUPLICATE_DETECTION_FOR_IMAGES = False  # Set to True to enable duplicate image detection Currently off as it's not reconstructing duplicates correctly
+DUPLICATE_DETECTION_FOR_IMAGES = False  # NOT WORKING Set to True to enable duplicate image detection Currently off as it's not reconstructing duplicates correctly 
 
 
 def extract_text_with_image_placeholders(pdf_path: str, images_folder: str, 
@@ -316,7 +316,7 @@ def detect_duplicate_images(images_folder: str):
         return duplicates
     else:
         print("No duplicate images detected.")
-
+        return {}
 
 def rename_pdf_file_names(input_dir: str):
     """
@@ -433,16 +433,20 @@ if __name__ == "__main__":
 
     import time
 
+    # Get the absolute paths relative to the project root
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+    
     #Clear output directory before running
-    output_dir = "./data/output"
+    output_dir = os.path.join(PROJECT_ROOT, "data", "output")
     if os.path.exists(output_dir):
         import shutil
         shutil.rmtree(output_dir)
         print(f"Cleared existing output directory: {output_dir}")
     # Example usage of the complete workflow
     # Adjust input_dir and output_dir as needed
-    input_dir = "./data/pdfs"
-    output_dir = "./data/output"
+    input_dir = os.path.join(PROJECT_ROOT, "data", "pdfs")
+    output_dir = os.path.join(PROJECT_ROOT, "data", "output")
     
 
     #measure time

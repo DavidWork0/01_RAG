@@ -9,15 +9,20 @@ import torch.nn.functional as F
 import time
 import numpy as np
 
+# Get absolute paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+
 BATCH_SIZE = 20  # Number of chunks to process in each batch 25 for Qwen3-0.6B and >6GB VRAM || 100 for Qwen3-0.6B and 12GB VRAM --> Batch size 20 seems to be the sweetspot for time
 FIXED_SIZE_CHUNK_SIZE = 1000  # Size of each text chunk
 FIXED_SIZE_OVERLAP = 250  # Overlap between chunks
-CHUNK_STRATEGY = "fixed_size"  # fixed_size, by_sentence implemented here
+CHUNK_SIZE_MAX_by_sentence = 1000  # Max size for by_sentence chunking
+CHUNK_STRATEGY = "by_sentence"  # fixed_size, by_sentence implemented here
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B" 
 EMBEDDING_DIMENSION = 1024  # Embedding vector length for Qwen3-Embedding-0.6B model 
-FOLDER_PATH = "./data/output/final_merged"  # Folder containing .txt files
+FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged", "cleaned")  # Folder containing .txt files
 db_type = f"chroma_db_{CHUNK_STRATEGY}_{EMBEDDING_MODEL.replace('/', '_')}_{EMBEDDING_DIMENSION}"
-DB_PATH = f"./data/output/{db_type}"  # Path to store ChromaDB
+DB_PATH = os.path.join(PROJECT_ROOT, "data", "output", db_type)  # Path to store ChromaDB
 
 VERBOSE_MODE = False  # Whether to print detailed logs
 
@@ -70,7 +75,7 @@ def load_text_files(folder_path: str) -> List[Tuple[str, str]]:
     print(f"Loaded {len(documents)} documents")
     return documents
 
-def chunk_text_by_sentence(text: str) -> List[str]:
+def chunk_text_by_sentence(text: str, chunk_size: int) -> List[str]:
     """Split text into chunks based on sentence boundaries."""
     import nltk
     nltk.download('punkt', quiet=True)
@@ -81,7 +86,7 @@ def chunk_text_by_sentence(text: str) -> List[str]:
     current_chunk = ""
     
     for sentence in sentences:
-        if len(current_chunk) + len(sentence) + 1 <= CHUNK_SIZE:
+        if len(current_chunk) + len(sentence) + 1 <= chunk_size:
             current_chunk += " " + sentence if current_chunk else sentence
         else:
             if current_chunk:
@@ -95,6 +100,11 @@ def chunk_text_by_sentence(text: str) -> List[str]:
 
 def chunk_text_fixed_length(text: str, chunk_size: int = FIXED_SIZE_CHUNK_SIZE, overlap: int = FIXED_SIZE_OVERLAP) -> List[str]:
     """Split text into overlapping chunks."""
+    # Validate inputs
+    if overlap >= chunk_size:
+        overlap = chunk_size - 1  # Adjust overlap to be less than chunk_size
+        raise ValueError(f"Overlap ({overlap}) must be less than chunk_size ({chunk_size})")
+        
     chunks = []
     start = 0
     
@@ -108,7 +118,7 @@ def chunk_text_fixed_length(text: str, chunk_size: int = FIXED_SIZE_CHUNK_SIZE, 
 
 def create_embeddings_db(folder_path: str, db_path: str, embedding_fn) -> chromadb.Collection:
     """Process text files and store embeddings in ChromaDB."""
-    print("\n[Creating Embeddings Database]")
+    print(f"\n[Creating Embeddings Database] from folder: {folder_path} to db path: {db_path}")
     
     # Initialize ChromaDB with custom embedding function
     client = chromadb.PersistentClient(path=db_path)
@@ -160,7 +170,7 @@ def chunking_strategy_selector(text: str) -> List[str]:
     if CHUNK_STRATEGY == "fixed_size":
         return chunk_text_fixed_length(text)
     elif CHUNK_STRATEGY == "by_sentence":
-        return chunk_text_by_sentence(text)
+        return chunk_text_by_sentence(text, chunk_size=CHUNK_SIZE_MAX_by_sentence)
     else:
         raise ValueError(f"Unknown chunking strategy: {CHUNK_STRATEGY}")
 
@@ -205,16 +215,6 @@ def run_chunking_and_db_creation():
     print("\n[2/4] Setting up vector database...")
     db_start = time.time()
 
-    """
-    client = chromadb.PersistentClient(path=DB_PATH)
-    # Try to get existing collection or create new one
-    try:
-        collection = client.get_collection(name="documents", embedding_function=embedding_fn)
-        print(f"✓ Loaded existing collection with {collection.count()} chunks")
-    except:
-        print("Creating new collection...")
-        collection = create_embeddings_db(FOLDER_PATH, DB_PATH, embedding_fn)
-    """
     print("Creating new collection...")
     collection = create_embeddings_db(FOLDER_PATH, DB_PATH, embedding_fn)
 
