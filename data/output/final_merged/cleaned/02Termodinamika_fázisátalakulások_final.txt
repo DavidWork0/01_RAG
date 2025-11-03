@@ -1,0 +1,1059 @@
+1.2. Termodinamikai alapok
+
+A termodinamika a fizikai – kémiai folyamatok leírásának egy sajátos módja. A hőenergia-változás
+
+szempontjából vizsgálja a jelenségeket. A folyamatokat szinte mindig kíséri valamilyen energia-
+
+változás, ezek követésével, részletes elemzésével szerezhetünk ismereteket anyagoktól, anyagi
+
+rendszerekről, az azokban lejátszódó folyamatokról.
+
+Az anyagtudomány számára is fontos megismernünk az anyagok termikus viselkedését;
+
+•
+hogyan változnak a tulajdonságaik a hőmérséklet függvényében,
+
+•
+mennyire stabil az anyag az adott körülmények között,
+
+•
+egyensúlyban van-e,
+
+•
+mennyi energiát kell befektetnünk, hogy egy változás végbemenjen (mennyit nyerhetünk, ha
+
+lezajlik), stb.
+
+A termodinamika részletesebb tárgyalása a fizika feladata, itt csak az anyagtudományban használt
+
+fogalmak tisztességes megalapozásához szükséges néhány részletét ismertetjük.
+
+A termodinamika leggyakoribb tárgyalásmódjában az axiomatikus felépítést követi, azaz főtételekre
+
+épül, ezek nem bizonyítandó alaptételek, a továbbiak ebből következnek, levezethetők. Mélyebb
+
+részletezés nélkül:
+
+•
+Az I főtétel az energia-megmaradás törvény kiterjesztése termikus folyamatokra: Egy
+
+rendszer belső energiája két úton változhat: vagy munkát végzünk rajta (mechanikai, kémiai,
+
+elektromos, stb.) vagy hőt közlünk vele.
+
+ΔU = ΔW + ΔQ
+
+Természetesen az előjel változhat, nyerhetünk munkát, elvezethetünk hőt a rendszerből
+
+(megállapodás szerint negatív az előjel, ha a rendszerből távozik energia és pozitív, ha a
+
+rendszer kap).
+
+•
+A II. főtétel a termikus energia sajátos jellegéről szól, arról, hogy ez a részecskék rendezetlen
+
+mozgásából adódik. Ezért nem lehet a hőenergiát 100%-ban átalakítani más energiaformára,
+
+azaz nem lehet ezt az össze-vissza mozgást mind rendezetté tenni és teljes mértékben
+
+hasznosítani. A II. főtételnek sokféle megfogalmazása létezik, az egyik leggyakoribb a
+
+hőerőgépek maximális hatásfokát megadó formula:
+
+
+ =  −
+
+
+ahol T2 és T1 annak a két hőtartálynak a hőmérséklete, amelyben a hőerőgép dolgozik.
+
+•
+A II. főtétel egy másik megfogalmazása definiálja az entrópia fogalmát. Ez szintén a hőenergia
+
+különleges jellegét, a természeti folyamatok irreverzibilitását fejezi ki egy állapothatározó
+
+formájában:
+
+∆	 = ∆
+
+
+ . ∆	 ≥ ∆
+
+
+
+
+Azaz az entrópia a folyamat során mérhető hőmennyiség megváltozásának és a
+
+hőmérsékletnek a hányadosa. Egy reverzibilisen vezetett folyamatban állandó, irreverzibilis
+
+folyamatokban növekszik. Emellett jellemzője, hogy egyensúlyi állapotban maximális.
+
+Állapothatározók
+
+A termodinamikában használt mennyiségeket érdemes csoportosítani extenzív és intenzív
+
+állapothatározókra (paraméterekre).
+
+Extenzív
+Intenzív
+Másodlagos intenzív
+
+Mértéke arányos a rendszer
+
+Mértéke független a rendszer
+
+Extenzív paraméterek tömeg
+
+kiterjedésével
+
+kiterjedésétől
+
+vagy térfogategységre
+
+vonatkoztatott fajlagos értékei
+
+Belső energia
+(U) [joule]
+
+Hőmérséklet
+(T) [K]
+
+Sűrűség
+(ρ) [kg/m3]
+
+Térfogat
+(V) [m3]
+
+Nyomás
+(p) [Pa]
+
+Fajtérfogat
+(1/V) [1/m3]
+
+Anyagmennyiség  (n) [mol]
+
+Kémiai potenciál  (µ) [joule/mol]
+
+Hőtágulási együttható  (α)  [1/K]
+
+Entrópia
+(S) [joule/K]
+
+
+A fenti mennyiségek közül korábbi tanulmányok alapján ismert a V,  n,  T,  p. A többi:
+
+•
+Belső energia: A rendszer energiájának azon része, amely a fizikai-kémiai szerkezetében, a
+
+részecskék mozgási energiájában tárolt (haladó, forgó, rezgő).
+
+ = 
+ 
+
+ahol
+f: a részecskék szabadsági foka,
+k:  Boltzman állandó,
+N: a részecskék száma
+
+•
+Entrópia:
+A II főtételben adott definíció mellett szemléletes a statisztikus fizikai
+
+meghatározás:  A rendszer állapotának valószínűsége (Az adott makroállapot
+
+hányféle mikroállapotból valósítható meg).
+
+=   
+
+ahol
+k:  Boltzman állandó
+és w a termodinamikai valószínűség, ami azt fejezi ki, hogy
+
+egy makroállapot hányféle mikroállapoton keresztül valósulhat meg.
+
+•
+Kémiai potenciál: 1 mól anyag által végezhető hasznos kémiai munka, ha T és p állandó. (Pl.:
+
+ha egy kémiai reakcióban felszabaduló energiát alakítunk át mechanikai vagy villamos
+
+munkává.) ( A később tárgyalandó szabadentalpia 1 mol anyagra vonatkoztatott értéke)
+
+Egyensúly
+
+Az egyensúly az anyagi rendszerek kitüntetett állapota, amelyben az intenzív paraméterek
+
+kiegyenlítődtek, ezáltal az extenzív paraméterek sem változnak. Amennyiben valamely intenzív
+
+állapothatározó nem kiegyenlített, a rendszerben olyan folyamatok indulnak meg (extenzív
+
+mennyiségek áramai), amelyek a rendszert az egyensúly irányába mozdítják. Hőmérséklet-különbség
+
+esetén energia, nyomáskülönbségre térfogat, kémiai potenciál-különbségre komponens transzportja
+
+fog zajlani, míg az egyensúly be nem áll. Ez azt is mutatja, hogy egy rendszerben önként mindig olyan
+
+folyamatok fognak lejátszódni, amik az egyensúly felé mozdítják azt.
+
+Nem szabad elfelejteni, hogy az egyensúly mindig dinamikus, azaz, ha a makroszkópos paraméterek
+
+változatlanok is, molekuláris szinten állandó mozgás, változás van, csak ennek statisztikus eredője
+
+lesz állandó. Ez biztosítja, hogy az egyensúlyban levő rendszerek azonnal képesek reagálni a külvilág
+
+hatásaira. A le-Châtelier - Braun elv mondja ki, ha egy (dinamikus) egyensúlyi rendszerbe
+
+beavatkozunk, a rendszer erre úgy reagál, hogy a külső hatás mértékét csökkentse. Példa lehet erre
+
+kémiából az un. tömeghatás törvény, vagy egy, az olvadásponton levő olvadék-szilárd rendszer. Ha
+
+ebből hőt vonunk el, hőtermelő (exoterm) folyamatot indítunk el, azaz valamennyi olvadék meg fog
+
+szilárdulni és a hőmérséklet (egy darabig) nem fog változni. Természetesen fordítva is igaz,
+
+hőközléssel endoterm folyamat, a szilárd fázis olvadása indul meg. A termodinamikai törvények
+
+univerzális jellegét mutatja, hogy az elektromágneses jelenségek között megismert Lenz törvény is
+
+egyikpéldája a le-Châtelier - Braun elvnek.
+
+Az egyensúly kitüntetett jellegét az is mutatja, hogy az energia jellegű mennyiségeknek minimuma
+
+van egyensúlyban, míg az entrópiának maximuma.
+
+Potenciálfüggvények
+
+A termodinamikai folyamatok energetikai jellemzésére több fogalmat is használnak. A legegyszerűbb
+
+a hőmennyiség (Q) és a kémiai reakciók energiaváltozásainak leírására praktikus entalpia (H).
+
+Mindkettőnek hátránya, hogy megváltozásuk mértéke függ attól is, hogy a rendszer milyen úton
+
+jutott az A állapotából a B-be. (Matematikailag: a Q és a H nem folytonosan differenciálható
+
+függvények)
+
+A potenciálfüggvények, szabadenergia (F) és a szabadentalpia (G) viszont olyanok, hogy ha egy
+
+rendszer eljut A-ból B-be, a szabadenergia változás (ΔF vagy ΔG) egy adott érték, függetlenül attól,
+
+hogyan jutottunk a B állapotba. (Vegyük észre az analógiát: a villamos töltésen végzett munka is csak
+
+attól függ, mekkora a potenciálkülönbség a két pont között és ugyanez a helyzet a gravitációs térben
+
+végzett munkával is.)
+
+A termodinamikai potenciálfüggvények azt az energiát jelentik, amely egy folyamatban maximálisan
+
+átalakítható más energiaformává (mechanikai, villamos, stb.) Definíciószerűen:
+
+•
+Szabadenergia: Egy izoterm, izochor állapotváltozás során nyerhető maximális hasznos
+
+munka
+
+ΔF = ΔU - TΔS
+
+•
+Szabadentalpia: ugyanez izoterm – izobár esetben
+
+ΔG = ΔH – TΔS
+
+Az izobár és izochor változás között annyi a különbség, hogy előző esetben az energia egy része a
+
+térfogati munkavégzésre fordítódik,  W = pΔV.  Ez elsősorban a gáz halmazállapotban lejátszódó
+
+folyamatoknál jelentős. Az anyagtudomány főképp szilárd, néha folyékony anyagokkal foglalkozik,
+
+ezeknél a térfogat-változás elhanyagolható. Ebből az következik, hogy ΔF és ΔG értéke között
+
+gyakorlatilag nincs különbség. A szakirodalom ezért nagyobb részt a szabadenergiát használja minden
+
+folyamatra. Ezt a gyakorlatot követjük ebben a tankönyvben is.
+
+Milyen előnyökkel jár a potenciálfüggvények használata?
+
+•
+Nem kell pontról pontra követni egy folyamatot, ha a kezdeti és végállapotot ismerjük, a
+
+szabadenergia-változás kiszámítható.
+
+•
+Mérhető termodinamikai adatokból (T, p, c, stb.) számíthatók.
+
+•
+Mutatja az egyensúlyt, ahol F vagy G minimuma van, az a rendszer egyensúlyi állapota.
+
+Egyszerre tartalmazza az energiaminimum és az entrópiamaximum elvet.
+
+Egy példa: A kristályhibák tárgyalásánál említettük, hogy a ponthibák száma soha nem nulla, és az
+
+egyensúlyi koncentráció a hőmérséklet függvénye. Ábrázolva a szabadenergiát, megérthető a
+
+jelenség. Minden egyes hibahely létrehozásához munkát kell végeznünk, ezért a belső energia
+
+egyenes arányban nő a hibahelyek számával. Az entrópia tag viszont kezdetben meredeken nő (-1-
+
+szerese csökken), hiszen néhány hibahely is rohamosan növeli a lehetséges mikroállapotok számát,
+
+később a logaritmikus függvény már kevésbé meredek. A kettő eredőjeként a szabadenergia
+
+kezdetben csökken, az  
+
+  egyensúlyi koncentrációnál lesz a minimuma, több ponthiba pedig már
+
+növeli a szabadenergiát.
+
+The image is a graph with a grid background, displaying various labeled regions and points. Here's a detailed description:
+
+1. **Axes**:
+- The horizontal axis is labeled "Xₑₚ" and is translated to "Ponthiba koncentráció," which means "Ponthiba concentration."
+- The vertical axis is labeled "ΔF," with values ranging from -ΔF to +ΔF.
+
+2. **Regions and Labels**:
+- The graph is divided into different regions by curved and straight lines.
+- The region in the upper right is labeled "ΔU."
+- The central region is labeled "ΔF."
+- The lower left region is labeled "-TΔS."
+
+3. **Curved Lines**:
+- There are two curved lines forming a loop around the central region labeled "ΔF."
+- The upper loop is labeled "ΔU."
+- The lower loop is labeled "-TΔS."
+
+4. **Points**:
+- Several black stars are scattered across the grid, possibly indicating specific data points or significant locations on the graph.
+
+5. **Grid**:
+- The background consists of a hexagonal grid pattern, which might represent a specific type of data visualization or model.
+
+Overall, the graph appears to be a scientific or technical diagram, possibly related to thermodynamics or a similar field, given the use of symbols like ΔF, ΔU, and TΔS.
+
+1.3. Fázisátalakulások
+
+Fázisátalakulás alatt a halmazállapot-változásokat továbbá a szilárd állapoton belüli módosulat-
+
+változásokat értjük. Az anyagtudomány számára itt is kiemelt a szilárd fázis, tehát leginkább az
+
+olvadék → szilárd átmenetet vizsgálja. Emellett fontosak az olvadáspont alatti, a kristályszerkezet, és
+
+ezzel sok fizikai, technikai paraméter változásával járó módosulat-változások; pl. a vas-szén
+
+rendszerben a ferrit - ausztenit átalakulások vagy a szilícium-dioxid (SiO2) különböző módosulatai, a
+
+kvarc - krisztobalit – tridimit. Az újabb felületkezelő technológiák gyakori megoldása valamilyen
+
+vákuumtechnikai módon bevonat készítése, amikor közvetlen gáz → szilárd átalakulás játszódik le.
+
+A fázisátalakulásokat két nézőpont szerint fogjuk tárgyalni:
+
+•
+Az egyensúlyi szemléletben azt vizsgáljuk, hogy az adott paraméterek mellett milyen
+
+összetételű fázisok kialakulása várható. Ennek leírására legalkalmasabbak a fázisdiagramok.
+
+•
+A kinetikai (nem-egyensúlyi) tárgyaláskor arra vagyunk kíváncsiak, milyen mechanizmus
+
+szerint alakul ki az új szerkezet, az egyensúlyi állapot mellett milyen egyéb, esetleg
+
+előnyösebb tulajdonságú szerkezet kialakulására van lehetőség, milyen eszközökkel
+
+avatkozhatunk bele a folyamatokba.
+
+1.3.1. Lehűlési görbék
+
+Először azt vizsgáljuk meg, hogy különböző olvadékok lehűlése során hogyan változik a hőmérséklet
+az idő függvényében. Itt nagyon lassú hűtésre gondoljunk, hogy a vizsgált rendszer folyamatosan
+egyensúlyi állapotban legyen, kis hőmérséklet-változás után sok időt hagyva a kiegyenlítődésre.
+
+Az értelmezéshez segítségünkre lesz a Gibbs-féle fázisszabály:
+
+F + SZ = K + 1
+
+•
+F: fázisok száma,
+A fázis olyan - homogén vagy inhomogén - rendszer, amelyen belül
+
+makroszkopikus határfelületek nincsenek.
+
+•
+Sz: szabadsági fokok száma,
+(itt)
+azon
+paraméterek
+száma,
+amelyet
+szabadon
+
+módosíthatunk, anélkül, hogy ettől a fázisok száma megváltozna.
+
+•
+K: komponensek száma,
+A komponens a rendszert alkotó kémiailag egységes
+
+anyagfajta.
+
+Általában K és F adott és ebből tudjuk a rendszer adott egyensúlyi állapotában a szabadsági fokot
+kiszámolni. (Az eredeti összefüggésben K + 2 szerepel a jobb oldalon, ha nem vesszük figyelembe a
+gázfázist, aminek komoly szerepe itt nincs, a K + 1-es változat használható.)
+
+A leggyakrabban tapasztalt lehűlési görbék a következők:
+
+Egykomponensű anyag
+Kétkomponensű, a két anyag
+korlátlanul képez elegykristályt
+
+Kétkomponensű, a két anyag
+egy eutektikus összetételt
+képez
+
+The image is a graph with the vertical axis labeled "Hőmérséklet" (which means "Temperature" in Hungarian) and the horizontal axis labeled "Idő" (which means "Time" in Hungarian). The graph shows a temperature change over time.
+
+- The temperature starts high and decreases sharply, reaching a point labeled \( T_M \).
+- After reaching \( T_M \), the temperature remains constant for a period of time, indicating a plateau.
+- Eventually, the temperature begins to decrease again at a slower rate.
+
+This graph likely represents a cooling process, where the temperature drops quickly initially, stabilizes at a certain temperature (\( T_M \)), and then decreases more gradually over time.
+
+The image is a graph with the vertical axis labeled "Hőmérséklet" (which means "Temperature" in Hungarian) and the horizontal axis labeled "Idő" (which means "Time" in Hungarian). The graph shows a curve that starts at a higher temperature (T_L) and gradually decreases over time, approaching a lower temperature (T_S). There are two horizontal dashed lines: one at T_L and another at T_S. The curve intersects the T_L line and approaches the T_S line asymptotically. The area between the curve and the T_S line is shaded, indicating the temperature difference over time. The dashed line extending from T_L to the right represents a straight decline, contrasting with the gradual slope of the actual temperature decrease shown by the solid curve.
+
+The image is a graph with the title "Hőmérséklet," which is Hungarian for "Temperature." The x-axis is labeled "Idő," meaning "Time." The y-axis represents temperature, with two specific temperature levels marked: "T_L" and "T_E."
+
+The graph shows a temperature curve that starts high at "T_L" and decreases sharply, leveling off at "T_E" for a period of time. After this plateau, the temperature continues to decrease gradually. This suggests a cooling process where the temperature initially drops quickly, stabilizes at a certain level, and then decreases more slowly over time.
+
+Az olvadék a hűlés során eléri a
+TM olvadáspontot, itt addig
+nem változik a hőmérséklet,
+míg
+a
+teljes
+mennyiség
+kikristályosodik.
+Tovább a szilárd anyag lehűlése
+zajlik
+
+Az olvadék eléri a TL likvidusz
+hőmérsékletet. Itt megindul a
+kristályosodás, de a magasabb
+olvadáspontú anyagból több
+válik ki. Ezért folyamatosan
+változik az olvadék összetétele,
+így az olvadáspontja is. A TS
+szolidusz pontban fejeződik be
+a kristályosodás.
+
+A folyamat a TE eutektikus pont
+eléréséig úgy zajlik, mint az
+előzőnél.
+Itt
+az
+olvadék
+összetétele pont olyan amilyen
+összetételben a szilárd fázis is
+ki
+tud
+válni.
+Így
+ez
+a
+hőmérséklet nem változik, míg
+a
+kristályosodás
+be
+nem
+fejeződik.
+
+1.3.2. Fázisdiagramok
+
+Ha ugyanazon anyagpárosítás több különböző összetételével felvesszük a lehűlési görbéket,
+kirajzolódik a rendszer fázisdiagramja. A vízszintes tengelyen az idő helyett az összetételt ábrázolva
+kapjuk a szokásos formát.
+
+The image is a graph with two axes: the vertical axis labeled "Hőmérséklet" (Temperature) and the horizontal axis labeled "Idő" (Time). The graph shows three different curves, each representing a different percentage composition (B %) over time.
+
+1. **Red Dashed Line (0 B %):** This line starts at the top of the graph and decreases sharply, indicating a rapid decrease in temperature over time.
+
+2. **Green Dashed Line (10 B %):** This line starts slightly lower than the red line and decreases more gradually, showing a slower rate of temperature decrease compared to the 0 B % line.
+
+3. **Blue Dashed Line (100 B %):** This line starts at the bottom of the graph and remains relatively flat, indicating that the temperature remains stable over time.
+
+The graph illustrates how the temperature changes over time for different compositions, with higher compositions (like 100 B %) showing less temperature change.
+
+The image is a phase diagram with temperature (Hőmérséklet) on the y-axis and concentration (koncentráció) on the x-axis. The diagram illustrates the phase behavior of a binary mixture as temperature and concentration change.
+
+1. **Phases:**
+- **szilárd (solid):** Located at the bottom of the diagram, this phase is stable at low temperatures and high concentrations.
+- **olvadék (liquid):** This phase is represented by the red line, indicating the liquid region. It is stable at higher temperatures and lower concentrations.
+- **szolidusz (solidus):** This is the line separating the solid and liquid phases, shown in blue.
+- **líkvidusz (liquidus):** This line separates the liquid and solidus phases, shown in red.
+
+2. **Lines and Regions:**
+- The **solidus line** (blue) and **liquidus line** (red) intersect, forming a region labeled "olvadék + szilárd" (liquid + solid), indicating a two-phase region where both liquid and solid coexist.
+- The area above the liquidus line is labeled "olvadék" (liquid), indicating the single-phase liquid region.
+- The area below the solidus line is labeled "szilárd" (solid), indicating the single-phase solid region.
+
+3. **Temperature Levels:**
+- The diagram is divided into regions by horizontal lines labeled T1, T2, T3, T4, and T5, representing different temperature levels.
+
+This phase diagram is typically used to understand the conditions under which a mixture of two components will exist in different phases (solid, liquid, or both).
+
+… ábra
+
+A továbbiakban néhány egyszerűbb eset elemzésével bemutatjuk, milyen információk olvashatók le
+a fázisdiagramokról.
+
+A ….. ábra két komponens korlátlan elegyedését mutatja. Az A függőleges egyenesen A anyagból
+100 %, míg anyagból 0 % van és a B függőleges egyenesen pedig fordítva. A TA és TB pontot
+összekötő két görbe vonal felett folyadék halmazállapotú olvadék (I.) van, alatta pedig szilárd anyag
+(III.), a két vonal között pedig olvadék és szilárd fázis (II.) egymás mellett található. Amelyik vonal
+felett tisztán folyadék halmazállapotú olvadék található, likvidusz (liquidus) vonalnak, és amelyik
+vonal alatt tisztán szilárd anyag van, azt szolidusz (solidus) vonalnak nevezik.
+
+A fázisdiagramon követhetjük a lehűlés menetét. Pl. az A pontban az olvadék hőmérséklete T1, és
+összetétele X1. Ahogy csökken a hőmérséklet, B pontban elérjük a likvidusz görbét. Ekkor jelenik
+meg az első szilárd szemcse. Ebben több lesz a magasabb olvadáspontú A komponens, a pontos
+összetételét úgy kapjuk meg, hogy B pontból egy vízszintest (konódát) húzunk, és ahol ez metszi a
+szolidusz görbét (C pont), az adja meg a szilárd fázis összetételét (X2). Emiatt természetesen meg fog
+változni az olvadék összetétele is, növekszik a B anyag aránya, így viszont az olvadék olvadáspontja
+is csökken, azaz az egész elmozdul a kék nyíl irányába. Így folyamatosan változó összetételű
+olvadékból folyamatosan változó összetételű szilárd fázis válik ki, végül az utolsó csepp olvadék
+tiszta B anyagot tartalmaz, amely a TB hőmérsékleten dermed meg. Ezután már csak a homogén
+szilárd anyag hűl tovább.
+
+Lehűlés közben, ameddig egyensúlyban van szilárd és olvadék fázis, a kivált anyag mennyiségét az
+un. emelőszabállyal határozhatjuk meg. Az X1 összetételű olvadékból indulva T2 hőmérsékleten
+gondoljunk egy kétkarú emelőt a P pontba. Az olvadék tömegét a T2 konóda likvidusz vonallal való
+metszéspontjába, a szilárd anyag tömegét a szolidusszal való metszéspontba képzeljük. A két
+mérlegkar c és d hosszú, az egyensúly feltétele:
+
+= )
+#
+
+é!  ∙# = $%&á(  ∙) á*+é,,: é!
+$%&á(
+
+The image is a phase diagram, which is a graphical representation of the physical states of a substance under different conditions of temperature and concentration. The diagram is divided into several regions, each representing a different phase or state of matter. Here's a detailed description:
+
+1. **Axes**:
+- The vertical axis is labeled "Hőmérséklet" (Temperature) and is marked with temperatures \( T_A, T_1, T_2, T_3, \) and \( T_B \).
+- The horizontal axis is labeled "Koncentráció" (Concentration) and is marked with points \( A, X_2, X_1, \) and \( B \).
+
+2. **Phases**:
+- **Olvasék (Liquidus)**: The top yellow region labeled "olvasék" represents the liquid phase.
+- **Konóda (Solidus)**: The bottom yellow region labeled "szilárd" represents the solid phase.
+- **Lívidusz (Mixture of Liquid and Solid)**: The green region between "olvasék" and "szilárd" represents a mixture of liquid and solid phases.
+- **Szolidusz (Solid Phase)**: The bottom green region labeled "szolidusz" represents a solid solution or alloy.
+
+3. **Lines and Points**:
+- **Lines**:
+- The lines separating the different phases are labeled with temperatures and concentrations. The upper boundary line is the liquidus line, and the lower boundary line is the solidus line.
+- **Points**:
+- **Point A**: Located at the intersection of the liquidus line and the concentration axis.
+- **Point B**: Located on the liquidus line at a specific concentration.
+- **Point C**: Located on the vertical line at concentration \( X_2 \) and temperature \( T_2 \).
+- **Point P**: Located within the liquidus region, marked by a star.
+- **Point D**: Located on the solidus line at concentration \( X_1 \).
+
+4. **Regions**:
+- The diagram is divided into different regions by the lines, each representing a different phase or combination of phases:
+- The region above the liquidus line is entirely liquid.
+- The region below the solidus line is entirely solid.
+- The region between the liquidus and solidus lines is a mixture of liquid and solid.
+
+5. **Arrows and Labels**:
+- An orange vertical arrow from point C to the concentration axis indicates a change in concentration.
+- The diagram includes labels for different phases and critical points, helping to identify the conditions under which each phase exists.
+
+This phase diagram is useful for understanding the conditions under which different phases of a substance coexist and how they transition from one phase to another as temperature and concentration change.
+
+
+… ábra
+
+A gyakorlati fémek közül a réz-nikkel ill. az arany-ezüst ötvözeteknél tapasztalható a korlátlan
+elegyedési képesség a szilárd fázisban.
+
+A következő változatban a komponensek olvadék fázisban korlátlanul elegyednek, szilárd fázisban
+viszont egyáltalán nem. ( ábra) Létezik egy olyan arány, amelynél a két komponens állandó
+összetételben és fix hőmérsékleten kristályosodik, más néven eutektikumot képez. Nézzük a 80% B
+tartalmú olvadékot! Hűtve elérjük a T1 hőmérsékletet az L1 pontban. Ez esetben tiszta B anyag fog
+kiválni, ezáltal az olvadék folyamatosan dúsul az A komponensben, csökken az olvadáspont, a
+rendszer L2-n keresztül tart az E pontba. Amikor elérte, a hőmérséklet-csökkenés megáll, és addig
+nem változik, míg a teljes anyag meg nem szilárdult. A kivált eutektikum a két komponens szemcséit
+tartalmazza állandó összetételben.
+
+The image is a phase diagram and microstructure diagram for a binary eutectic system, specifically for components A and B. Here's a detailed description:
+
+### Phase Diagram:
+1. **Axes:**
+- The x-axis represents the percentage of component B, ranging from 0% to 100%.
+- The y-axis represents temperature, ranging from \( T_A \) to \( T_B \).
+
+2. **Regions:**
+- **Single Phase Regions:**
+- The left side of the diagram (low B content) is labeled "A kristály" (A crystal) and "olvadék" (liquid).
+- The right side of the diagram (high B content) is labeled "B kristály" (B crystal) and "olvadék" (liquid).
+- **Two-Phase Regions:**
+- The central region is labeled "E + olvadék" (E + liquid), indicating a mixture of the eutectic phase (E) and liquid.
+- The top-right region is labeled "B + olvadék" (B + liquid), indicating a mixture of B crystal and liquid.
+- The bottom-left region is labeled "szírda A + B" (spheroid A + B), indicating a mixture of A and B phases.
+
+3. **Lines and Points:**
+- **Eutectic Point (E):**
+- The intersection point of the liquidus and solidus lines, where the eutectic reaction occurs.
+- **Lines:**
+- **Liquidus Line (L1 and L2):** Separates the liquid phase from the solid phases. L1 is the line from the eutectic point to \( T_1 \), and L2 is the line from the eutectic point to \( T_2 \).
+- **Solidus Line:** Separates the solid phases from the liquid phase.
+
+4. **Temperature Levels:**
+- \( T_A \): Temperature at the leftmost point.
+- \( T_1 \) and \( T_2 \): Temperatures at the top of the diagram, with \( T_1 \) being higher than \( T_2 \).
+- \( T_B \): Temperature at the top-right corner.
+
+### Microstructure Diagram:
+1. **Eutectic Microstructure:**
+- Three microstructure images are shown, each representing different compositions of B:
+- **20% B:** The microstructure is labeled "A kristály" (A crystal) and shows a pattern of A crystals.
+- **40% B:** The microstructure is labeled "E + olvadék" (E + liquid) and shows a mixture of eutectic (E) and liquid phases.
+- **80% B:** The microstructure is labeled "B kristály" (B crystal) and shows a pattern of B crystals.
+
+2. **Labels:**
+- "Összetétel:" (Composition): Indicates the percentage of B in each microstructure.
+
+### Additional Information:
+- The diagram includes dashed lines and vertical lines to indicate specific compositions and temperatures.
+- The eutectic isothermal line is labeled "Eutetikus izotherma" (Eutectic isothermal).
+
+This diagram is used to understand the phase transformations and microstructures in a binary eutectic system as a function of composition and temperature.
+
+
+… ábra
+
+The image consists of three micrographs, each showing the microstructure of different metal alloys at various magnifications. Here's a detailed description of each:
+
+1. **Left Micrograph:**
+- **Label:** "Al-13%Si ötvözet, 200x"
+- **Description:** This micrograph shows the microstructure of an aluminum-silicon alloy with 13% silicon content, magnified 200 times. The image displays a pattern of elongated, wavy lines and irregular shapes, indicating the presence of dendrites and possibly secondary phases. The contrast between the lines and the background suggests different phases or grain boundaries within the alloy.
+
+2. **Middle Micrograph:**
+- **Label:** "Al-33%Cu ötvözet, 180x"
+- **Description:** This micrograph depicts the microstructure of an aluminum-copper alloy with 33% copper content, magnified 180 times. The image features a more uniform and parallel arrangement of lines, suggesting a more consistent phase distribution. The regularity of the lines indicates a well-organized crystal structure, possibly due to the presence of a strengthening phase like copper precipitates.
+
+3. **Right Micrograph:**
+- **Label:** "Sn -37%Pb eutectikus ötvözet, 375x"
+- **Description:** This micrograph shows the microstructure of a tin-lead eutectic alloy with 37% lead content, magnified 375 times. The image displays a complex, interwoven pattern of light and dark regions, characteristic of a eutectic structure. The distinct, sharp lines and regions represent the two phases that form simultaneously during the eutectic reaction, typically alpha (Sn) and beta (Pb) phases.
+
+Each micrograph provides insight into the different microstructural features and phase distributions in these metal alloys, influenced by their composition and processing conditions.
+
+
+ábra: Mikroszkópos felvételek eutektikus kristályszerkezetről. Lassú hűtéssel nagyobb
+méretű, jellegzetes alakzatok képződnek.
+a) Az Al mátrixban tűszerű Si kristályok nőttek.
+
+b) Lemezes kristályok, a sötétebb CuAl2, a világosabb Al szilárd oldat lemezek.
+
+c) A sötétebb lemezek az ólomban gazdag szilárd oldatból, a világosabbak tiszta
+
+ónból állnak.
+
+A (számunkra) utolsó változatban annyi az újdonság, hogy a komponensek korlátozottan képesek
+oldani egymást szilárd fázisban is. Ennek következménye, hogy pl. az X4 állapotból indulva, a
+likvidusz görbét elérve un. β fázis válik ki. A görög betűs jelölés azt mutatja, hogy nem tiszta B
+anyagot kaptunk, hanem pár % A tartalmú szilárd oldatot. A fázis összetételét a piros konóda és a
+szolidusz görbe metszéspontja mutatja. Azt is láthatjuk, hogy a β tartomány nem ér le egészen
+
+szobahőmérsékletig, a szilárd oldhatóság csökken alacsonyabb hőmérsékleten, ezért hűlés közben a
+szilárd szemcsékből az A anyag fokozatosan kiszorul, és egy új fázist, kiválásokat képez. Az
+alumínium ötözetekre pl. jellemző a kiválás, ami jó esetben hatékonyan növeli az anyag szilárdságát.
+
+The image is a phase diagram for a silver-copper (Ag-Cu) alloy system, showing the different phases and their compositions at various temperatures. Here's a detailed description:
+
+### Phase Diagram:
+- **Axes:**
+- The x-axis represents the concentration of copper (Cu) in atomic percent (At.%), ranging from 0% (pure Ag) to 100% (pure Cu).
+- The y-axis represents temperature in degrees Celsius (°C), ranging from 200°C to 1200°C.
+
+- **Phases:**
+- **α (Alpha):** A solid solution phase present in the lower left region of the diagram.
+- **β (Beta):** A solid solution phase present in the upper right region of the diagram.
+- **Eutectikum (Eutectic):** The eutectic mixture of α and β phases.
+- **Olvasék (Liquid):** The liquid phase present in the central region of the diagram.
+- **Olvasék + α (Liquid + Alpha):** A region where the liquid phase coexists with the α phase.
+- **Olvasék + β (Liquid + Beta):** A region where the liquid phase coexists with the β phase.
+
+- **Eutectic Point:**
+- The eutectic point is marked at 779°C and approximately 72 At.% Cu. At this point, the liquid phase transforms into a mixture of α and β phases.
+
+- **Regions:**
+- **α Kristályok (α Crystals):** Pure α phase.
+- **β Kristályok (β Crystals):** Pure β phase.
+- **Eutectikus (Eutectic):** Mixture of α and β phases.
+- **Olvasék (Liquid):** Liquid phase.
+- **Olvasék + α (Liquid + α):** Coexistence of liquid and α.
+- **Olvasék + β (Liquid + β):** Coexistence of liquid and β.
+
+### Microstructures at 779°C:
+- **α Phase:**
+- The microstructure shows a fine-grained α phase with no β phase present.
+- **Eutectic:**
+- The microstructure shows a mixture of α and β phases, forming a characteristic eutectic structure.
+- **β Phase:**
+- The microstructure shows a fine-grained β phase with no α phase present.
+- **Eutectic with α and β:**
+- The microstructure shows a mixture of α and β phases, with α surrounding the β phase (eutectic structure).
+
+### Labels:
+- **X1, X2, X3, X4:** These points represent specific compositions along the liquidus and solidus lines.
+- **Szobahőmérőklet (Solidus Line):** The line below which the material is solid.
+- **Olvasék (Liquidus Line):** The line above which the material is liquid.
+
+This phase diagram illustrates the phase transformations and microstructures of the Ag-Cu alloy system at different compositions and temperatures, highlighting the eutectic reaction at 779°C.
+
+
+… ábra: Kétkoponensű rendszer, korlátlan elegyedés olvadék fázisban, korlátozott elegyedés szilárd
+fázisban
+
+The image is a microscopic view of a material, likely a type of composite or concrete, showing a detailed texture. The image is in grayscale, with various shades of black, gray, and white.
+
+Key features in the image include:
+
+1. **Kiválások**: This is Hungarian for "exposures" or "protrusions." These are small, irregularly shaped protrusions scattered throughout the material.
+
+2. **Kiválások a szemcseháttáron**: This translates to "exposures at the grain boundary." This indicates areas where the protrusions are located near the boundaries between different grains or particles in the material.
+
+The scale bar at the bottom left indicates a length of 80 micrometers (µm), providing a sense of the size of the features observed. The overall texture appears rough and heterogeneous, with numerous small particles and irregularities.
+
+
+… ábra: 4% rezet tartalmazó Al ötvözet. A kiválások CuAl2 összetételűek, szilárdító hatásuk főképp
+abban áll, hogy akadályozzák a diszlokációk mozgását.
+
+The image is a diagram of a three-dimensional geometric shape, specifically a polyhedron, with various labeled sections and features. Here's a detailed description:
+
+1. **Vertices and Edges:**
+- The polyhedron has vertices labeled A, B, and C.
+- The edges are marked with numbers indicating their lengths: 1080, 1160, 1190, and 1000.
+
+2. **Faces:**
+- The polyhedron is divided into three main sections:
+- **Kétalkotós eutetrikum** (Two-angled eutetrikum): This section is located at the top and is labeled with the number 1080.
+- **Háromalkotós eutetrikum** (Three-angled eutetrikum): This section is located on the left side and is labeled with the number 1190.
+- **Kétalkotós eutetrikum** (Two-angled eutetrikum): This section is located on the right side and is labeled with the number 1160.
+
+3. **Lines and Angles:**
+- The diagram includes several lines and angles marked with numbers, indicating measurements or divisions within the polyhedron.
+- The lines are drawn to show the relationships between different sections and vertices.
+
+4. **Shading:**
+- The sections are shaded differently to distinguish between the two-angled and three-angled eutetrikums.
+
+5. **Arrows:**
+- There are arrows pointing to specific sections, likely indicating the direction or orientation of the sections.
+
+Overall, the diagram appears to be a technical representation of a polyhedron, possibly used in mathematical or engineering contexts to illustrate specific properties or divisions of the shape.
+
+The image is a phase diagram for a Ba-Ti-O system, showing the temperature and composition dependence of the phases present. The x-axis represents the mole percentage of TiO₂ (from 30% to 90%), and the y-axis represents temperature (from 1200 K to 1800 K).
+
+Key features and phases include:
+
+1. **Ba₂TiO₄ + Liquid Region:**
+- Exists at higher temperatures (~1563 K to ~1860 K).
+- The boundary between Ba₂TiO₄ and liquid ends at ~1600 K.
+
+2. **BaO + Ba₂TiO₄ + Hex. BaTiO₃ Region:**
+- Present at lower temperatures (~1460 K).
+- Hex. BaTiO₃ indicates hexagonal phase of BaTiO₃.
+
+3. **Cubic BaTiO₃ + Liquid Region:**
+- Exists at temperatures from ~1322 K to ~1612 K.
+- The boundary with liquid ends at ~1600 K.
+
+4. **Cubic BaTiO₃ + BaTi₂O₅ Region:**
+- Exists at temperatures from ~1210 K to ~1322 K.
+
+5. **Cubic BaTiO₃ + BaTi₃O₇ Region:**
+- Exists at temperatures from ~1210 K to ~1317 K.
+
+6. **BaTi₂O₅ + BaTi₃O₇ Region:**
+- Exists at temperatures from ~1317 K to ~1357 K.
+
+7. **BaTi₄O₉ + Liquid Region:**
+- Exists at temperatures from ~1357 K to ~1428 K.
+
+8. **BaTi₄O₉ + TiO₂ Region:**
+- Exists at higher temperatures (~1428 K to ~1830 K).
+
+The diagram shows phase boundaries and critical temperatures where phase transitions occur, such as the transition from hexagonal to cubic BaTiO₃. The liquid phase is present across a wide range of compositions and temperatures, particularly near the eutectic point.
+
+ábra: Illusztrációként lássunk két összetettebb fázisdiagramot; az első a ferroelektromos,
+piezoelektromos tulajdonsága miatt fontos bárium-titanát rendszer, a másik pedig egy elvi ábra a
+háromalkotós rendszerek lehetséges ábrázolásáról.
+
+Az interneten számos jó oktató anyag található fázisdiagramokról, és gazdag gyűjtemény két és
+többalkotós rendszerek fázisdiagramjairól. Az előbbiekhez néhány cím:
+
+− http://www.doitpoms.ac.uk/tlplib/phase-diagrams/index.php
+
+− http://www1.asminternational.org/asmenterprise/apd/help/Help.aspx
+
+− http://www.soton.ac.uk/%7Epasr1/index.htm
+
+
+1.3.3. A fázisátalakulások kinetikája
+
+Az eddigi egyensúlyi leírásban nem vettük figyelembe az időt, elvileg minden apró változtatás után
+megvárjuk az egyensúly beálltát, majd újra egy kicsit lépünk, és így tovább. Így megtudhatjuk az adott
+állapotban stabil fázis összetételét, szerkezetét. A kinetikai szemléletben vizsgáljuk a folyamatok
+időbeli lefolyását és az átalakulások mechanizmusát, milyen részlépések során jut el a rendszer egyik
+állapotból a másikba. Ezáltal megismerhetjük a beavatkozás lehetőségeit is, hogy tudjuk befolyásolni
+a termék összetételét, kristályszerkezetét, hogy a kívánt tulajdonságokat jobban megközelítse.
+
+Kövessük hogyan alakul ki a szilárd fázis, ha egy olvadékot hűtünk. A folyadékokban is hatnak az
+atomok molekulák között összetartó erők, ezek bizonyos fokig irányítottak is, de a részecskék
+termikus energiája nagyobb, és ez fenntartja a rendezetlenséget az olvadék fázisban. Ahogy
+közeledünk az olvadásponthoz, kisebb csoportok összeállhatnak és a kristályokra emlékeztető rend
+alakul ki bennük. Ez kis idő múlva felbomlik, de minél közelebb vagyunk az olvadásponthoz, annál
+gyakrabban keletkeznek ilyen kezdemények, és annál tovább fennmaradnak. Az olvadásponton
+egyensúlyban lesznek az összetartó és szétszóró energiák, ez alatt pedig a szilárd fázis a stabilabb.
+Ahhoz hogy a kristályos fázis kialakuljon, két egymást követő lépésnek kell lejátszódni:
+
+•
+kristálymagok keletkeznek, amelyek a későbbi szilárd fázis kiindulópontjai
+
+•
+a szemcsék növekednek.
+
+E két folyamat egymáshoz való viszonya határozza meg a kristálytextúrát; ha könnyű, gyors a
+magképződés, és ehhez képest lassú a növekedés, finomkristályos szerkezet alakul ki, és minél
+nehézkesebb a csíraképződés, annál inkább nagyobb, durvább szemcsék keletkeznek. A kettő közül a
+magképződés az, amit a körülmények változtatásával jobban tudunk befolyásolni, a gyakorlatban is
+inkább ezt használják. Kétféle módon keletkezhetnek kristálykezdemények:
+
+•
+homogén magképződés: a csíra az olvadék saját anyagából, annak bármely pontján azonos
+
+valószínűséggel alakul ki, úgy, ahogy az előző bekezdésben leírtuk.
+
+•
+heterogén magképződés: az olvadásponton már létezik valamilyen kristályosodási góc,
+
+általában idegen anyagból, de lehet akár az edény fala is. Ezzel kiküszöbölhető a homogén
+
+magképződés esetlegessége, nehezen szabályozható volta. A bevitt magok mennyisége
+
+szabályozható, így elég pontosan beállítható az átlagos krisztallit-méret, esetleg az alakjuk is.
+
+Nézzük meg a szabadenergia változását a homogén magképződés során! Tekintsük gömb alakúnak a
+részecskéket. Ahogy egy mag kialakul, az már szilárd, rendezett fázis, amelynek kisebb a
+szabadenergiája, mégpedig a térfogatával arányosan:
+
+∆. = − ∆./  ∙
+01
+2 32
+
+ahol ∆./ az egységnyi térfogatú új fázis kialakulásakor felszabaduló energia. Ugyanekkor azonban új
+határfelület is keletkezik, ami növeli a rendszer szabadenergiáját:
+
+∆. =  4 4637
+
+ahol γ a felületi feszültség. Ha ábrázoljuk ∆F-et a magsugár függvényében, a ….. ábrát kapjuk. Mint
+látjuk, kezdetben a négyzetes függvény meredekebb, így a szemcse növekedése növeli a rendszer
+szabadenergiáját, tehát önként inkább az ellenkező folyamat, azaz a visszaoldódás játszódik le. Ha a
+szemcse mégis eléri az r* kritikus méretet, a függvény menete megfordul, és innen már a további
+növekedés a valószínűbb. Nyilván minél kisebb r*, annál könnyebb (homogén) gócokat létrehozni, és
+valószínűbb a finomkristályos textúra, és fordítva; minél nagyobb r*, annál durvább szemcséjű,
+esetleg egykristályos szerkezetet tudunk létrehozni.
+
+The image is a graph showing the relationship between the Gibbs free energy change (ΔF) and the radius (r) of a system, likely related to the formation and dissolution of crystals. The graph has several curves and annotations in Hungarian:
+
+1. **Axes:**
+- The vertical axis is labeled "Szabadenergia változása ΔF" which translates to "Change in Gibbs free energy ΔF."
+- The horizontal axis is labeled "sugar, r" which translates to "radius, r."
+
+2. **Curves:**
+- **Blue Curve (Térfogati energia, ΔF ∼ r³):** This curve represents the volume energy, with ΔF proportional to r³. It dips below zero, indicating a region where the system is more stable.
+- **Green Curve (Eredő ΔF):** This curve represents the effective ΔF, showing a general trend that increases with radius after a minimum.
+- **Red Dashed Curve (Felületi energia, ΔF = 4πγr):** This curve represents surface energy, with ΔF proportional to the surface area (4πγr). It increases linearly with radius.
+
+3. **Annotations:**
+- **ΔF = 4πγr:** This annotation indicates the surface energy term.
+- **Kristályszemcse visszaoladás:** This label is near the blue curve, indicating the dissolution of a crystalline system.
+- **Kristályszemcse növekedés:** This label is near the green curve, indicating the growth of a crystalline system.
+
+4. **Dashed Vertical Line:**
+- A vertical dashed line intersects the curves at various points, possibly indicating a critical radius or specific condition where phase transitions occur.
+
+The graph illustrates how different energy contributions (volume and surface) affect the stability and growth of crystalline structures as a function of size.
+
+
+ábra: A kritikus szemcseméret értelmezése homogén magképződés esetén.
+
+A kritikus szemcseméretet a fenti egyenletek felhasználásával a következőképpen számíthatjuk:
+
+T
+L
+
+T
+r
+E
+∆
+=
+∗
+γ
+2
+
+
+ahol TE az egyensúlyi olvadáspont, L az olvadáshő és ΔT a túlhűtés.
+
+A túlhűtés az az állapot, amikor az olvadáspont alá hűl a rendszer, anélkül, hogy megindulna a
+
+kristályosodás. Elsősorban a homogén magképződés nehézkessége miatt történhet meg. Ahogy
+
+keletkezik valamennyi kristálycsíra, ezek növekedése nagyon gyors lesz, a rendszer a kristályosodási
+
+hő hatására felmelegszik az olvadáspontra és innen folytatódhat a megszilárdulás.
+
+Többkomponensű rendszerekben még a diffúzió szerepe is fontos lesz, hiszen az olvadék és a szilárd
+fázis összetétele különbözik, az épp kiválni szándékozó részecske lehet, hogy nem a fázishatáron van,
+előbb oda kell szállítani.
+
+A technológiai gyakorlat túlnyomó többségében heterogén rnagképződést alkalmaznak, mert
+pontosabban kézben tartható a folyamat. Az egykristály gyártástól eltekintve leggyakrabban apró
+szemcsés, kisméretű krisztallitokból álló anyagot kell előállítani. A nagy magképződési gyakoriságot
+kis mennyiségű ötvöző (mineralizátor) hozzáadásával biztosítják. Ezek válnak ki először az olvadékból,
+kisebb felületi feszültségű határréteget hoznak létre. Összességében megkönnyítik az új fázis
+kialakulását. Nem kívánt kristályosodási góc lehet az anyagban levő szennyezés is.
+
+Speciális, de gyakori esete a heterogén magképződésnek, amikor az edény fala a kristályosodás
+kiindulópontja. Ezt könnyíti, hogy a hűtés is a falon keresztül történik. A felület állapotától és a hűtés
+intenzitásától függően befolyásolhatjuk a kiváló réteg szerkezetét, tapadását. A félvezető
+technológiában alkalmazott un. epitaxiális kristálynövesztés is hasonló fali reakció, de itt a cél az alap-
+egykristály szerkezetének folytatása az új réteg(ek)ben.
+
+A fenti gondolatmenetben mindig olvadékból keletkező szilárd fázisokról beszéltünk, de minimális
+módosításokkal igaz a leírás az oldatból kiváló kristályokra is. A modern technológiában gyakori és
+fontos a vákuumtechnikai úton, gázfázisból leválasztott szilárd rétegek előállítása, de ennek
+mechanizmusát, sajátosságait itt nem tárgyaljuk.
+
+A sokféle feltétel hatására igen változatos formában tudnak az anyagok kikristályosodni, ennek
+különösen az ásványok körében találunk szép példáit. A sok internetes forrásból egy:
+
+http://en.wikipedia.org/wiki/Crystal_habit  Az anyagtudomány feladata, hogy a kívánt tulajdonságok
+
+elérésére a megfelelő kristálytextúrát alakítsa ki, ismerve a fontos paramétereket, mint a hűtés,
+
+túlhűtés, segédanyagok, stb.
+
+Egykristályok előállítása
+
+A mai csúcstechnológia több területen igényel olyan hibátlan anyagokat, amelyekben nincsenek
+krisztallithatárok, sőt a félvezetőkben még a diszlokációk jelenléte is káros. Ezért egykristálys
+anyagokat készítenek pl:
+
+•
+Nikkel szuperötvözetből turbinalapátoknak, amelyek szilárdsága, hőtűrése, élettartama nagyobb
+
+•
+Optikai, fotonikai anyagokból, pl. lézerek, nemlineáris optikai elemek, zafír
+
+•
+Félvezető alapanyagokból (Si, GaAs, stb.), mert a szemcsehatárokon másképp viselkedne az
+
+anyag, mint a szabályos kristályban, és ez a kis méret miatt már nagy hibát okozna.
+
+The image shows a large, clear glass bottle with a decorative design. The bottle has a bulbous body with a textured pattern that resembles waves or ripples, giving it an artistic appearance. The top of the bottle is narrower and tapers into a spout, which is typical for a carboy or a similar type of container used for storing liquids. The bottle is placed on a table, and in the background, there is a room with wooden doors and some signage, including an exit sign. The setting appears to be indoors, possibly in a public or institutional building.
+
+
+… ábra:  Zafír egykristály, szeletelés, polírozás után teljesítmény LED hordozója készül belőle.
+
+Az egykristály húzásra az anyagoktól függően több eljárást dolgoztak ki. Mindegyiknek alapja, hogy
+meg kell akadályozni a magképződést, ennek feltétele a hőmérséklet nagyon pontos beállítása és
+megtartása a húzás teljes idejében. A szilíciumot az un. Czochralski (CZ) eljárással készítik. Egy kvarc
+tégelyben melegítik az nagytisztaságú anyagot. Amikor stabilizálódott a hőmérséklet (op: 1414°C)
+felülről egy magkristályt érintenek a felszínhez (heterogén magképződés), majd ezt lassan emelik. A
+
+ránőtt kristály követi a mag szerkezetét és orientációját. Először vékony szál nő, ebben még eleinte
+lehetnek diszlokációk, később már az sem. Tovább lassítva a húzást a szál megvastagodik, és több
+órai munkával kb. 2 m magas és 300 mm vastag rúd készíthető. A szimmetrikus hőeloszlás és forma
+érdekében a húzógépet és a tégelyt is forgatják, természetesen ellentétes irányban.
+
+
+The image is a labeled diagram of a glass-blowing furnace, commonly used in glass manufacturing. Here's a detailed description of the components:
+
+1. **Mag**: This is the main body of the furnace, typically made of heat-resistant materials to withstand high temperatures.
+
+2. **Si egykristály**: This refers to a single-crystal silicon component, which might be used for specific thermal or electrical functions within the furnace.
+
+3. **Kvarc tégel**: This is a quartz furnace wall, known for its high-temperature resistance and low thermal expansion.
+
+4. **Vizhúzódésses kámpra**: This is a chamber designed for the introduction of water, likely for cooling purposes.
+
+5. **Hosszszáverő**: This is a long shaft or rod, possibly used for manipulating the glass inside the furnace.
+
+6. **Szén fútőelem**: This is a carbon heating element, used to generate heat within the furnace.
+
+7. **Grafit tégel**: This is a graphite furnace wall, known for its high-temperature resistance and electrical conductivity.
+
+8. **Tégelytartó**: This is a support for the furnace tube, ensuring stability and alignment.
+
+9. **Cseppfögő**: This is a condenser or dropper, possibly used to cool and condense gases or vapors.
+
+10. **Elektroda**: This is an electrode, likely used for electrical heating or other electrical functions within the furnace.
+
+The diagram illustrates the internal structure and components of a glass-blowing furnace, highlighting the materials and parts used for high-temperature operations.
+
+
+… ábra: a Czochralski egykristály húzó berendezés.
+
+Kérdések, problémák, feladatok:
+
+1.
+Mi a dinamikus egyensúly?
+
+2.
+Melyek a potenciálfüggvények? Melyek a fő jellemző tulajdonságaik?
+
+3.
+Mit jelent az, hogy egyensúlyi fázisdiagramot ábrázolunk?
+
+4.
+A mellékelt fázisdiagram az Al – Si rendszert
+
+mutatja. Kövesse végig, hogy történik a szilárd
+
+fázisok kialakulása,ha az A, B, C pontoknak
+
+megfelelő állapotról indulunk ki és hűtjük a
+
+rendszert! Hol lehet a kiválásos keményítés
+
+tartománya?
+
+5.
+Rajzoljon egy fázisdiagramot, ahol a két
+
+The image is a phase diagram that illustrates the relationship between aluminum (Al) and silicon (Si) at different temperatures, specifically at 400°C and 1400°C. The x-axis represents the composition of the alloy, ranging from 100% Al to 100% Si, with intermediate values like 50% and 75% marked. The y-axis represents temperature, ranging from 400°C to 1400°C.
+
+The diagram includes three distinct regions labeled A, B, and C:
+
+1. **Region A**: This is located at the lower left corner of the diagram, near the 400°C temperature line. It represents a two-phase region where aluminum and a compound (likely aluminum silicide) coexist. The boundary between these phases is marked by a line that slopes upwards as it moves from left to right.
+
+2. **Region B**: This is the middle region, marked by a vertical dashed line at approximately 50% Si. It represents a single-phase region where the alloy exists in a liquid or solid solution state between 400°C and 1400°C.
+
+3. **Region C**: This is the upper right region, marked by a vertical dashed line at approximately 75% Si. Similar to Region B, it represents a single-phase region but at higher temperatures closer to 1400°C.
+
+The phase boundaries are indicated by solid lines, showing the conditions under which different phases coexist. The diagram helps in understanding the thermal behavior and phase stability of Al-Si alloys at various compositions and temperatures.
+
+komponens egy A3B összetételű vegyületet
+
+alkot, és két eutektikus összetétel is létezik!
+
+6.
+Milyen tényezőkkel tudjuk egy olvadékból megszilárduló fém kristálytextúráját befolyásolni?
+
+7.
+Keressen az interneten példákat: milyen egykristályos anyagokat használnak az elektronikában,
+
+fotonikában? Mi az előnye az egykristályosnak a polikristályoshoz képest?
+
+8.
+Az autókatalizátorokban oxigén érzékelőként stabilizált ZrO2-t használnak. Mi ez, mit kell
+
+stabilizálni, hogy történik ez? Olvasson utána!
