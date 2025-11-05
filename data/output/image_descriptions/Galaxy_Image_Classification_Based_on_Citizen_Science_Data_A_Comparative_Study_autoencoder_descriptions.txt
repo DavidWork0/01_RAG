@@ -1,0 +1,255 @@
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0000_img000]
+The image is a logo for "IEEE Access." The text is in two colors: "IEEE" is in dark blue, and "Access" is in light blue. Below the main text, there are three descriptors separated by bullet points: "Multidisciplinary," "Rapid Review," and "Open Access Journal." The font is bold and modern, and there is a registered trademark symbol (®) next to "Access." The overall design is clean and professional.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0001_img001]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0002_img002]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0003_img003]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0003_img004]
+The image is a diagram of an autoencoder neural network, which is used for dimensionality reduction and feature learning. The diagram is divided into two main parts: the encoder and the decoder.
+
+### Encoder:
+1. **Input Image**: The left side of the diagram shows the input image, represented by a column of black circles.
+2. **Hidden Layer (1)**: The input image is passed through a dense layer with 1024 neurons.
+3. **Hidden Layer (2)**: The output from the first hidden layer is then passed through another dense layer with 512 neurons.
+4. **Encoding**: The output from the second hidden layer is compressed into 256 features, represented by a column of red circles. This is the bottleneck layer of the network.
+
+### Decoder:
+1. **Dense Connections**: The 256 features are then passed through a series of dense layers, each with a number of neurons that increase as the data is reconstructed.
+2. **Output**: The final output is a reconstructed version of the input image, represented by a column of gray circles.
+
+### Key Features:
+- **Dense Connections**: The diagram shows dense connections between layers, meaning each neuron in one layer is connected to every neuron in the next layer.
+- **Encoding**: The process of compressing the input image into 256 features is highlighted in the center of the diagram.
+- **Reconstruction**: The decoder's role is to reconstruct the input image from the 256 features.
+
+This autoencoder architecture is commonly used for tasks such as image compression, denoising, and feature learning.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0004_img005]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0004_img006]
+The image is a diagram of a Convolutional Autoencoder, which is a type of neural network used for unsupervised learning of efficient codings of input data. The diagram is divided into two main parts: the Encoder and the Decoder.
+
+### Encoder:
+1. **Input Image (RGB):** The process begins with an input image represented in RGB (Red, Green, Blue) format.
+2. **Convolution Layer:** The input image passes through a convolution layer with 16 kernels, each of size 3x3. This operation helps in extracting features from the input image.
+3. **Max Pooling Layer:** Following the convolution layer, a max pooling operation with a 2x2 window is applied. This reduces the spatial dimensions (width and height) of the feature maps, helping to make the representation more robust to translations.
+4. **Second Convolution Layer:** The output from the first max pooling layer is then passed through another convolution layer with 8 kernels, each of size 3x3.
+5. **Second Max Pooling Layer:** Another max pooling operation with a 2x2 window is applied, further reducing the spatial dimensions.
+
+### Flattening and Reshaping:
+- The output from the second max pooling layer is flattened into a 1D vector.
+- This flattened vector is then reshaped to prepare it for the decoder.
+
+### Decoder:
+1. **First Convolution Layer:** The reshaped vector is passed through the first convolution layer in the decoder, which has 8 kernels of size 3x3.
+2. **First Max Pooling Layer:** A max pooling operation with a 2x2 window is applied.
+3. **Second Convolution Layer:** The output is then passed through another convolution layer with 16 kernels, each of size 3x3.
+4. **Second Max Pooling Layer:** Another max pooling operation with a 2x2 window is applied.
+
+### Output:
+- The final output is the reconstructed input image. The decoder essentially reverses the operations of the encoder to reconstruct the original input image from the encoded representation.
+
+### Summary:
+The diagram illustrates the flow of data through a Convolutional Autoencoder, showing how the input image is transformed through convolution and pooling layers in the encoder, flattened, and then reconstructed back to the original image through similar operations in the decoder. This process is used for tasks like image denoising, compression, and feature learning.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0005_img007]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0005_img008]
+The image is a diagram of a Convolutional Neural Network (CNN) architecture, illustrating the flow of data through various layers. Here's a detailed description:
+
+1. **Input Image**: 
+   - On the left, there is an input image, which is a small, grayscale image with a bright spot in the center.
+
+2. **Convolutional Layer (C1)**:
+   - The input image is passed through a Convolutional layer labeled "C1" with 16 kernels (filters) of size 3x3.
+   - This layer produces 16 feature maps, each highlighting different features in the input image.
+
+3. **Pooling Layer (P1)**:
+   - The output from the Convolutional layer is then passed through a Pooling layer labeled "P1" with a 2x2 window.
+   - The Pooling operation reduces the spatial dimensions of the feature maps, retaining the most important information.
+
+4. **Convolutional Layer (C2)**:
+   - The pooled feature maps are then fed into another Convolutional layer labeled "C2" with 8 kernels of size 3x3.
+   - This layer produces 8 feature maps, capturing more abstract features.
+
+5. **Pooling Layer (P2)**:
+   - The output from the second Convolutional layer is passed through a second Pooling layer labeled "P2" with a 2x2 window.
+   - This further reduces the spatial dimensions of the feature maps.
+
+6. **Convolutional Layer (C3)**:
+   - The pooled feature maps are then passed through a third Convolutional layer labeled "C3" with 8 kernels of size 3x3.
+   - This layer produces 8 feature maps.
+
+7. **Pooling Layer (P3)**:
+   - The output from the third Convolutional layer is passed through a third Pooling layer labeled "P3" with a 2x2 window.
+   - This further reduces the spatial dimensions.
+
+8. **Dense Layers (D1 and D2)**:
+   - The final pooled feature maps are flattened and passed through two Dense layers.
+   - The first Dense layer (D1) has 256 neurons.
+   - The output from D1 is then passed through a second Dense layer (D2) with 128 neurons.
+
+9. **Output Layer**:
+   - The final output from the Dense layer is passed to the Output layer, which produces the final prediction.
+
+The diagram uses red arrows to show the flow of data through the network, and the feature maps are represented as a series of stacked, rectangular blocks. The dense layers are depicted as fully connected layers, with the final output layer shown as a single, vertical block.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0006_img009]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img010]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img011]
+The image appears to be a depiction of a galaxy, likely taken by a space telescope. At the center, there is a bright, glowing core, which is the most luminous part of the image. Surrounding the core is a faint, diffuse halo that gradually fades into the surrounding space. The halo has a somewhat elliptical shape, with a concentration of stars and possibly gas and dust. The background is dark, filled with numerous small, faint points of light, representing distant stars. The overall appearance suggests a spiral or elliptical galaxy, with the central core being the focal point.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img012]
+The image appears to be a blurred photograph of a bright light source, possibly a star or a planet, set against a dark background. The light source is central and emits a soft glow with a gradient of colors, transitioning from yellow at the center to green and then to a reddish hue. Surrounding the central light are faint, out-of-focus points of light, which could be other stars or celestial objects. The overall effect is a bokeh effect, where the background is dark and the light sources are diffused, creating a dreamy, ethereal appearance.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img013]
+The image appears to be a blurred photograph of a celestial object, likely a star or galaxy, with a bright central region. The central area is glowing with a mix of yellow and green hues, suggesting it might be a star with a halo or a galaxy with a bright core. To the right, there is a smaller, more distinct blue-white light, possibly another star or a planet. The background is dark, typical of space imagery, with some indistinct green and brownish areas, which might be due to the camera's exposure or the presence of other celestial objects. The overall effect is a mix of colors and light, creating a vibrant yet blurry scene.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img014]
+The image shows a galaxy with a bright central core, surrounded by a faint, diffuse halo. The core appears to be emitting a significant amount of light, creating a glowing effect. The halo has a somewhat elliptical shape, with a gradient that fades into the surrounding dark space. The overall appearance is reminiscent of a lenticular galaxy, which has a central core and a prominent halo or disk. The background is mostly dark, indicating that the galaxy is set against the vastness of space.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img015]
+The image depicts a galaxy with a distinct spiral structure. The galaxy has a bright central core, from which the spiral arms extend outward. The arms are fainter as they move away from the center, creating a gradient of brightness. The overall shape is elongated, resembling a pinwheel. The background is dark, typical of a space image, with scattered stars visible around the galaxy. The colors range from yellow and white at the center to blue and purple in the outer regions of the spiral arms.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img016]
+The image depicts a view of the night sky, featuring a prominent galaxy at the center. This galaxy has a bright core with a spiral structure, typical of a spiral galaxy. Surrounding the galaxy are several smaller stars and celestial objects, some of which appear to be stars or other galaxies. The background is dark, filled with numerous faint stars, creating a sense of depth and vastness in space. The colors range from blues and whites in the galaxy to yellows and reds in the nearby stars, adding to the visual interest of the scene.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img017]
+The image appears to be a grayscale or black-and-white photograph. It features a central bright spot that gradually fades into a darker surrounding area. The bright spot is somewhat circular and has a soft, diffused glow, creating a halo effect around it. The rest of the image is predominantly dark, with the transition from the bright center to the dark periphery being smooth and gradual. The overall appearance is reminiscent of a light source or a lens flare effect.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img018]
+The image appears to be a grayscale or black-and-white photograph. It features a central bright spot that gradually fades into a darker surrounding area. The bright spot is somewhat circular and has a soft, diffused edge, creating a halo effect around it. The rest of the image is predominantly dark, with no other discernible features or objects present. The overall appearance is simple and minimalistic, with a focus on the central light source.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img019]
+The image appears to be a grayscale or black-and-white photograph. It features a central bright spot that gradually fades into a darker surrounding area. The bright spot is somewhat circular and has a soft, diffused edge, creating a halo effect. The overall appearance is reminiscent of a light source or a lens flare, with the brightness decreasing as it moves outward. The background is predominantly dark, which makes the central bright area stand out more prominently.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img020]
+The image appears to be a grayscale or black-and-white photograph. It features a central, bright, circular area that gradually fades into a darker surrounding. The central bright spot is somewhat diffuse, creating a halo effect that diminishes in intensity as it moves outward. The overall appearance is reminiscent of a light source or lens flare, with the brightness concentrated in the middle and decreasing towards the edges. The background is predominantly dark, enhancing the contrast with the central light area.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img021]
+The image appears to be a blurred or out-of-focus photograph. It features a faint, elongated, and somewhat oval-shaped light area in the center, surrounded by a dark background. The light area has a gradient, becoming lighter in the middle and gradually fading into the surrounding darkness. The overall appearance is soft and lacks sharp definition, making it difficult to discern specific details or objects within the image.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img022]
+The image appears to be a grayscale or black-and-white photograph with a central, slightly blurred, bright spot. The background is predominantly dark, creating a stark contrast with the central light area. The bright spot has a soft, diffuse edge, suggesting it might be a light source or a reflection. The overall appearance is somewhat abstract, with no distinct shapes or objects discernible beyond the central light. The image has a dreamy or ethereal quality due to the lack of sharpness and the contrast between the light and dark areas.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img023]
+The image appears to be a blurry, low-resolution photograph. It features a central, somewhat circular light source that is out of focus, creating a soft, glowing effect. The background is predominantly dark, with some indistinct shapes or areas of lighter coloration around the central light. The overall appearance is hazy, making it difficult to discern specific details or objects within the image. The edges of the image are framed by a dark border, which adds to the vignette effect, drawing attention to the central light.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img024]
+The image appears to be a blurry, low-resolution photograph. The central focus is a light source, possibly a lamp or a window, which is out of focus, creating a soft, glowing effect. The surrounding area is dark, making it difficult to discern specific details. There are some indistinct shapes or objects on the right side, but they are not clearly visible due to the blur and low lighting. The overall impression is that of a dimly lit room with a central light source.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img025]
+The image appears to be a blurry photograph with a dimly lit scene. There is a central light source that is out of focus, creating a soft, glowing effect. To the right, there is another, smaller light source that is also blurred. The background is dark, making the light sources stand out. The overall effect is hazy and indistinct, suggesting a low-light environment or a scene with motion blur.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img026]
+The image appears to be a blurry and low-resolution photograph. It shows a light-colored, oval-shaped object against a dark background. The object is indistinct, making it difficult to identify its exact nature. The overall appearance is somewhat abstract due to the lack of clarity and focus.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img027]
+The image appears to be a blurry and low-resolution photograph. It shows a horizontal, elongated object that is light-colored, possibly white or light gray, against a dark background. The object seems to be slightly curved or angled, and it's difficult to make out any specific details due to the blurriness. The overall scene is dimly lit, making it challenging to discern additional features or context.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0007_img028]
+The image appears to be a blurry photograph of a celestial scene, likely taken through a telescope or binoculars. The central focus is a bright, hazy object that could be a planet or a star cluster. Surrounding this central object are several smaller, fainter points of light, which might be other stars or celestial bodies. The overall image is dark, suggesting it was taken in a low-light environment, typical of astronomical photography. The lack of sharpness and clarity makes it difficult to identify specific details or objects within the image.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0008_img029]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0009_img030]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img031]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img032]
+The image appears to be a photograph of a galaxy, likely taken through a telescope. The central part of the image is dominated by a bright, glowing core, which is typical of many galaxies. Surrounding the core is a diffuse, hazy region that might represent the galaxy's disk or halo. There are several smaller, distinct points of light around the central core, which could be stars or other celestial objects. The background is dark, indicating that the image was taken in space or a dark location to capture the faint light from these distant objects. The colors in the image range from yellow and white in the core to various hues in the surrounding areas, suggesting different temperatures and compositions of the materials in the galaxy.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img033]
+The image appears to be a photograph of a celestial object, likely a star or galaxy, taken through a telescope. The central object is bright and has a glowing, somewhat diffuse appearance, suggesting it might be a star with a halo or a galaxy with a visible halo or nebula. The light is predominantly yellowish, with some reddish and greenish hues around the edges, indicating possible emission lines or dust.
+
+In the background, the image is dark, typical of space photography, with a few faint points of light scattered around, which could be other stars or distant celestial objects. The overall appearance suggests a deep-space image, capturing the intricate details of a distant astronomical phenomenon.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img034]
+The image appears to be a photograph of a galaxy, likely taken by a space telescope such as the Hubble Space Telescope. The central part of the image features a bright, glowing core, which is likely the galactic center. This core is surrounded by a faint, diffuse halo, suggesting the presence of a large amount of interstellar gas and dust.
+
+Surrounding the central galaxy, there are several smaller, distinct points of light. These are likely other galaxies or stars, each varying in brightness and color. The colors range from white and blue to red, indicating different temperatures and compositions of the celestial objects. The background is predominantly dark, typical of deep-space images, with a few scattered stars visible.
+
+Overall, the image captures a stunning view of the universe, highlighting the beauty and complexity of distant galaxies and their components.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img035]
+The image shows a galaxy with a bright central core, surrounded by a faint, diffuse halo. The galaxy appears to have a spiral structure, with the core being the most luminous part. The surrounding space is dark, dotted with numerous small, faint stars. The overall appearance is typical of a spiral galaxy, with the central core possibly indicating a high concentration of stars and other celestial objects. The image captures the galaxy against the backdrop of the night sky, highlighting its luminosity and structure.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img036]
+The image appears to be a photograph of a galaxy, likely taken by a space telescope. The central part of the galaxy is bright, with a yellowish core, which is probably the galactic nucleus. Surrounding the core is a diffuse, glowing halo, indicating the presence of a large amount of gas and dust. There are also several smaller, distinct stars visible around the galaxy, appearing as bright points against the dark background of space. The overall appearance suggests that this is an image of a spiral galaxy, with the central core and halo being prominent features.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img037]
+The image appears to be a blurred photograph of a galaxy. The galaxy has a distinct elongated shape, with a bright central region that gradually fades into a more diffuse tail. The colors in the galaxy range from yellow to green, with a hint of red near the center. The background is dark, typical of space imagery, with some out-of-focus light spots that might be other celestial objects. The overall effect is a soft, glowing appearance against the dark backdrop.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img038]
+The image appears to be a photograph of a galaxy taken by a space telescope, likely the Hubble Space Telescope. The central part of the galaxy is bright and luminous, with a glowing core that emits light. Surrounding the core is a halo of colors, including green, red, and yellow, which may represent different gases and dust in the galaxy. The outer regions of the galaxy are darker, with a textured appearance that could be due to the presence of stars and interstellar material. There are also a few small, bright points near the top of the image, which might be other stars or celestial objects. The overall image has a high level of detail, showcasing the intricate structures within the galaxy.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img039]
+The image shows a small, faint object in the night sky, which appears to be a comet. The comet has a bright central core with a gradient of colors, transitioning from a yellowish hue at the center to reddish and bluish tones towards the edges. The tail of the comet is elongated and slightly blurred, suggesting it is moving or dispersing. The background is dark, typical of a night sky, with no other visible stars or celestial objects.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img040]
+The image shows a galaxy with a distinct spiral structure. The galaxy has a bright central core, from which the spiral arms extend outward. The arms are faint and appear to be made of stars and interstellar gas. The background is dark, filled with small, scattered stars, typical of a deep-space photograph. The overall appearance is characteristic of a barred spiral galaxy, with the central bar structure contributing to the spiral pattern.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img041]
+The image shows a galaxy with a bright, central core surrounded by a faint, diffuse halo. The core appears to be a yellowish-white color, indicating a high concentration of stars and possibly a supermassive black hole at the center. The halo has a slightly reddish tint, suggesting the presence of older stars or interstellar dust. The galaxy is set against a dark background filled with numerous small, faint stars, typical of a deep-space photograph. The overall appearance is reminiscent of a spiral galaxy, with the central core and halo forming a distinct, elongated shape.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img042]
+The image depicts a galaxy with a bright central core, surrounded by a diffuse, glowing halo. The core appears to be a luminous point, possibly a supermassive black hole or a dense cluster of stars. The halo extends outward, creating a nebulous, cloud-like structure that gradually fades into the surrounding space. The background is dark, filled with scattered stars, enhancing the prominence of the galaxy. The overall appearance is reminiscent of a lenticular or spiral galaxy, with the central light source being the focal point.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img043]
+The image appears to be a photograph of a galaxy. The galaxy has a distinct spiral shape, with a bright central core that is likely the galactic bulge. The spiral arms extend outward from the core, displaying a mix of colors, including yellow and blue, which may indicate different temperatures and compositions of the stars and interstellar material. The background is dark, typical of deep-space images, with some faint stars or other celestial objects visible. The overall appearance suggests a typical spiral galaxy, possibly similar to the Milky Way.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img044]
+The image appears to be a photograph of a galaxy, likely taken by a space telescope such as the Hubble Space Telescope. The galaxy is centrally located and features a bright core, which is the most luminous part of the image. Surrounding the core, there is a halo of light with various colors, including green, blue, and red, indicating different types of stars and interstellar material. The outer regions of the galaxy are darker, suggesting a dense concentration of stars and possibly a spiral structure. The background is mostly dark, typical of deep-space images, with a few faint stars visible. The overall appearance suggests a vibrant and active galactic environment.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img045]
+The image appears to be a photograph of a galaxy, likely taken through a telescope. The galaxy is centrally located and features a bright core with a glowing, yellowish hue. Surrounding the core is a faint, diffuse halo that gradually fades into the surrounding darkness. The background is mostly dark, indicating the vastness of space. The galaxy's structure suggests it might be a spiral galaxy, with the core and halo possibly representing the central bulge and spiral arms, though the arms are not distinctly visible in this image. The overall appearance is typical of a galaxy captured in infrared or visible light, highlighting its central region and extending outwards into space.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img046]
+The image appears to be a close-up view of a small, bright, and somewhat blurry object against a dark background. The object has a glowing, yellowish center with a reddish hue around it, suggesting it might be a celestial body or a light source. The surrounding area is dark and indistinct, with some faint, possibly text-like patterns or noise, which makes the central object stand out prominently. The overall appearance is reminiscent of a star or a planet in space, with the surrounding darkness enhancing its visibility.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0010_img047]
+The image appears to be a photograph of a galaxy, likely taken through a telescope. The central part of the image is dominated by a bright, glowing core, which is typical of many galaxies. This core is surrounded by a diffuse, hazy halo, suggesting the presence of a large amount of interstellar dust and gas. The outer regions of the galaxy are less bright and more diffuse, blending into the dark background of space.
+
+In the lower left corner, there is a smaller, distinct point of light, which could be another star or a smaller celestial object. The overall color palette of the image includes shades of white, yellow, and brown, with the background being predominantly dark, indicating the vastness of space. The image has a somewhat blurry or out-of-focus quality, which is common in astronomical photography due to the distance and the light-gathering capabilities of telescopes.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0011_img048]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0012_img049]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0013_img050]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0014_img051]
+The image shows the logo of "IEEE Access." The text is split into two parts: "IEEE" is written in bold, dark blue capital letters, while "Access" is written in light blue lowercase letters. The "Access" part is slightly smaller in size compared to "IEEE." The registered trademark symbol (®) is placed at the upper right corner of the word "Access." The overall design is clean and modern, with a simple color scheme of blue and white.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0014_img052]
+The image is a black and white photograph of a man. He has a receding hairline and a full beard. He is smiling slightly and has a friendly expression. He is wearing a suit jacket over a collared shirt. The background appears to be indoors, with a window or some vertical blinds visible behind him. The overall tone of the image is formal and professional.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0014_img053]
+The image is a black and white photograph of a person. The individual has short, slightly wavy hair and is looking directly at the camera with a neutral expression. The person has a fair complexion and is wearing a dark-colored shirt. The background is plain and light, providing a clear contrast to the subject. The image appears to be a headshot, focusing on the person's face and upper shoulders.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0014_img054]
+The image is a black and white photograph of a man. He has short, dark hair and a beard. He is smiling, showing his teeth. The man is wearing a plain white shirt. The background is plain and light-colored, providing a clear contrast to his face. The image appears to be a headshot, likely used for identification or professional purposes.
+
+[IMAGE:Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_page0014_img055]
+The image is a black and white photograph of a person smiling at the camera. The person is wearing large, dark sunglasses with a classic rectangular shape. They have long, straight hair that falls over their shoulders. The person is dressed in a dark jacket with a zipper and a light-colored top underneath. 
+
+In the background, there is a traditional architectural structure, possibly a gate or entrance, with a tiled roof. There are trees and some other people visible in the distance, suggesting the setting might be a public or historical area. The overall mood of the image is cheerful and relaxed.
+

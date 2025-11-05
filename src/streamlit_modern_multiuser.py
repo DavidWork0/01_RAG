@@ -7,6 +7,9 @@ Author: Generated for 01_RAG project
 Date: November 1, 2025
 """
 
+# Mennyi kredit kell 2 félév alatt? <- Problematic question
+
+
 import sys
 from pathlib import Path
 import uuid
@@ -19,6 +22,7 @@ import streamlit as st
 from typing import Optional, List, Dict
 import time
 import re
+import threading
 
 # Import the hybrid RAG module
 try:
@@ -50,6 +54,11 @@ MODEL_CONFIG = {
 # =============================================================================
 # SHARED RESOURCES (CACHED GLOBALLY ACROSS ALL USERS)
 # =============================================================================
+
+@st.cache_resource
+def get_llm_lock():
+    """Get a shared lock for LLM access (must be cached to work across sessions)."""
+    return threading.Lock()
 
 @st.cache_resource(show_spinner="Loading RAG system...")
 def get_shared_rag_system():
@@ -246,6 +255,12 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         margin-bottom: 8px;
     }
+    
+    .stAlert {
+        border-radius: 12px !important;
+        border-left-width: 4px !important;
+        font-weight: 500 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -286,9 +301,16 @@ def generate_llm_response(
     context: str,
     chat_history: List[Dict] = None,
     max_tokens: int = 4096,
-    temperature: float = 0.7
+    temperature: float = 0.7,
+    status_placeholder = None
 ) -> str:
-    """Generate LLM response using retrieved context and chat history."""
+    """Generate LLM response using retrieved context and chat history.
+    
+    Thread-safe: Uses global lock to prevent concurrent CUDA operations.
+    """
+    # Get the shared lock
+    llm_lock = get_llm_lock()
+    
     system_message = """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
 
 Always:
@@ -336,15 +358,50 @@ Please answer based on your general knowledge, but clearly state that this answe
 """
     
     try:
-        output = llm_function(
-            prompt,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=0.9,
-            echo=False
-        )
-        return output["choices"][0]["text"]
+        # Try to acquire lock without blocking first
+        lock_acquired = llm_lock.acquire(blocking=False)
+        
+        if not lock_acquired:
+            # Lock is held by another user - show waiting message
+            if status_placeholder:
+                status_placeholder.warning("⏳ **LLM is currently busy** - Another user is being served. Please wait...")
+            
+            # Now wait for the lock (blocking)
+            llm_lock.acquire()
+            lock_acquired = True
+            
+            # Clear the waiting message once we got the lock
+            if status_placeholder:
+                status_placeholder.empty()
+        
+        # At this point, we have the lock
+        try:
+            # Update status to show we're processing
+            if status_placeholder:
+                status_placeholder.info("🤔 **Generating response...**")
+            
+            # CRITICAL: Lock prevents concurrent CUDA operations from different users
+            output = llm_function(
+                prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=0.9,
+                echo=False
+            )
+            
+            # Clear processing message
+            if status_placeholder:
+                status_placeholder.empty()
+                
+            return output["choices"][0]["text"]
+        finally:
+            # Always release the lock if we acquired it
+            if lock_acquired:
+                llm_lock.release()
+            
     except Exception as e:
+        if status_placeholder:
+            status_placeholder.empty()
         return f"Error generating response: {str(e)}"
 
 def display_message(message: Dict):
@@ -475,59 +532,69 @@ if send_button and user_input.strip():
     }
     st.session_state.chat_history.append(user_message)
     
+    # Create a placeholder for status messages
+    status_placeholder = st.empty()
+    
     # Generate response
-    with st.spinner("🤔 Thinking..."):
-        try:
-            # Search for relevant chunks
-            results = rag_system.search(
-                query=user_input,
-                top_k=st.session_state.top_k
-            )
-            
-            # Filter by similarity threshold
-            filtered_results = [r for r in results if r['similarity_score'] >= SIMILARITY_THRESHOLD]
-            no_relevant_context = not filtered_results
-            
-            if no_relevant_context:
-                context = ""
-                st.warning(f"⚠️ No relevant information found in knowledge base (threshold: {SIMILARITY_THRESHOLD}%). Answering with LLM only.")
-            else:
-                context = rag_system.format_for_llm(filtered_results, max_chunks=None)
-            
-            # Generate response using shared LLM
-            response = generate_llm_response(
-                llm_model,
-                user_input,
-                context,
-                st.session_state.chat_history[:-1] if len(st.session_state.chat_history) > 1 else [],
-                st.session_state.max_tokens,
-                st.session_state.temperature
-            )
-            
-            # Parse response
-            parsed_response = parse_thinking_response(response)
-            
-            # Add warning if no context
-            final_answer = parsed_response['answer']
-            #if no_relevant_context:
-                #final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
-            
-            # Add assistant message
-            assistant_message = {
-                'role': 'assistant',
-                'content': final_answer,
-                'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
-                'sources': filtered_results,
-                'has_thinking': parsed_response['has_thinking'],
-                'thinking': parsed_response.get('thinking'),
-                'no_context': no_relevant_context
-            }
-            st.session_state.chat_history.append(assistant_message)
-            
-            st.rerun()
-            
-        except Exception as e:
-            st.error(f"Error generating response: {str(e)}")
+    try:
+        # Show initial processing status
+        status_placeholder.info("🔍 **Searching knowledge base...**")
+        
+        # Search for relevant chunks
+        results = rag_system.search(
+            query=user_input,
+            top_k=st.session_state.top_k
+        )
+        
+        # Filter by similarity threshold
+        filtered_results = [r for r in results if r['similarity_score'] >= SIMILARITY_THRESHOLD]
+        no_relevant_context = not filtered_results
+        
+        if no_relevant_context:
+            context = ""
+            status_placeholder.warning(f"⚠️ No relevant information found in knowledge base (threshold: {SIMILARITY_THRESHOLD}%). Answering with LLM only.")
+            time.sleep(1)  # Brief pause so user can see the message
+        else:
+            context = rag_system.format_for_llm(filtered_results, max_chunks=None)
+        
+        # Generate response using shared LLM (with status updates)
+        response = generate_llm_response(
+            llm_model,
+            user_input,
+            context,
+            st.session_state.chat_history[:-1] if len(st.session_state.chat_history) > 1 else [],
+            st.session_state.max_tokens,
+            st.session_state.temperature,
+            status_placeholder=status_placeholder
+        )
+        
+        # Parse response
+        parsed_response = parse_thinking_response(response)
+        
+        # Add warning if no context
+        final_answer = parsed_response['answer']
+        #if no_relevant_context:
+            #final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
+        
+        # Add assistant message
+        assistant_message = {
+            'role': 'assistant',
+            'content': final_answer,
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'sources': filtered_results,
+            'has_thinking': parsed_response['has_thinking'],
+            'thinking': parsed_response.get('thinking'),
+            'no_context': no_relevant_context
+        }
+        st.session_state.chat_history.append(assistant_message)
+        
+        # Clear status and rerun
+        status_placeholder.empty()
+        st.rerun()
+        
+    except Exception as e:
+        status_placeholder.empty()
+        st.error(f"Error generating response: {str(e)}")
 
 # Status bar
 st.markdown(f"""
