@@ -78,6 +78,7 @@ class TestDataPipelinePDF(unittest.TestCase):
     def test_parse_descriptions_file_basic(self):
         """Test parsing of image descriptions file"""
         # Create a test descriptions file
+        
         desc_file = os.path.join(self.test_dir, "descriptions.txt")
         with open(desc_file, 'w', encoding='utf-8') as f:
             f.write("[IMAGE:test_img_001]\n")
@@ -833,6 +834,7 @@ def run_pipeline_health_check():
     
     # Check 5: streamlit app
     try:
+        # Already imported at module level, just check if it's available
         import streamlit_modern_multiuser
         checks["streamlit_app"] = True
         print("[OK] streamlit_modern_multiuser.py - Import successful")
