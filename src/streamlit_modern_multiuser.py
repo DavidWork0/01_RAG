@@ -36,8 +36,8 @@ except ImportError as e:
 # =============================================================================
 
 TOP_K_RESULTS = 25
-#DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024"
-DEFAULT_DB_PATH = "data/output/chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024"
+DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024"
+#DEFAULT_DB_PATH = "data/output/chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024"
 SIMILARITY_THRESHOLD = 40.0
 
 AVAILABLE_MODELS = ["InternVL3_5-2B-Q6_K"]

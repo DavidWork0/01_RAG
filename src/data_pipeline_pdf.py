@@ -16,6 +16,7 @@ from intevl3_5.InternVL35_4B_reducedv2_single import initialize_model, inference
 from typing import List, Dict, Tuple
 
 DUPLICATE_DETECTION_FOR_IMAGES = False  # NOT WORKING Set to True to enable duplicate image detection Currently off as it's not reconstructing duplicates correctly 
+CLEAN_OUTPUT_DIR = True  # Set to True to clear output directory before running
 
 
 def extract_text_with_image_placeholders(pdf_path: str, images_folder: str, 
@@ -436,18 +437,20 @@ if __name__ == "__main__":
     # Get the absolute paths relative to the project root
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-    
-    #Clear output directory before running
-    output_dir = os.path.join(PROJECT_ROOT, "data", "output")
-    if os.path.exists(output_dir):
-        import shutil
-        shutil.rmtree(output_dir)
-        print(f"Cleared existing output directory: {output_dir}")
+
+    if CLEAN_OUTPUT_DIR == True:
+        #Clear output directory before running
+        output_dir = os.path.join(PROJECT_ROOT, "data", "output")
+        if os.path.exists(output_dir):
+            import shutil
+            shutil.rmtree(output_dir)
+            print(f"Cleared existing output directory: {output_dir}")
+
     # Example usage of the complete workflow
     # Adjust input_dir and output_dir as needed
     input_dir = os.path.join(PROJECT_ROOT, "data", "pdfs")
     output_dir = os.path.join(PROJECT_ROOT, "data", "output")
-    
+        
 
     #measure time
     try:
@@ -463,30 +466,3 @@ if __name__ == "__main__":
         i=1 #do nothing
 
     print(f"Total processing time: {end_time - start_time:.2f} seconds")
-
-
-"""
-# Example: Process a single PDF
-pdf_path = "document.pdf"
-
-# Step 1: Extract text with placeholders and images
-metadata = extract_text_with_image_placeholders(
-    pdf_path=pdf_path,
-    images_folder="extracted_images",
-    output_text="text_with_placeholders.txt"
-)
-
-# Step 2: Process images with YOUR vision model
-# Replace process_images_with_vl_model with your actual model
-process_images_with_vl_model(
-    images_folder="extracted_images",
-    output_descriptions="image_descriptions.txt"
-)
-
-# Step 3: Merge the two text files
-merge_text_with_descriptions(
-    text_with_placeholders="text_with_placeholders.txt",
-    descriptions_file="image_descriptions.txt",
-    output_merged="final_document.txt"
-)
-"""

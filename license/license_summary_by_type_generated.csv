@@ -1,0 +1,6 @@
+License Type,Number of Packages,Packages Included
+MIT,13,"PyYAML, SQLAlchemy, instructor, jsonschema, langchain, llama_cpp_python, onnxruntime, onnxruntime-gpu, openai, pydantic, pytest, rich, typer"
+Apache 2.0,12,"accelerate, aiohttp, chromadb, datasets, google-auth, grpcio, onnx, ragas, requests, sentence-transformers, streamlit, transformers"
+BSD 3-Clause,11,"click, httpx, lxml, numpy, pandas, protobuf, scikit-learn, scipy, torch, torchvision, uvicorn"
+BSD 2-Clause,1,torchaudio
+MIT-CMU,1,pillow
