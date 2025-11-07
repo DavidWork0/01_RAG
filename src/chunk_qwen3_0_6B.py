@@ -22,7 +22,7 @@ EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
 EMBEDDING_DIMENSION = 1024  # Embedding vector length for Qwen3-Embedding-0.6B model 
 FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged", "cleaned")  # Folder containing CLEANED .txt files
 #FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged")  # Folder containing .txt files
-db_type = f"chroma_db_{CHUNK_STRATEGY}_{EMBEDDING_MODEL.replace('/', '_')}_{EMBEDDING_DIMENSION}"
+db_type = f"chroma_db_{CHUNK_STRATEGY}_{EMBEDDING_MODEL.replace('/', '_')}_{EMBEDDING_DIMENSION}_cleaned"
 DB_PATH = os.path.join(PROJECT_ROOT, "data", "output", db_type)  # Path to store ChromaDB
 
 VERBOSE_MODE = False  # Whether to print detailed logs
