@@ -21,8 +21,8 @@ MODEL_CACHE_DIR = './models/huggingface'
 
 # Search Configuration
 DEFAULT_TOP_K = 25  # Number of results to retrieve
-SEMANTIC_WEIGHT = 0.75  # Weight for semantic similarity (0-1)
-KEYWORD_WEIGHT = 0.25   # Weight for keyword matching (0-1)
+SEMANTIC_WEIGHT = 0.70  # Weight for semantic similarity (0-1)
+KEYWORD_WEIGHT = 0.30   # Weight for keyword matching (0-1)
 
 
 class Qwen3EmbeddingFunction(EmbeddingFunction):
@@ -102,8 +102,8 @@ class HybridRAGQwen3_Module:
         collection_name: str = "documents",
         model_cache_dir: str = './models/huggingface',
         device: Optional[str] = None,
-        semantic_weight: float = 0.75,
-        keyword_weight: float = 0.25,
+        semantic_weight: float = 0.70,
+        keyword_weight: float = 0.30,
         verbose: bool = True
     ):
         """

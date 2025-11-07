@@ -1,0 +1,70 @@
+{
+  "test_questions": [
+    {
+      "id": 1,
+      "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+      "category": "user_management",
+      "tags": ["RHEL", "instance", "owner"]
+    },
+    {
+      "id": 2,
+      "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+      "category": "ldap_commands",
+      "tags": ["idsldapsearch", "keystore", "encryption"]
+    },
+    {
+      "id": 3,
+      "question": "Where are DB2 install logs stored when I finished with the install?",
+      "category": "installation",
+      "tags": ["DB2", "logs", "installation"]
+    },
+    {
+      "id": 4,
+      "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+      "category": "replication",
+      "tags": ["ISVD10", "replication", "topology", "multi-master"]
+    },
+    {
+      "id": 5,
+      "question": "I've completed the install of ISVD10 on RHEL, but when I try to use the \"idsldapsearch\" command from my bash shell, I'm presented with an error saying that there is no such command. I'm logged in as the user \"root\". What is the issue and how can I solve it?",
+      "category": "troubleshooting",
+      "tags": ["ISVD10", "idsldapsearch", "PATH", "root"]
+    },
+    {
+      "id": 6,
+      "question": "How can I add my custom schema file?",
+      "category": "schema",
+      "tags": ["schema", "customization"]
+    },
+    {
+      "id": 7,
+      "question": "What's this error: GLPMIG074E ?",
+      "category": "error_codes",
+      "tags": ["error", "GLPMIG074E"]
+    },
+    {
+      "id": 8,
+      "question": "What command is used to list all instances on a linux install of ISVD?",
+      "category": "commands",
+      "tags": ["ISVD", "instances", "linux"]
+    },
+    {
+      "id": 9,
+      "question": "What does LDIF stand for?",
+      "category": "terminology",
+      "tags": ["LDIF", "acronym"]
+    },
+    {
+      "id": 10,
+      "question": "I'm done with the install of everything on a RHEL machine. I've install WAS and WAT as well. I need to start the websphere server though, and I forgot where the file is for this. Can you tell me how I can start the WAS WAT server? Also suggest a way to auto-start this after a reboot of the server.",
+      "category": "server_management",
+      "tags": ["WAS", "WAT", "WebSphere", "startup", "auto-start"]
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_date": "2025-11-06",
+    "description": "Test questions for ISVD10/IBM Security Verify Directory RAG system inference testing",
+    "total_questions": 10
+  }
+}

@@ -20,7 +20,8 @@ CHUNK_SIZE_MAX_by_sentence = 1000  # Max size for by_sentence chunking
 CHUNK_STRATEGY = "fixed_size"  # fixed_size, by_sentence implemented here
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B" 
 EMBEDDING_DIMENSION = 1024  # Embedding vector length for Qwen3-Embedding-0.6B model 
-FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged", "cleaned")  # Folder containing .txt files
+FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged", "cleaned")  # Folder containing CLEANED .txt files
+#FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged")  # Folder containing .txt files
 db_type = f"chroma_db_{CHUNK_STRATEGY}_{EMBEDDING_MODEL.replace('/', '_')}_{EMBEDDING_DIMENSION}"
 DB_PATH = os.path.join(PROJECT_ROOT, "data", "output", db_type)  # Path to store ChromaDB
 

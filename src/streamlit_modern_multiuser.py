@@ -31,25 +31,31 @@ except ImportError as e:
     st.error(f"Error importing hybrid_rag_module: {e}")
     st.stop()
 
+# Import shared configuration
+try:
+    from inference_config import (
+        DEFAULT_DB_PATH,
+        TOP_K_RESULTS,
+        MODEL_CONFIG,
+        DEFAULT_MAX_TOKENS,
+        MAX_TOKENS_OPTIONS,
+        EMBEDDING_MODEL,
+        DEFAULT_MODEL,
+        get_system_message,
+        get_model_config,
+        get_available_models,
+        PROMPT_TEMPLATE,
+        PROMPT_TEMPLATE_WITH_HISTORY
+    )
+except ImportError as e:
+    st.error(f"Error importing inference_config: {e}")
+    st.stop()
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
-TOP_K_RESULTS = 25
-DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024"
-#DEFAULT_DB_PATH = "data/output/chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024"
 SIMILARITY_THRESHOLD = 40.0
-
-AVAILABLE_MODELS = ["InternVL3_5-2B-Q6_K"]
-
-MODEL_CONFIG = {
-    "InternVL3_5-2B-Q6_K": {
-        "path": "models/llamacpp/InternVL3_5-2B-Q6_K.gguf",
-        "key": "llm_internvl",
-        "n_ctx": 40960,
-        "supports_vision": True
-    }
-}
 
 # =============================================================================
 # SHARED RESOURCES (CACHED GLOBALLY ACROSS ALL USERS)
@@ -71,7 +77,7 @@ def get_shared_rag_system():
     
     try:
         rag = HybridRAGQwen3_Module(
-            embedding_model="Qwen/Qwen3-Embedding-0.6B",
+            embedding_model=EMBEDDING_MODEL,
             db_path=str(db_path),
             device='cuda',
             verbose=False
@@ -84,14 +90,10 @@ def get_shared_rag_system():
 @st.cache_resource(show_spinner="Loading language model...")
 def get_shared_llm_model(model_name: str):
     """Load LLM once and share across all users."""
-    if model_name not in MODEL_CONFIG:
-        st.error(f"Unknown model: {model_name}")
-        return None
-    
     try:
         from llama_cpp import Llama
         
-        config = MODEL_CONFIG[model_name]
+        config = get_model_config(model_name)
         model_path = project_root / config["path"]
         
         if not model_path.exists():
@@ -101,9 +103,9 @@ def get_shared_llm_model(model_name: str):
         llm = Llama(
             model_path=str(model_path),
             n_ctx=config["n_ctx"],
-            n_gpu_layers=-1,
-            temperature=0.7,
-            verbose=False
+            n_gpu_layers=config["n_gpu_layers"],
+            temperature=config["temperature"],
+            verbose=config["verbose"]
         )
         return llm
     except Exception as e:
@@ -130,16 +132,17 @@ def initialize_user_session():
     
     # User preferences
     if 'model_name' not in st.session_state:
-        st.session_state.model_name = 'InternVL3_5-2B-Q6_K'
+        st.session_state.model_name = DEFAULT_MODEL
     
     if 'temperature' not in st.session_state:
-        st.session_state.temperature = 0.7
+        model_config = get_model_config(DEFAULT_MODEL)
+        st.session_state.temperature = model_config['temperature']
     
     if 'max_tokens' not in st.session_state:
-        st.session_state.max_tokens = 4096
+        st.session_state.max_tokens = DEFAULT_MAX_TOKENS
     
     if 'top_k' not in st.session_state:
-        st.session_state.top_k = 25
+        st.session_state.top_k = TOP_K_RESULTS
 
 initialize_user_session()
 
@@ -311,44 +314,55 @@ def generate_llm_response(
     # Get the shared lock
     llm_lock = get_llm_lock()
     
-    system_message = """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
-
-Always:
-- Analyze the retrieved context carefully before forming an answer.
-- Separate your reasoning process and show it inside <think></think> tags. This section should logically outline how you arrive at your conclusion but should never include guesses unrelated to the provided data.
-- Outside the tags, write your final answer clearly, accurately, and concisely in English.
-- If information is missing or unclear, state that explicitly instead of assuming or fabricating details.
-- Ensure all responses are entirely in English, regardless of the query language.
-
-Example structure:
-<think>
-Step-by-step reasoning and evidence analysis...
-</think>
-Final, concise answer in English."""
+    # Get system message from config based on current model
+    system_message = get_system_message(st.session_state.model_name)
     
-    # Build prompt
-    prompt = f"<|im_start|>system\n{system_message}<|im_end|>\n"
+    # Get model config for inference settings
+    model_config = get_model_config(st.session_state.model_name)
     
-    # Add chat history
+    # Build prompt with conversation history
     if chat_history and len(chat_history) > 0:
+        history_str = ""
         recent_history = chat_history[-10:]
         for msg in recent_history:
             if msg['role'] == 'user':
-                prompt += f"<|im_start|>user\n{msg['content']}<|im_end|>\n"
+                history_str += f"<|im_start|>user\n{msg['content']}<|im_end|>\n"
             elif msg['role'] == 'assistant':
-                prompt += f"<|im_start|>assistant\n{msg['content']}<|im_end|>\n"
-    
-    # Handle context
-    if context and context.strip():
-        prompt += f"""<|im_start|>user
-Context from knowledge base:
-{context}
+                history_str += f"<|im_start|>assistant\n{msg['content']}<|im_end|>\n"
+        
+        # Handle context
+        if context and context.strip():
+            prompt = PROMPT_TEMPLATE_WITH_HISTORY.format(
+                system_message=system_message,
+                history=history_str,
+                context=context,
+                query=query
+            )
+        else:
+            # No context case with history
+            prompt = f"""<|im_start|>system
+{system_message}<|im_end|>
+{history_str}<|im_start|>user
+⚠️ Note: No relevant information was found in the knowledge base for this question.
 
-Question: {query}<|im_end|>
+Question: {query}
+
+Please answer based on your general knowledge, but clearly state that this answer is not based on the provided documents.<|im_end|>
 <|im_start|>assistant
 """
     else:
-        prompt += f"""<|im_start|>user
+        # No history case
+        if context and context.strip():
+            prompt = PROMPT_TEMPLATE.format(
+                system_message=system_message,
+                context=context,
+                query=query
+            )
+        else:
+            # No context and no history
+            prompt = f"""<|im_start|>system
+{system_message}<|im_end|>
+<|im_start|>user
 ⚠️ Note: No relevant information was found in the knowledge base for this question.
 
 Question: {query}
@@ -385,7 +399,7 @@ Please answer based on your general knowledge, but clearly state that this answe
                 prompt,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                top_p=0.9,
+                top_p=model_config['top_p'],
                 echo=False
             )
             
@@ -454,8 +468,6 @@ def display_message(message: Dict):
                                 disabled=True,
                                 label_visibility="collapsed"
                             )
-
-
 
 
 # =============================================================================
