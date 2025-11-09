@@ -9,23 +9,32 @@ import torch.nn.functional as F
 import time
 import numpy as np
 
-# Get absolute paths
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+# Import configuration
+from rag_config import (
+    BATCH_SIZE,
+    FIXED_SIZE_CHUNK_SIZE,
+    FIXED_SIZE_OVERLAP,
+    CHUNK_SIZE_MAX_BY_SENTENCE,
+    CHUNK_STRATEGY,
+    EMBEDDING_MODEL,
+    EMBEDDING_DIMENSION,
+    COLLECTION_NAME,
+    MODEL_CACHE_DIR,
+    MAX_EMBEDDING_LENGTH,
+    PADDING,
+    TRUNCATION,
+    VERBOSE_MODE,
+    NLTK_QUIET,
+    get_input_folder,
+    get_db_path,
+    get_device,
+    get_torch_dtype,
+    print_config_summary
+)
 
-BATCH_SIZE = 20  # Number of chunks to process in each batch 25 for Qwen3-0.6B and >6GB VRAM || 100 for Qwen3-0.6B and 12GB VRAM --> Batch size 20 seems to be the sweetspot for time
-FIXED_SIZE_CHUNK_SIZE = 1000  # Size of each text chunk
-FIXED_SIZE_OVERLAP = 250  # Overlap between chunks
-CHUNK_SIZE_MAX_by_sentence = 1000  # Max size for by_sentence chunking
-CHUNK_STRATEGY = "fixed_size"  # fixed_size, by_sentence implemented here
-EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B" 
-EMBEDDING_DIMENSION = 1024  # Embedding vector length for Qwen3-Embedding-0.6B model 
-FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged", "cleaned")  # Folder containing CLEANED .txt files
-#FOLDER_PATH = os.path.join(PROJECT_ROOT, "data", "output", "final_merged")  # Folder containing .txt files
-db_type = f"chroma_db_{CHUNK_STRATEGY}_{EMBEDDING_MODEL.replace('/', '_')}_{EMBEDDING_DIMENSION}_cleaned"
-DB_PATH = os.path.join(PROJECT_ROOT, "data", "output", db_type)  # Path to store ChromaDB
-
-VERBOSE_MODE = False  # Whether to print detailed logs
+# Get paths from config
+FOLDER_PATH = get_input_folder(cleaned=True)
+DB_PATH = get_db_path()
 
 class Qwen3EmbeddingFunction(EmbeddingFunction):
     """Custom embedding function for ChromaDB using Qwen3-Embedding model."""
@@ -45,9 +54,9 @@ class Qwen3EmbeddingFunction(EmbeddingFunction):
         # Tokenize the input texts
         encoded_input = self.tokenizer(
             input, 
-            padding=True, 
-            truncation=True, 
-            max_length=512,
+            padding=PADDING, 
+            truncation=TRUNCATION, 
+            max_length=MAX_EMBEDDING_LENGTH,
             return_tensors='pt'
         ).to(self.device)
         
@@ -76,10 +85,13 @@ def load_text_files(folder_path: str) -> List[Tuple[str, str]]:
     print(f"Loaded {len(documents)} documents")
     return documents
 
-def chunk_text_by_sentence(text: str, chunk_size: int) -> List[str]:
+def chunk_text_by_sentence(text: str, chunk_size: int = None) -> List[str]:
     """Split text into chunks based on sentence boundaries."""
+    if chunk_size is None:
+        chunk_size = CHUNK_SIZE_MAX_BY_SENTENCE
+    
     import nltk
-    nltk.download('punkt', quiet=True)
+    nltk.download('punkt', quiet=NLTK_QUIET)
     from nltk.tokenize import sent_tokenize
 
     sentences = sent_tokenize(text)
@@ -124,7 +136,7 @@ def create_embeddings_db(folder_path: str, db_path: str, embedding_fn) -> chroma
     # Initialize ChromaDB with custom embedding function
     client = chromadb.PersistentClient(path=db_path)
     collection = client.get_or_create_collection(
-        name="documents", #name of the collection.
+        name=COLLECTION_NAME,
         embedding_function=embedding_fn
     )
     
@@ -152,10 +164,9 @@ def create_embeddings_db(folder_path: str, db_path: str, embedding_fn) -> chroma
     print(f"Created {len(all_chunks)} chunks from {len(documents)} documents")
     
     # Add to database in batches (embeddings generated automatically by ChromaDB)
-    batch_size = BATCH_SIZE
     print("\nAdding chunks to database...")
-    for i in range(0, len(all_chunks), batch_size):
-        batch_end = min(i + batch_size, len(all_chunks))
+    for i in range(0, len(all_chunks), BATCH_SIZE):
+        batch_end = min(i + BATCH_SIZE, len(all_chunks))
         collection.add(
             documents=all_chunks[i:batch_end],
             metadatas=metadatas[i:batch_end],
@@ -171,36 +182,39 @@ def chunking_strategy_selector(text: str) -> List[str]:
     if CHUNK_STRATEGY == "fixed_size":
         return chunk_text_fixed_length(text)
     elif CHUNK_STRATEGY == "by_sentence":
-        return chunk_text_by_sentence(text, chunk_size=CHUNK_SIZE_MAX_by_sentence)
+        return chunk_text_by_sentence(text, chunk_size=CHUNK_SIZE_MAX_BY_SENTENCE)
     else:
         raise ValueError(f"Unknown chunking strategy: {CHUNK_STRATEGY}")
 
 def run_chunking_and_db_creation():
     
+    # Print configuration summary
+    print_config_summary()
+    
     print("="*60)
-    print(f" CHUNKING AND EMBEDDINGS DATABASE CREATION with ChromaDB source: {FOLDER_PATH} _embed_model: {EMBEDDING_MODEL} _chunk strategy: {CHUNK_STRATEGY}")
+    print(f" CHUNKING AND EMBEDDINGS DATABASE CREATION")
     print("="*60)
     
     # Step 1: Initialize embedding model
     print("\n[1/4] Loading embedding model...")
     start_time = time.time()
     
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cache_dir = './models/huggingface'
+    device = get_device()
+    torch_dtype = get_torch_dtype()
     
     # Load tokenizer and model
-    print(f"  Loading tokenizer and model from cache: {cache_dir}")
+    print(f"  Loading tokenizer and model from cache: {MODEL_CACHE_DIR}")
     tokenizer = AutoTokenizer.from_pretrained(
         EMBEDDING_MODEL,
-        cache_dir=cache_dir,
+        cache_dir=MODEL_CACHE_DIR,
         trust_remote_code=True
     )
     
     model = AutoModel.from_pretrained(
         EMBEDDING_MODEL,
-        cache_dir=cache_dir,
+        cache_dir=MODEL_CACHE_DIR,
         trust_remote_code=True,
-        torch_dtype=torch.float16 if device == 'cuda' else torch.float32
+        torch_dtype=torch_dtype
     ).to(device)
     
     model.eval()  # Set to evaluation mode

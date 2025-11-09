@@ -9,20 +9,31 @@ import torch
 import torch.nn.functional as F
 import time
 
-# Database Configuration
-DB_PATH = "./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024" 
-#DB_PATH = "./data/output/chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024"
-COLLECTION_NAME = "documents"
+# Import configuration
+from rag_config import (
+    DEFAULT_DB_PATH,
+    COLLECTION_NAME,
+    EMBEDDING_MODEL,
+    EMBEDDING_DIMENSION,
+    MODEL_CACHE_DIR,
+    DEFAULT_TOP_K,
+    SEMANTIC_WEIGHT,
+    KEYWORD_WEIGHT,
+    INITIAL_K_MULTIPLIER,
+    INITIAL_K_CAP,
+    STOP_WORDS,
+    MIN_KEYWORD_LENGTH,
+    KEYWORD_SCORING_METHOD,
+    MAX_EMBEDDING_LENGTH,
+    PADDING,
+    TRUNCATION,
+    VERBOSE_RAG,
+    get_device,
+    get_torch_dtype
+)
 
-# Embedding Model Configuration
-EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
-EMBEDDING_DIMENSION = 1024
-MODEL_CACHE_DIR = './models/huggingface'
-
-# Search Configuration
-DEFAULT_TOP_K = 25  # Number of results to retrieve
-SEMANTIC_WEIGHT = 0.70  # Weight for semantic similarity (0-1)
-KEYWORD_WEIGHT = 0.30   # Weight for keyword matching (0-1)
+# For backward compatibility
+DB_PATH = DEFAULT_DB_PATH
 
 
 class Qwen3EmbeddingFunction(EmbeddingFunction):
@@ -66,9 +77,9 @@ class Qwen3EmbeddingFunction(EmbeddingFunction):
         # Tokenize the input texts
         encoded_input = self.tokenizer(
             input, 
-            padding=True, 
-            truncation=True,
-            max_length=1024,
+            padding=PADDING, 
+            truncation=TRUNCATION,
+            max_length=MAX_EMBEDDING_LENGTH,
             return_tensors='pt'
         ).to(self.device)
         
@@ -97,14 +108,14 @@ class HybridRAGQwen3_Module:
     
     def __init__(
         self,
-        embedding_model: str = "Qwen/Qwen3-Embedding-0.6B",
-        db_path: str = "./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024",
-        collection_name: str = "documents",
-        model_cache_dir: str = './models/huggingface',
+        embedding_model: str = EMBEDDING_MODEL,
+        db_path: str = DEFAULT_DB_PATH,
+        collection_name: str = COLLECTION_NAME,
+        model_cache_dir: str = MODEL_CACHE_DIR,
         device: Optional[str] = None,
-        semantic_weight: float = 0.70,
-        keyword_weight: float = 0.30,
-        verbose: bool = True
+        semantic_weight: float = SEMANTIC_WEIGHT,
+        keyword_weight: float = KEYWORD_WEIGHT,
+        verbose: bool = VERBOSE_RAG
     ):
         """
         Initialize the Hybrid RAG system.
@@ -129,7 +140,7 @@ class HybridRAGQwen3_Module:
         
         # Auto-detect device if not specified
         if device is None:
-            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            self.device = get_device()
         else:
             self.device = device
         
@@ -172,7 +183,7 @@ class HybridRAGQwen3_Module:
             cache_dir=self.model_cache_dir,
             trust_remote_code=True,
             local_files_only=True,
-            torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32
+            torch_dtype=get_torch_dtype()
         ).to(self.device)
         
         model.eval()  # Set to evaluation mode
@@ -234,18 +245,9 @@ class HybridRAGQwen3_Module:
         Returns:
             Set of keywords
         """
-        stop_words = {
-            'what', 'when', 'where', 'who', 'why', 'how', 'is', 'are', 
-            'was', 'were', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for',
-            'and', 'or', 'but', 'with', 'from', 'of', 'by', 'as', 'that',
-            'this', 'these', 'those', 'be', 'been', 'being', 'have', 'has',
-            'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could',
-            'can', 'may', 'might', 'must', 'shall'
-        }
-        
         keywords = set(
             word.lower() for word in query.split() 
-            if word.lower() not in stop_words and len(word) > 2
+            if word.lower() not in STOP_WORDS and len(word) > MIN_KEYWORD_LENGTH
         )
         
         return keywords
@@ -428,7 +430,7 @@ class HybridRAGQwen3_Module:
     def search(
         self,
         query: str,
-        top_k: int = 25,
+        top_k: int = DEFAULT_TOP_K,
         return_distances: bool = True
     ) -> List[Dict]:
         """
@@ -461,7 +463,7 @@ class HybridRAGQwen3_Module:
         start_time = time.time()
         
         # Step 1: Perform semantic search
-        initial_k = min(top_k * 3, 100)  # Get 3x results but cap at 100
+        initial_k = min(top_k * INITIAL_K_MULTIPLIER, INITIAL_K_CAP)
         semantic_results = self._perform_semantic_search(query, initial_k)
         
         if not semantic_results['documents'][0]:
@@ -539,8 +541,8 @@ class HybridRAGQwen3_Module:
 # =============================================================================
 
 def create_rag_system(
-    embedding_model: str = "Qwen/Qwen3-Embedding-0.6B",
-    db_path: str = "./data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024",
+    embedding_model: str = EMBEDDING_MODEL,
+    db_path: str = DEFAULT_DB_PATH,
     **kwargs
 ) -> HybridRAGQwen3_Module:
     """

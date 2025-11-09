@@ -7,7 +7,6 @@ Author: Generated for 01_RAG project
 Date: November 1, 2025
 """
 
-# Mennyi kredit kell 2 félév alatt? <- Problematic question
 
 
 import sys
@@ -33,7 +32,7 @@ except ImportError as e:
 
 # Import shared configuration
 try:
-    from inference_config import (
+    from src.model_config import (
         DEFAULT_DB_PATH,
         TOP_K_RESULTS,
         MODEL_CONFIG,
@@ -48,7 +47,7 @@ try:
         PROMPT_TEMPLATE_WITH_HISTORY
     )
 except ImportError as e:
-    st.error(f"Error importing inference_config: {e}")
+    st.error(f"Error importing model_config: {e}")
     st.stop()
 
 # =============================================================================
@@ -303,7 +302,7 @@ def generate_llm_response(
     query: str,
     context: str,
     chat_history: List[Dict] = None,
-    max_tokens: int = 4096,
+    max_tokens: int = DEFAULT_MAX_TOKENS,
     temperature: float = 0.7,
     status_placeholder = None
 ) -> str:

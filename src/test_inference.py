@@ -32,7 +32,7 @@ from inference_logger import InferenceLogger
 from llama_cpp import Llama
 
 # Import shared configuration
-from inference_config import (
+from src.model_config import (
     DEFAULT_DB_PATH,
     TEST_QUESTIONS_PATH,
     TOP_K_RESULTS,
