@@ -18,14 +18,19 @@ import pandas as pd
 class InferenceLogger:
     """Logger for tracking RAG system inference performance."""
     
-    def __init__(self, log_dir: str = "data/test/logs"):
+    def __init__(self, log_dir: Optional[str] = None):
         """
         Initialize the inference logger.
         
         Args:
-            log_dir: Directory to store log files
+            log_dir: Directory to store log files (if None, uses project_root/data/test/logs)
         """
-        self.log_dir = Path(log_dir)
+        if log_dir is None:
+            # Get project root (parent of src directory)
+            project_root = Path(__file__).parent.parent
+            self.log_dir = project_root / "data" / "test" / "logs"
+        else:
+            self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
         
         # JSON Lines log file for detailed records
@@ -42,6 +47,7 @@ class InferenceLogger:
         """Initialize the CSV log file with headers."""
         headers = [
             "timestamp",
+            "session_name",
             "question_id",
             "question",
             "model_name",
@@ -71,7 +77,8 @@ class InferenceLogger:
         thinking: Optional[str] = None,
         sources: Optional[List[Dict]] = None,
         error: Optional[str] = None,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
+        session_name: Optional[str] = None
     ) -> Dict:
         """
         Log an inference test result.
@@ -88,6 +95,7 @@ class InferenceLogger:
             sources: List of source chunks with metadata
             error: Error message if inference failed
             metadata: Additional metadata to log
+            session_name: Name of the test session for grouping
         
         Returns:
             Dictionary containing the logged entry
@@ -97,6 +105,7 @@ class InferenceLogger:
         # Create detailed log entry
         log_entry = {
             "timestamp": timestamp,
+            "session_name": session_name,
             "question_id": question_id,
             "question": question,
             "answer": answer,
@@ -124,6 +133,7 @@ class InferenceLogger:
             writer = csv.writer(f)
             writer.writerow([
                 timestamp,
+                session_name or "",
                 question_id,
                 question,
                 model_name,

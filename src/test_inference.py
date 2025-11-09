@@ -60,7 +60,7 @@ def load_test_questions(questions_path: str) -> List[Dict]:
         return []
 
 
-def create_session_log_file(model_name: str) -> Path:
+def create_session_log_file(model_name: str) -> tuple[Path, str]:
     """
     Create a detailed log file for the current test session.
     
@@ -68,14 +68,15 @@ def create_session_log_file(model_name: str) -> Path:
         model_name: Name of the model being tested
     
     Returns:
-        Path to the created log file
+        Tuple of (Path to the created log file, session name)
     """
     timestamp = time.strftime("%Y%m%d_%H%M%S")
+    session_name = f"test_session_{model_name}_{timestamp}"
     log_dir = project_root / "data" / "test" / "logs" / "sessions"
     log_dir.mkdir(parents=True, exist_ok=True)
     
-    log_file = log_dir / f"test_session_{model_name}_{timestamp}.log"
-    return log_file
+    log_file = log_dir / f"{session_name}.log"
+    return log_file, session_name
 
 
 def write_log_header(log_file: Path, model_name: str, args):
@@ -334,7 +335,8 @@ def run_single_test(
     logger: InferenceLogger,
     max_tokens: int = 2048,
     verbose: bool = True,
-    log_file: Optional[Path] = None
+    log_file: Optional[Path] = None,
+    session_name: Optional[str] = None
 ) -> Dict:
     """
     Run a single inference test.
@@ -348,6 +350,7 @@ def run_single_test(
         max_tokens: Maximum tokens for response
         verbose: Print progress messages
         log_file: Optional path to session log file
+        session_name: Optional session name for grouping tests
     
     Returns:
         Dictionary with test results including raw_response and chunks
@@ -357,7 +360,7 @@ def run_single_test(
     
     if verbose:
         print(f"\n{'='*80}")
-        print(f"Testing Q{q_id}: {q_text}...")
+        print(f"Testing Q{q_id}: {q_text}")
         print(f"{'='*80}")
     
     start_time = time.time()
@@ -412,7 +415,8 @@ def run_single_test(
         num_chunks_retrieved=len(results) if results else 0,
         thinking=thinking,
         sources=results,
-        error=error_msg
+        error=error_msg,
+        session_name=session_name
     )
     
     # Add raw response and chunks to log entry for session logging
@@ -443,7 +447,8 @@ def run_all_tests(
     questions: List[Dict],
     logger: InferenceLogger,
     max_tokens: int = 2048,
-    log_file: Optional[Path] = None
+    log_file: Optional[Path] = None,
+    session_name: Optional[str] = None
 ) -> List[Dict]:
     """
     Run all inference tests.
@@ -456,6 +461,7 @@ def run_all_tests(
         logger: InferenceLogger instance
         max_tokens: Maximum tokens for response
         log_file: Optional path to session log file
+        session_name: Optional session name for grouping tests
     
     Returns:
         List of test result dictionaries
@@ -477,7 +483,8 @@ def run_all_tests(
             logger=logger,
             max_tokens=max_tokens,
             verbose=True,
-            log_file=log_file
+            log_file=log_file,
+            session_name=session_name
         )
         results.append(result)
     
@@ -721,9 +728,10 @@ Examples:
         sys.exit(1)
     
     # Create session log file
-    log_file = create_session_log_file(args.model)
+    log_file, session_name = create_session_log_file(args.model)
     write_log_header(log_file, args.model, args)
     print(f"📄 Session log created: {log_file}")
+    print(f"📋 Session name: {session_name}")
     
     # Run tests
     if args.mode == 'single':
@@ -742,7 +750,8 @@ Examples:
             logger=logger,
             max_tokens=args.max_tokens,
             verbose=True,
-            log_file=log_file
+            log_file=log_file,
+            session_name=session_name
         )
         session_time = time.time() - session_start
         
@@ -768,7 +777,8 @@ Examples:
             questions=questions,
             logger=logger,
             max_tokens=args.max_tokens,
-            log_file=log_file
+            log_file=log_file,
+            session_name=session_name
         )
     
     print(f"\n✅ Tests complete. Results logged to: {logger.log_dir}")

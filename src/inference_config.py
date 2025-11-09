@@ -30,7 +30,7 @@ TOP_K_RESULTS = 25
 MODEL_CONFIG = {
     "InternVL3_5-2B-Q6_K": {
         "path": "models/llamacpp/InternVL3_5-2B-Q6_K.gguf",
-        "n_ctx": 40960,
+        "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
         "n_gpu_layers": -1,  # -1 means use all GPU layers
@@ -38,7 +38,7 @@ MODEL_CONFIG = {
     },
     "InternVL3_5-8B-Q4_K_M": {
         "path": "models/llamacpp/InternVL3_5-8B-Q4_K_M.gguf",
-        "n_ctx": 40960,
+        "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
         "n_gpu_layers": -1,
@@ -56,7 +56,7 @@ DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
 # =============================================================================
 
 # Default maximum tokens for responses
-DEFAULT_MAX_TOKENS = 4096
+DEFAULT_MAX_TOKENS = 8192
 
 # Maximum tokens options for UI
 MAX_TOKENS_OPTIONS = [512, 1024, 2048, 4096, 6144, 8192]
@@ -66,15 +66,23 @@ MAX_TOKENS_OPTIONS = [512, 1024, 2048, 4096, 6144, 8192]
 # =============================================================================
 
 # System message for InternVL models (with thinking)
-SYSTEM_MESSAGE_INTERNVL = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base.
+SYSTEM_MESSAGE_INTERNVL =  """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
 
-Before providing your final answer, show your reasoning process inside <think></think> tags. Then provide your clear, accurate, and concise answer outside the tags.
+Always:
+- Analyze the retrieved context carefully before forming an answer.
+- Separate your reasoning process and show it inside <think></think> tags. This section should logically outline how you arrive at your conclusion but should never include guesses unrelated to the provided data.
+- Outside the tags, write your final answer clearly, accurately, and concisely in English.
+- If information is missing or unclear, state that explicitly instead of assuming or fabricating details.
+- Avoid thinking loops. If you find yourself repeating the same reasoning, try rephrasing the user's question or ask for clarification.
+- If you recommend actions, ensure they are directly supported by the context.
+- Be mindful of the context length and avoid exceeding it.
+- Use bullet points or numbered lists for clarity when appropriate.
 
-Example format:
+Example structure:
 <think>
-Let me analyze the context... The key points are... Therefore...
+Step-by-step reasoning and evidence analysis...
 </think>
-Based on the analysis, the answer is..."""
+Final Answer: Your clear and concise answer here."""
 
 # System message for other models (without thinking)
 SYSTEM_MESSAGE_STANDARD = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base."""
