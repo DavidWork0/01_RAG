@@ -29,7 +29,6 @@ sys.path.insert(0, str(project_root))
 # Import required modules
 from hybrid_rag_module_qwen3 import HybridRAGQwen3_Module
 from inference_logger import InferenceLogger
-from llama_cpp import Llama
 
 # Import shared configuration
 from src.model_config import (
@@ -39,9 +38,13 @@ from src.model_config import (
     MODEL_CONFIG,
     DEFAULT_MAX_TOKENS,
     EMBEDDING_MODEL,
+    SIMILARITY_THRESHOLD,
     get_system_message,
     get_model_config,
     get_available_models,
+    parse_thinking_response,
+    load_llm_model,
+    generate_llm_response,
     PROMPT_TEMPLATE
 )
 
@@ -256,71 +259,6 @@ def write_log_footer(log_file: Path, stats: Dict, total_time: float):
         f.write("="*80 + "\n")
         f.write("END OF SESSION LOG\n")
         f.write("="*80 + "\n")
-
-
-def parse_thinking_response(response_text: str) -> Dict:
-    """Parse LLM response to separate thinking process from final answer."""
-    patterns = [
-        (r'<think>(.*?)</think>', 'think'),
-        (r'<thinking>(.*?)</thinking>', 'thinking'),
-        (r'<thoughts>(.*?)</thoughts>', 'thoughts'),
-        (r'\[THINKING\](.*?)\[/THINKING\]', 'bracket'),
-    ]
-    
-    for pattern, tag_type in patterns:
-        thinking_matches = re.findall(pattern, response_text, re.DOTALL | re.IGNORECASE)
-        
-        if thinking_matches:
-            thinking = '\n\n'.join([t.strip() for t in thinking_matches])
-            final_answer = re.sub(pattern, '', response_text, flags=re.DOTALL | re.IGNORECASE).strip()
-            final_answer = re.sub(r'\n{3,}', '\n\n', final_answer).strip()
-            
-            return {
-                'has_thinking': True,
-                'thinking': thinking,
-                'answer': final_answer if final_answer else "Answer extracted from thinking process."
-            }
-    
-    return {
-        'has_thinking': False,
-        'thinking': None,
-        'answer': response_text.strip()
-    }
-
-
-def generate_llm_response(
-    llm_model,
-    query: str,
-    context: str,
-    model_name: str,
-    max_tokens: int = 2048
-) -> str:
-    """Generate LLM response using retrieved context."""
-    
-    # Get system message from config
-    system_message = get_system_message(model_name)
-    
-    # Build prompt using config template
-    prompt = PROMPT_TEMPLATE.format(
-        system_message=system_message,
-        context=context,
-        query=query
-    )
-    
-    # Get model config for inference settings
-    model_config = get_model_config(model_name)
-    
-    try:
-        output = llm_model(
-            prompt,
-            max_tokens=max_tokens,
-            temperature=model_config['temperature'],
-            top_p=model_config['top_p'],
-            echo=False
-        )
-        return output["choices"][0]["text"]
-    except Exception as e:
-        return f"Error generating response: {str(e)}"
 
 
 # =============================================================================
@@ -705,24 +643,14 @@ Examples:
         print(f"❌ Failed to initialize RAG system: {e}")
         sys.exit(1)
     
-    # Load LLM model
+    # Load LLM model using shared function
     print(f"\n🤖 Loading LLM model: {args.model}...")
-    model_config = get_model_config(args.model)
-    model_path = project_root / model_config['path']
-    
-    if not model_path.exists():
-        print(f"❌ Model file not found: {model_path}")
-        sys.exit(1)
-    
     try:
-        llm_model = Llama(
-            model_path=str(model_path),
-            n_ctx=model_config['n_ctx'],
-            n_gpu_layers=model_config['n_gpu_layers'],
-            temperature=model_config['temperature'],
-            verbose=model_config['verbose']
-        )
+        llm_model = load_llm_model(args.model, project_root)
         print(f"✅ Model loaded: {args.model}")
+    except FileNotFoundError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
     except Exception as e:
         print(f"❌ Failed to load model: {e}")
         sys.exit(1)

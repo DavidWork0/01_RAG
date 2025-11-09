@@ -40,21 +40,19 @@ try:
         MAX_TOKENS_OPTIONS,
         EMBEDDING_MODEL,
         DEFAULT_MODEL,
+        SIMILARITY_THRESHOLD,
         get_system_message,
         get_model_config,
         get_available_models,
+        parse_thinking_response,
+        load_llm_model,
+        generate_llm_response as _generate_llm_response_core,
         PROMPT_TEMPLATE,
         PROMPT_TEMPLATE_WITH_HISTORY
     )
 except ImportError as e:
     st.error(f"Error importing model_config: {e}")
     st.stop()
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-SIMILARITY_THRESHOLD = 40.0
 
 # =============================================================================
 # SHARED RESOURCES (CACHED GLOBALLY ACROSS ALL USERS)
@@ -88,27 +86,15 @@ def get_shared_rag_system():
 
 @st.cache_resource(show_spinner="Loading language model...")
 def get_shared_llm_model(model_name: str):
-    """Load LLM once and share across all users."""
+    """Load LLM once and share across all users using shared config."""
     try:
-        from llama_cpp import Llama
-        
-        config = get_model_config(model_name)
-        model_path = project_root / config["path"]
-        
-        if not model_path.exists():
-            st.error(f"Model not found: {model_path}")
-            return None
-        
-        llm = Llama(
-            model_path=str(model_path),
-            n_ctx=config["n_ctx"],
-            n_gpu_layers=config["n_gpu_layers"],
-            temperature=config["temperature"],
-            verbose=config["verbose"]
-        )
+        llm = load_llm_model(model_name, project_root)
         return llm
+    except FileNotFoundError as e:
+        st.error(f"❌ Model file not found: {e}")
+        return None
     except Exception as e:
-        st.error(f"Error loading LLM: {e}")
+        st.error(f"❌ Error loading LLM: {e}")
         return None
 
 # =============================================================================
@@ -270,33 +256,6 @@ st.markdown("""
 # HELPER FUNCTIONS
 # =============================================================================
 
-def parse_thinking_response(response_text: str) -> Dict:
-    """Parse LLM response to separate thinking process from final answer."""
-    patterns = [
-        (r'<think>(.*?)</think>', 'think'),
-        (r'<thinking>(.*?)</thinking>', 'thinking'),
-    ]
-    
-    for pattern, tag_type in patterns:
-        thinking_matches = re.findall(pattern, response_text, re.DOTALL | re.IGNORECASE)
-        
-        if thinking_matches:
-            thinking = '\n\n'.join([t.strip() for t in thinking_matches])
-            final_answer = re.sub(pattern, '', response_text, flags=re.DOTALL | re.IGNORECASE).strip()
-            final_answer = re.sub(r'\n{3,}', '\n\n', final_answer).strip()
-            
-            return {
-                'has_thinking': True,
-                'thinking': thinking,
-                'answer': final_answer if final_answer else "Answer extracted from thinking process."
-            }
-    
-    return {
-        'has_thinking': False,
-        'thinking': None,
-        'answer': response_text.strip()
-    }
-
 def generate_llm_response(
     llm_function,
     query: str,
@@ -306,69 +265,14 @@ def generate_llm_response(
     temperature: float = 0.7,
     status_placeholder = None
 ) -> str:
-    """Generate LLM response using retrieved context and chat history.
+    """
+    Generate LLM response with thread-safe locking for multi-user support.
     
-    Thread-safe: Uses global lock to prevent concurrent CUDA operations.
+    This wraps the shared generate_llm_response_core function with thread locking
+    and UI status updates specific to Streamlit's multi-user environment.
     """
     # Get the shared lock
     llm_lock = get_llm_lock()
-    
-    # Get system message from config based on current model
-    system_message = get_system_message(st.session_state.model_name)
-    
-    # Get model config for inference settings
-    model_config = get_model_config(st.session_state.model_name)
-    
-    # Build prompt with conversation history
-    if chat_history and len(chat_history) > 0:
-        history_str = ""
-        recent_history = chat_history[-10:]
-        for msg in recent_history:
-            if msg['role'] == 'user':
-                history_str += f"<|im_start|>user\n{msg['content']}<|im_end|>\n"
-            elif msg['role'] == 'assistant':
-                history_str += f"<|im_start|>assistant\n{msg['content']}<|im_end|>\n"
-        
-        # Handle context
-        if context and context.strip():
-            prompt = PROMPT_TEMPLATE_WITH_HISTORY.format(
-                system_message=system_message,
-                history=history_str,
-                context=context,
-                query=query
-            )
-        else:
-            # No context case with history
-            prompt = f"""<|im_start|>system
-{system_message}<|im_end|>
-{history_str}<|im_start|>user
-⚠️ Note: No relevant information was found in the knowledge base for this question.
-
-Question: {query}
-
-Please answer based on your general knowledge, but clearly state that this answer is not based on the provided documents.<|im_end|>
-<|im_start|>assistant
-"""
-    else:
-        # No history case
-        if context and context.strip():
-            prompt = PROMPT_TEMPLATE.format(
-                system_message=system_message,
-                context=context,
-                query=query
-            )
-        else:
-            # No context and no history
-            prompt = f"""<|im_start|>system
-{system_message}<|im_end|>
-<|im_start|>user
-⚠️ Note: No relevant information was found in the knowledge base for this question.
-
-Question: {query}
-
-Please answer based on your general knowledge, but clearly state that this answer is not based on the provided documents.<|im_end|>
-<|im_start|>assistant
-"""
     
     try:
         # Try to acquire lock without blocking first
@@ -394,19 +298,22 @@ Please answer based on your general knowledge, but clearly state that this answe
                 status_placeholder.info("🤔 **Generating response...**")
             
             # CRITICAL: Lock prevents concurrent CUDA operations from different users
-            output = llm_function(
-                prompt,
+            # Use shared core function from model_config
+            response = _generate_llm_response_core(
+                llm_model=llm_function,
+                query=query,
+                context=context,
+                model_name=st.session_state.model_name,
                 max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=model_config['top_p'],
-                echo=False
+                chat_history=chat_history,
+                temperature=temperature
             )
             
             # Clear processing message
             if status_placeholder:
                 status_placeholder.empty()
                 
-            return output["choices"][0]["text"]
+            return response
         finally:
             # Always release the lock if we acquired it
             if lock_acquired:
