@@ -60,8 +60,8 @@ TORCH_DTYPE = 'auto'  # 'auto' = float16 for CUDA, float32 for CPU
 CHUNK_STRATEGY = "fixed_size"
 
 # Fixed-size chunking parameters
-FIXED_SIZE_CHUNK_SIZE = 1000  # Characters per chunk
-FIXED_SIZE_OVERLAP = 250      # Character overlap between chunks
+FIXED_SIZE_CHUNK_SIZE = 800  # Characters per chunk
+FIXED_SIZE_OVERLAP = 200      # Character overlap between chunks
 
 # Sentence-based chunking parameters
 CHUNK_SIZE_MAX_BY_SENTENCE = 1000  # Max characters per chunk for sentence-based chunking
@@ -108,7 +108,7 @@ DEFAULT_DB_PATH = get_db_path()
 # Recommended values:
 # - 20-25 for Qwen3-0.6B with 6-8GB VRAM
 # - 100 for Qwen3-0.6B with 12GB+ VRAM
-BATCH_SIZE = 20
+BATCH_SIZE = 50
 
 # =============================================================================
 # SEARCH CONFIGURATION - HYBRID RAG
@@ -123,10 +123,10 @@ KEYWORD_WEIGHT = 0.30   # Weight for keyword matching (0-1)
 
 # Initial retrieval multiplier for re-ranking
 # Retrieves (TOP_K * INITIAL_K_MULTIPLIER) results before keyword re-ranking
-INITIAL_K_MULTIPLIER = 3
+INITIAL_K_MULTIPLIER = 5
 
 # Cap for initial retrieval
-INITIAL_K_CAP = 100
+INITIAL_K_CAP = 200
 
 # Stop words for keyword extraction
 STOP_WORDS = {
@@ -149,7 +149,20 @@ KEYWORD_SCORING_METHOD = "simple"
 # EMBEDDING GENERATION CONFIGURATION
 # =============================================================================
 
-# Max token length for embedding model
+# Maximum INPUT sequence length (in tokens) for the embedding model
+# This limits how many tokens the tokenizer will process from input text
+# 
+# What this affects:
+#   - Individual text chunks during database creation (each chunk is embedded separately)
+#   - User search queries during RAG retrieval (query text is embedded for similarity search)
+# 
+# What this does NOT affect:
+#   - Total context length passed to LLM (limited by LLM's n_ctx, e.g., 40,960 tokens)
+#   - Number of retrieved chunks (limited by top_k parameter)
+#   - Length of concatenated context (retrieved chunks are NOT re-embedded, just concatenated as text)
+# 
+# Note: This is different from EMBEDDING_DIMENSION (output vector size = 1024)
+# Qwen3-Embedding-0.6B: accepts up to 512 input tokens → outputs 1024-dimensional vectors
 MAX_EMBEDDING_LENGTH = 512
 
 # Padding and truncation settings
