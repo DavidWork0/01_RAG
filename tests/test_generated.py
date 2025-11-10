@@ -892,6 +892,9 @@ if __name__ == '__main__':
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     
+    # Check for skipped tests
+    skipped_count = len(result.skipped)
+    
     # Print summary
     print("\n" + "="*60)
     print("TEST SUMMARY")
@@ -900,6 +903,23 @@ if __name__ == '__main__':
     print(f"Successes: {result.testsRun - len(result.failures) - len(result.errors)}")
     print(f"Failures: {len(result.failures)}")
     print(f"Errors: {len(result.errors)}")
+    print(f"Skipped: {skipped_count}")
+    
+    # Handle skipped tests as errors
+    if skipped_count > 0:
+        print("\n" + "="*60)
+        print("[ERROR] TESTS WERE SKIPPED - THIS IS NOT ALLOWED")
+        print("="*60)
+        print("\nSkipped tests indicate missing dependencies or modules.")
+        print("All required modules must be available for tests to run.\n")
+        print("Skipped tests:")
+        for test, reason in result.skipped:
+            print(f"  - {test}: {reason}")
+        print("\n" + "="*60)
+        print("Please ensure all dependencies are installed:")
+        print("  pip install -r requirements.txt")
+        print("="*60 + "\n")
+        sys.exit(1)
     
     if result.wasSuccessful():
         print("\n[SUCCESS] ALL TESTS PASSED!")

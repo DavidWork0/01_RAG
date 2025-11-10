@@ -23,12 +23,12 @@ class InferenceLogger:
         Initialize the inference logger.
         
         Args:
-            log_dir: Directory to store log files (if None, uses project_root/data/test/logs)
+            log_dir: Directory to store log files (if None, uses project_root/tests/logs)
         """
         if log_dir is None:
             # Get project root (parent of src directory)
             project_root = Path(__file__).parent.parent
-            self.log_dir = project_root / "data" / "test" / "logs"
+            self.log_dir = project_root / "tests" / "logs"
         else:
             self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)

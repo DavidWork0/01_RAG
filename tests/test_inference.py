@@ -22,13 +22,14 @@ import time
 import re
 from typing import Dict, List, Optional
 
-# Add project root to path
+# Add project root and src to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / 'src'))
 
 # Import required modules
-from hybrid_rag_module_qwen3 import HybridRAGQwen3_Module
-from inference_logger import InferenceLogger
+from src.hybrid_rag_module_qwen3 import HybridRAGQwen3_Module
+from src.inference_logger import InferenceLogger
 
 # Import shared configuration
 from src.model_config import (
@@ -75,7 +76,7 @@ def create_session_log_file(model_name: str) -> tuple[Path, str]:
     """
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     session_name = f"test_session_{model_name}_{timestamp}"
-    log_dir = project_root / "data" / "test" / "logs" / "sessions"
+    log_dir = project_root / "tests" / "logs" / "sessions"
     log_dir.mkdir(parents=True, exist_ok=True)
     
     log_file = log_dir / f"{session_name}.log"
@@ -512,7 +513,7 @@ def export_report(logger: InferenceLogger, output_path: Optional[str] = None):
     """Export test results to Excel report."""
     if output_path is None:
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        output_path = project_root / "data" / "test" / "logs" / f"inference_report_{timestamp}.xlsx"
+        output_path = project_root / "tests" / "logs" / f"inference_report_{timestamp}.xlsx"
     else:
         output_path = Path(output_path)
     
@@ -537,6 +538,9 @@ Examples:
   # Run all tests with a specific model
   python test_inference.py --model InternVL3_5-2B-Q6_K --mode all
   
+  # Run quick test (5 selected questions)
+  python test_inference.py --model InternVL3_5-2B-Q6_K --mode quick
+  
   # Run a single test
   python test_inference.py --model InternVL3_5-2B-Q6_K --mode single --question-id 1
   
@@ -560,8 +564,8 @@ Examples:
     
     parser.add_argument(
         '--mode',
-        choices=['single', 'all'],
-        help='Test mode: single question or all questions'
+        choices=['single', 'all', 'quick'],
+        help='Test mode: single question, all questions, or quick test (5 questions)'
     )
     
     parser.add_argument(
@@ -696,6 +700,30 @@ Examples:
             'avg_answer_length': result['answer_length'] if result['success'] else 0
         }
         write_log_footer(log_file, stats, session_time)
+        
+    elif args.mode == 'quick':
+        # Quick test mode: run only selected questions (1, 5, 10, 11, 14)
+        quick_test_ids = [1, 5, 10, 11, 14]
+        quick_questions = [q for q in questions if q['id'] in quick_test_ids]
+        
+        if len(quick_questions) != len(quick_test_ids):
+            found_ids = [q['id'] for q in quick_questions]
+            missing_ids = [qid for qid in quick_test_ids if qid not in found_ids]
+            print(f"⚠️  Warning: Could not find questions with IDs: {missing_ids}")
+        
+        print(f"\n🚀 Quick test mode: Running {len(quick_questions)} selected questions")
+        print(f"   Question IDs: {[q['id'] for q in quick_questions]}")
+        
+        results = run_all_tests(
+            rag_system=rag_system,
+            llm_model=llm_model,
+            model_name=args.model,
+            questions=quick_questions,
+            logger=logger,
+            max_tokens=args.max_tokens,
+            log_file=log_file,
+            session_name=session_name
+        )
         
     elif args.mode == 'all':
         results = run_all_tests(

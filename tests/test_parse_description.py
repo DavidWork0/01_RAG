@@ -1,7 +1,16 @@
+import sys
+import os
+from pathlib import Path
+
+# Add project root and src paths
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / 'src'))
+sys.path.insert(0, str(project_root / 'src' / 'intevl3_5'))
+
 from src.data_pipeline_pdf import merge_text_with_descriptions
 
 # make temporary test function to debugging
-import os
 
 def test_parse_descriptions(texts_with_placeholders_output, output_image_descriptions_output, merged_output_test):
 

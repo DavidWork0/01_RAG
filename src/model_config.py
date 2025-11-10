@@ -153,14 +153,11 @@ Step-by-step reasoning and evidence analysis...
 Your clear and concise answer here."""
 
 # System message for other models (without thinking)
-SYSTEM_MESSAGE_STANDARD = """
-You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system.
-Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
-If the context contains the answer, use it directly and clearly attribute or reference it when appropriate.
-If the context does not contain relevant information, respond concisely using general knowledge without inventing details or assuming missing information.
-Always provide structured, accurate, and easy-to-read responses.
-Collect every important detail from the context and present it in a clear manner.
-"""
+SYSTEM_MESSAGE_STANDARD = """You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system. Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
+-If the context contains the answer, use it directly and clearly attribute or reference it when appropriate.
+-If the context does not contain relevant information, respond concisely using general knowledge without inventing details or assuming missing information.
+-Always provide structured, accurate, and easy-to-read responses.
+-Collect every important detail from the context and present it in a clear manner."""
 
 # Prompt template
 PROMPT_TEMPLATE = """<|im_start|>system
