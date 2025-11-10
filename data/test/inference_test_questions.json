@@ -1,0 +1,115 @@
+{
+  "test_questions": [
+    {
+      "id": 1,
+      "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+      "category": "user_management",
+      "tags": ["RHEL", "instance", "owner"]
+    },
+    {
+      "id": 2,
+      "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+      "category": "ldap_commands",
+      "tags": ["idsldapsearch", "keystore", "encryption"]
+    },
+    {
+      "id": 3,
+      "question": "Where are DB2 install logs stored when I finished with the install?",
+      "category": "installation",
+      "tags": ["DB2", "logs", "installation"]
+    },
+    {
+      "id": 4,
+      "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+      "category": "replication",
+      "tags": ["ISVD10", "replication", "topology", "multi-master"]
+    },
+    {
+      "id": 5,
+      "question": "I've completed the install of ISVD10 on RHEL, but when I try to use the \"idsldapsearch\" command from my bash shell, I'm presented with an error saying that there is no such command. I'm logged in as the user \"root\". What is the issue and how can I solve it?",
+      "category": "troubleshooting",
+      "tags": ["ISVD10", "idsldapsearch", "PATH", "root"]
+    },
+    {
+      "id": 6,
+      "question": "How can I add my custom schema file?",
+      "category": "schema",
+      "tags": ["schema", "customization"]
+    },
+    {
+      "id": 7,
+      "question": "What's this error: GLPMIG074E ?",
+      "category": "error_codes",
+      "tags": ["error", "GLPMIG074E"]
+    },
+    {
+      "id": 8,
+      "question": "What command is used to list all instances on a linux install of ISVD?",
+      "category": "commands",
+      "tags": ["ISVD", "instances", "linux"]
+    },
+    {
+      "id": 9,
+      "question": "What does LDIF stand for?",
+      "category": "terminology",
+      "tags": ["LDIF", "acronym"]
+    },
+    {
+      "id": 10,
+      "question": "I'm done with the install of everything on a RHEL machine. I've install WAS and WAT as well. I need to start the websphere server though, and I forgot where the file is for this. Can you tell me how I can start the WAS WAT server? Also suggest a way to auto-start this after a reboot of the server.",
+      "category": "server_management",
+      "tags": ["WAS", "WAT", "WebSphere", "startup", "auto-start"]
+    },
+    {
+      "id": 11,
+      "question": "What is the average lifespan of an African elephant in the wild?",
+      "category": "animals_non_relevant",
+      "tags": ["elephant", "wildlife", "lifespan", "Africa"]
+    },
+    {
+      "id": 12,
+      "question": "How many species of penguins exist in Antarctica?",
+      "category": "animals_non_relevant",
+      "tags": ["penguins", "Antarctica", "species", "birds"]
+    },
+    {
+      "id": 13,
+      "question": "What do giant pandas primarily eat in their natural habitat?",
+      "category": "animals_non_relevant",
+      "tags": ["panda", "diet", "bamboo", "habitat"]
+    },
+    {
+      "id": 14,
+      "question": "Can dolphins recognize themselves in a mirror?",
+      "category": "animals_non_relevant",
+      "tags": ["dolphins", "cognition", "self-awareness", "marine"]
+    },
+    {
+      "id": 15,
+      "question": "What is the fastest land animal and how fast can it run?",
+      "category": "animals_non_relevant",
+      "tags": ["cheetah", "speed", "land animals", "wildlife"]
+    },
+    {
+      "id": 16,
+      "question": "How do octopuses change their skin color and texture?",
+      "category": "animals_non_relevant",
+      "tags": ["octopus", "camouflage", "marine biology", "adaptation"]
+    },
+    {
+      "id": 17,
+      "question": "What is the primary difference between African and Asian elephants?",
+      "category": "animals_non_relevant",
+      "tags": ["elephants", "species", "comparison", "wildlife"]
+    }
+  ],
+  "metadata": {
+    "version": "1.1",
+    "created_date": "2025-11-06",
+    "updated_date": "2025-11-09",
+    "description": "Test questions for ISVD10/IBM Security Verify Directory RAG system inference testing. Includes 7 non-relevant animal questions to verify LLM performance without retrieved chunks.",
+    "total_questions": 17,
+    "relevant_questions": 10,
+    "non_relevant_questions": 7
+  }
+}

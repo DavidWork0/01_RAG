@@ -130,8 +130,8 @@ def extract_text_with_image_placeholders(pdf_path: str, images_folder: str,
     
     doc.close()
     
-    print(f"\n✓ Saved text with placeholders: {output_text}")
-    print(f"✓ Extracted {len(images_metadata)} images to: {images_folder}")
+    print(f"\n[OK] Saved text with placeholders: {output_text}")
+    print(f"[OK] Extracted {len(images_metadata)} images to: {images_folder}")
     
     return images_metadata
 
@@ -158,7 +158,7 @@ def create_descriptions_file_template(images_folder: str, output_file: str):
             f.write(f"{image_id}\n")
             f.write(f"[TODO: Add description for {img_file}]\n\n")
     
-    print(f"✓ Created descriptions template: {output_file}")
+    print(f"[OK] Created descriptions template: {output_file}")
     print(f"  Process images and fill in descriptions!")
 
 def process_images_with_vl_model(images_folder: str, output_descriptions: str, model, device, tokenizer):
@@ -201,7 +201,7 @@ def process_images_with_vl_model(images_folder: str, output_descriptions: str, m
             torch.cuda.empty_cache()
 
     
-    print(f"\n✓ Saved descriptions: {output_descriptions}")
+    print(f"\n[OK] Saved descriptions: {output_descriptions}")
 
 def parse_descriptions_file(descriptions_file: str) -> Dict[str, str]:
     """
@@ -274,13 +274,13 @@ def merge_text_with_descriptions(text_with_placeholders: str,
     with open(output_merged, 'w', encoding='utf-8') as f:
         f.write(text)
     
-    print(f"\n✓ Merged text saved: {output_merged}")
-    print(f"✓ Replaced {replaced_count} image placeholders")
+    print(f"\n[OK] Merged text saved: {output_merged}")
+    print(f"[OK] Replaced {replaced_count} image placeholders")
     
     # Check for unreplaced placeholders
     remaining = re.findall(r'\[IMAGE:[^\]]+\]', text)
     if remaining:
-        print(f"⚠ Warning: {len(remaining)} placeholders not replaced:")
+        print(f"[WARNING] {len(remaining)} placeholders not replaced:")
         for p in remaining[:5]:  # Show first 5
             print(f"  {p}")
 
@@ -337,7 +337,7 @@ def rename_pdf_file_names(input_dir: str):
             os.rename(src_path, dst_path)
             print(f"Renamed: {pdf_file} -> {new_name}")
     
-    print("✓ Renaming complete.")
+    print("[OK] Renaming complete.")
 
 def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
     """
@@ -420,10 +420,10 @@ def batch_process_pdfs_complete_workflow(input_dir: str, output_dir: str):
             merged_output = os.path.join(merged_dir, f"{pdf_name}_final.txt")
             merge_text_with_descriptions(text_output, descriptions_output, merged_output)
             
-            print(f"\n✓ Completed: {pdf_file}")
+            print(f"\n[OK] Completed: {pdf_file}")
             
         except Exception as e:
-            print(f"\n✗ Failed: {str(e)}")
+            print(f"\n[FAILED] {str(e)}")
     
     print(f"\n{'='*60}")
     print(f"All processing complete!")
