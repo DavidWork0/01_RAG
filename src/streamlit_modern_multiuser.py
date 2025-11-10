@@ -3,6 +3,36 @@ Modern Chat Interface for Hybrid RAG System - Multi-User Support
 ================================================================
 Shared model resources with separate user sessions
 
+MULTI-USER ARCHITECTURE:
+------------------------
+This application shares a single LLM model instance across all concurrent users
+to optimize VRAM usage. Thread locking ensures safe sequential access.
+
+KV CACHE BEHAVIOR:
+------------------
+- Single shared LLM instance maintains KV (Key-Value) cache state
+- Thread lock prevents concurrent access (one user at a time)
+- Each user's request includes full conversation history in the prompt
+- llama-cpp-python creates independent cache for each new prompt
+- No explicit cache reuse between different users' conversations
+
+SAFETY GUARANTEES:
+------------------
+✓ Thread lock prevents race conditions
+✓ Each prompt is self-contained with full context
+✓ No explicit cache continuation features used
+✓ User sessions are logically isolated
+
+TRADEOFFS:
+----------
+✓ VRAM Efficient: One model instance (~4-8GB)
+✗ Sequential Processing: Users queue when simultaneous requests occur
+✓ Cache Isolation: Each call starts with fresh context from prompt
+
+Alternative would be per-user model instances:
+  Pros: Perfect isolation, true parallel processing
+  Cons: N * model_size VRAM (expensive), N * load time
+
 Author: Generated for 01_RAG project
 Date: November 1, 2025
 """
@@ -86,7 +116,21 @@ def get_shared_rag_system():
 
 @st.cache_resource(show_spinner="Loading language model...")
 def get_shared_llm_model(model_name: str):
-    """Load LLM once and share across all users using shared config."""
+    """
+    Load LLM once and share across all users using shared config.
+    
+    ⚠️ KV CACHE CONSIDERATION:
+    This shared model instance maintains KV cache state. While thread locking
+    prevents concurrent access (avoiding race conditions), the KV cache from
+    one user's conversation may persist when another user accesses the model.
+    
+    Mitigation:
+    - Thread lock ensures sequential access (one user at a time)
+    - llama.cpp resets KV cache on new prompts by default
+    - For complete isolation, would need per-user model instances (high VRAM cost)
+    
+    Current tradeoff: VRAM efficiency > Perfect cache isolation
+    """
     try:
         llm = load_llm_model(model_name, project_root)
         return llm
@@ -298,6 +342,10 @@ def generate_llm_response(
                 status_placeholder.info("🤔 **Generating response...**")
             
             # CRITICAL: Lock prevents concurrent CUDA operations from different users
+            # KV Cache Management: llama.cpp automatically manages cache state
+            # Each new prompt starts fresh unless using explicit cache reuse
+            # The thread lock ensures one user completes before the next starts
+            
             # Use shared core function from model_config
             response = _generate_llm_response_core(
                 llm_model=llm_function,

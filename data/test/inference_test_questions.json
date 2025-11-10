@@ -59,12 +59,57 @@
       "question": "I'm done with the install of everything on a RHEL machine. I've install WAS and WAT as well. I need to start the websphere server though, and I forgot where the file is for this. Can you tell me how I can start the WAS WAT server? Also suggest a way to auto-start this after a reboot of the server.",
       "category": "server_management",
       "tags": ["WAS", "WAT", "WebSphere", "startup", "auto-start"]
+    },
+    {
+      "id": 11,
+      "question": "What is the average lifespan of an African elephant in the wild?",
+      "category": "animals_non_relevant",
+      "tags": ["elephant", "wildlife", "lifespan", "Africa"]
+    },
+    {
+      "id": 12,
+      "question": "How many species of penguins exist in Antarctica?",
+      "category": "animals_non_relevant",
+      "tags": ["penguins", "Antarctica", "species", "birds"]
+    },
+    {
+      "id": 13,
+      "question": "What do giant pandas primarily eat in their natural habitat?",
+      "category": "animals_non_relevant",
+      "tags": ["panda", "diet", "bamboo", "habitat"]
+    },
+    {
+      "id": 14,
+      "question": "Can dolphins recognize themselves in a mirror?",
+      "category": "animals_non_relevant",
+      "tags": ["dolphins", "cognition", "self-awareness", "marine"]
+    },
+    {
+      "id": 15,
+      "question": "What is the fastest land animal and how fast can it run?",
+      "category": "animals_non_relevant",
+      "tags": ["cheetah", "speed", "land animals", "wildlife"]
+    },
+    {
+      "id": 16,
+      "question": "How do octopuses change their skin color and texture?",
+      "category": "animals_non_relevant",
+      "tags": ["octopus", "camouflage", "marine biology", "adaptation"]
+    },
+    {
+      "id": 17,
+      "question": "What is the primary difference between African and Asian elephants?",
+      "category": "animals_non_relevant",
+      "tags": ["elephants", "species", "comparison", "wildlife"]
     }
   ],
   "metadata": {
-    "version": "1.0",
+    "version": "1.1",
     "created_date": "2025-11-06",
-    "description": "Test questions for ISVD10/IBM Security Verify Directory RAG system inference testing",
-    "total_questions": 10
+    "updated_date": "2025-11-09",
+    "description": "Test questions for ISVD10/IBM Security Verify Directory RAG system inference testing. Includes 7 non-relevant animal questions to verify LLM performance without retrieved chunks.",
+    "total_questions": 17,
+    "relevant_questions": 10,
+    "non_relevant_questions": 7
   }
 }

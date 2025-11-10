@@ -60,8 +60,8 @@ TORCH_DTYPE = 'auto'  # 'auto' = float16 for CUDA, float32 for CPU
 CHUNK_STRATEGY = "fixed_size"
 
 # Fixed-size chunking parameters
-FIXED_SIZE_CHUNK_SIZE = 800  # Characters per chunk
-FIXED_SIZE_OVERLAP = 200      # Character overlap between chunks
+FIXED_SIZE_CHUNK_SIZE = 1000  # Characters per chunk
+FIXED_SIZE_OVERLAP = 250      # Character overlap between chunks
 
 # Sentence-based chunking parameters
 CHUNK_SIZE_MAX_BY_SENTENCE = 1000  # Max characters per chunk for sentence-based chunking
@@ -117,16 +117,20 @@ BATCH_SIZE = 50
 # Default number of results to retrieve
 DEFAULT_TOP_K = 25
 
+# Minimum similarity score threshold (0-100)
+# Results with similarity scores below this threshold will be filtered out
+MIN_SIMILARITY_THRESHOLD = 40.0
+
 # Hybrid search weights (must sum to ~1.0)
 SEMANTIC_WEIGHT = 0.70  # Weight for semantic similarity (0-1)
 KEYWORD_WEIGHT = 0.30   # Weight for keyword matching (0-1)
 
 # Initial retrieval multiplier for re-ranking
 # Retrieves (TOP_K * INITIAL_K_MULTIPLIER) results before keyword re-ranking
-INITIAL_K_MULTIPLIER = 5
+INITIAL_K_MULTIPLIER = 3
 
 # Cap for initial retrieval
-INITIAL_K_CAP = 200
+INITIAL_K_CAP = 100
 
 # Stop words for keyword extraction
 STOP_WORDS = {
@@ -210,6 +214,12 @@ def validate_config():
     
     if not (0.0 <= KEYWORD_WEIGHT <= 1.0):
         raise ValueError(f"KEYWORD_WEIGHT must be between 0 and 1, got {KEYWORD_WEIGHT}")
+    
+    # Check minimum similarity threshold is valid
+    if not (0.0 <= MIN_SIMILARITY_THRESHOLD <= 100.0):
+        raise ValueError(
+            f"MIN_SIMILARITY_THRESHOLD must be between 0 and 100, got {MIN_SIMILARITY_THRESHOLD}"
+        )
     
     # Check chunking strategy is valid
     valid_strategies = ["fixed_size", "by_sentence"]
@@ -315,6 +325,7 @@ def print_config_summary():
     
     print("\n[SEARCH]")
     print(f"  Default Top-K:    {DEFAULT_TOP_K}")
+    print(f"  Min Similarity:   {MIN_SIMILARITY_THRESHOLD}%")
     print(f"  Semantic Weight:  {SEMANTIC_WEIGHT}")
     print(f"  Keyword Weight:   {KEYWORD_WEIGHT}")
     print(f"  Scoring Method:   {KEYWORD_SCORING_METHOD}")

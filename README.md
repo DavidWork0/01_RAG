@@ -4,7 +4,7 @@
 
 ## System usage:
 
-Currently the POC is done and working. **The performace is below the expected**. 
+Currently the POC is done and working. **The performace is below the expected**.
 
 ### Working principle:
 - Add pdf files to .\data\pdfs

@@ -22,8 +22,9 @@ from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 import warnings
 
-# Add project root to path
+# Add project root and src to path
 project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / 'src'))
 sys.path.insert(0, str(project_root / 'src' / 'intevl3_5'))
 
@@ -902,6 +903,8 @@ if __name__ == '__main__':
     
     if result.wasSuccessful():
         print("\n[SUCCESS] ALL TESTS PASSED!")
+        print("\nNote: [WARNING] messages in test output are intentional")
+        print("      They verify error handling works correctly.")
     else:
         print("\n[FAILURE] SOME TESTS FAILED - Review output above")
     

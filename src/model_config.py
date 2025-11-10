@@ -20,10 +20,10 @@ DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_10
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
 
 # Number of chunks to retrieve
-TOP_K_RESULTS = 25
+TOP_K_RESULTS = 20
 
 # Similarity threshold for filtering chunks (percentage)
-SIMILARITY_THRESHOLD = 40.0
+SIMILARITY_THRESHOLD = 50.0
 
 # =============================================================================
 # LLM MODEL CONFIGURATION
@@ -33,7 +33,7 @@ SIMILARITY_THRESHOLD = 40.0
 MODEL_CONFIG = {
     "InternVL3_5-2B-Q6_K": {
         "path": "models/llamacpp/InternVL3_5-2B-Q6_K.gguf",
-        "n_ctx": 40960,
+        "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
         "n_gpu_layers": -1,  # -1 means use all GPU layers
@@ -41,7 +41,74 @@ MODEL_CONFIG = {
     },
     "InternVL3_5-8B-Q4_K_M": {
         "path": "models/llamacpp/InternVL3_5-8B-Q4_K_M.gguf",
-        "n_ctx": 40960,
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "InternVL3-2B-Instruct-Q5_K_M": {
+        "path": "models/llamacpp/internvl3-2b-instruct-q5_k_m.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "Qwen3-4B-Instruct-2507-UD-Q6_K_XL": {
+        "path": "models/llamacpp/Qwen3-4B-Instruct-2507-UD-Q6_K_XL.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "Qwen3-8B-Q6_K": {
+        "path": "models/llamacpp/Qwen3-8B-Q6_K.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "OpenGVLab_InternVL3_5-8B-Q6_K": {
+        "path": "models/llamacpp/OpenGVLab_InternVL3_5-8B-Q6_K.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "InternVL3_5-2B-Q8_0": {
+        "path": "models/llamacpp/InternVL3_5-2B-Q8_0.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "Qwen3-4B-Instruct-2507-Q8_0": {
+        "path": "models/llamacpp/Qwen3-4B-Instruct-2507-Q8_0.gguf",
+        "n_ctx": 32768,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "Qwen3-8B-Q5_K_M": {
+        "path": "models/llamacpp/Qwen3-8B-Q5_K_M.gguf",
+        "n_ctx": 32768,  # Reduced from 16384 for better VRAM efficiency
+        "temperature": 0.7,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "n_gpu_layers": -1,
+        "verbose": False
+    },
+    "Qwen3-8B-Q4_K_M": {
+        "path": "models/llamacpp/Qwen3-8B-Q4_K_M.gguf",
+        "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
         "n_gpu_layers": -1,
@@ -51,8 +118,10 @@ MODEL_CONFIG = {
 
 
 # Default model to use
-DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
+#DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
+DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
 #DEFAULT_MODEL = "InternVL3_5-8B-Q4_K_M"
+#DEFAULT_MODEL = "InternVL3-2B-Instruct-Q5_K_M"
 
 # =============================================================================
 # INFERENCE SETTINGS
@@ -73,20 +142,25 @@ SYSTEM_MESSAGE_INTERNVL =  """You are a helpful AI assistant specialized in hybr
 
 Always:
 - Analyze the retrieved context carefully before forming an answer.
-- Separate your reasoning process and show it inside <think></think> tags. This section should logically outline how you arrive at your conclusion but should never include guesses unrelated to the provided data.
 - Outside the tags, write your final answer clearly, accurately, and concisely in English.
-- If information is missing or unclear, state that explicitly instead of assuming or fabricating details.
-- Avoid thinking loops. If you find yourself repeating the same reasoning, try rephrasing the user's question or ask for clarification.
 - If you recommend actions, ensure they are directly supported by the context.
 
 Example structure:
 <think>
 Step-by-step reasoning and evidence analysis...
 </think>
-Final Answer: Your clear and concise answer here."""
+
+Your clear and concise answer here."""
 
 # System message for other models (without thinking)
-SYSTEM_MESSAGE_STANDARD = """You are a helpful AI assistant. Answer the user's question based on the provided context from the knowledge base."""
+SYSTEM_MESSAGE_STANDARD = """
+You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system.
+Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
+If the context contains the answer, use it directly and clearly attribute or reference it when appropriate.
+If the context does not contain relevant information, respond concisely using general knowledge without inventing details or assuming missing information.
+Always provide structured, accurate, and easy-to-read responses.
+Collect every important detail from the context and present it in a clear manner.
+"""
 
 # Prompt template
 PROMPT_TEMPLATE = """<|im_start|>system
@@ -135,7 +209,7 @@ def get_system_message(model_name: str) -> str:
         System message string
     """
     if "InternVL" in model_name:
-        return SYSTEM_MESSAGE_INTERNVL
+        return SYSTEM_MESSAGE_STANDARD
     else:
         return SYSTEM_MESSAGE_STANDARD
 
@@ -250,12 +324,17 @@ def load_llm_model(model_name: str, project_root):
         raise ImportError(f"llama-cpp-python not installed: {e}")
     
     # Instantiate model with config parameters
+    # Note: For multi-user scenarios, each call creates a separate model instance
+    # to avoid KV cache contamination between users
     llm = Llama(
         model_path=str(model_path),
         n_ctx=config["n_ctx"],
         n_gpu_layers=config["n_gpu_layers"],
         temperature=config["temperature"],
-        verbose=config["verbose"]
+        verbose=config["verbose"],
+        # KV cache is managed per-instance; in streamlit with @st.cache_resource,
+        # one instance is shared, so we rely on thread locking to prevent
+        # concurrent access that could mix KV cache states
     )
     
     return llm

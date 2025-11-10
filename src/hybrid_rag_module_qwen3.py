@@ -10,13 +10,14 @@ import torch.nn.functional as F
 import time
 
 # Import configuration
-from rag_config import (
+from src.rag_config import (
     DEFAULT_DB_PATH,
     COLLECTION_NAME,
     EMBEDDING_MODEL,
     EMBEDDING_DIMENSION,
     MODEL_CACHE_DIR,
     DEFAULT_TOP_K,
+    MIN_SIMILARITY_THRESHOLD,
     SEMANTIC_WEIGHT,
     KEYWORD_WEIGHT,
     INITIAL_K_MULTIPLIER,
@@ -115,6 +116,7 @@ class HybridRAGQwen3_Module:
         device: Optional[str] = None,
         semantic_weight: float = SEMANTIC_WEIGHT,
         keyword_weight: float = KEYWORD_WEIGHT,
+        min_similarity: float = MIN_SIMILARITY_THRESHOLD,
         verbose: bool = VERBOSE_RAG
     ):
         """
@@ -128,6 +130,7 @@ class HybridRAGQwen3_Module:
             device: 'cuda', 'cpu', or None (auto-detect)
             semantic_weight: Weight for semantic similarity (0-1)
             keyword_weight: Weight for keyword matching (0-1)
+            min_similarity: Minimum similarity threshold (0-100)
             verbose: Print initialization messages
         """
         self.embedding_model = embedding_model
@@ -136,6 +139,7 @@ class HybridRAGQwen3_Module:
         self.model_cache_dir = model_cache_dir
         self.semantic_weight = semantic_weight
         self.keyword_weight = keyword_weight
+        self.min_similarity = min_similarity
         self.verbose = verbose
         
         # Auto-detect device if not specified
@@ -371,6 +375,34 @@ class HybridRAGQwen3_Module:
         
         return scored_results
     
+    def _filter_by_similarity(
+        self,
+        scored_results: List[Tuple]
+    ) -> List[Tuple]:
+        """
+        Step 5: Filter results by minimum similarity threshold.
+        
+        Applied AFTER reranking to ensure keyword matches are properly
+        considered before filtering out low-similarity results.
+        
+        Args:
+            scored_results: List of scored results (doc, meta, dist, keyword_score, combined_score)
+            
+        Returns:
+            List of filtered results above similarity threshold
+        """
+        filtered_results = []
+        
+        for doc, meta, dist, kw_score, comb_score in scored_results:
+            # Calculate similarity percentage (lower distance = higher similarity)
+            similarity = max(0, min(100, (1 - dist) * 100))
+            
+            # Only keep results above the minimum threshold
+            if similarity >= self.min_similarity:
+                filtered_results.append((doc, meta, dist, kw_score, comb_score))
+        
+        return filtered_results
+    
     def _rank_and_select_top_results(
         self,
         scored_results: List[Tuple],
@@ -378,6 +410,9 @@ class HybridRAGQwen3_Module:
     ) -> List[Tuple]:
         """
         Step 4: Sort results by combined score and select top_k.
+        
+        This reranks results by combining semantic similarity with keyword
+        matching scores. Lower combined_score = better result.
         
         Args:
             scored_results: List of scored results
@@ -396,7 +431,7 @@ class HybridRAGQwen3_Module:
         return_distances: bool
     ) -> List[Dict]:
         """
-        Step 5: Format results into structured output dictionaries.
+        Step 7: Format results into structured output dictionaries.
         
         Args:
             top_results: List of top-ranked results
@@ -438,6 +473,8 @@ class HybridRAGQwen3_Module:
         
         This is the main method for querying the RAG system. It combines
         semantic similarity with keyword matching to find relevant chunks.
+        Results are filtered to only include chunks above the minimum
+        similarity threshold.
         
         Args:
             query: Search query text
@@ -459,6 +496,7 @@ class HybridRAGQwen3_Module:
         
         self._print(f"\n Searching for: '{query}'")
         self._print(f"   Strategy: {int(self.semantic_weight*100)}% semantic + {int(self.keyword_weight*100)}% keyword")
+        self._print(f"   Min Similarity: {self.min_similarity}%")
         
         start_time = time.time()
         
@@ -476,11 +514,22 @@ class HybridRAGQwen3_Module:
         # Step 3: Score and combine results
         scored_results = self._score_and_combine_results(semantic_results, keywords)
         
-        # Step 4: Rank and select top results
-        top_results = self._rank_and_select_top_results(scored_results, top_k)
+        # Step 4: Rank ALL results by combined score (BEFORE filtering)
+        # This allows keyword matches to boost ranking before similarity filter removes them
+        ranked_results = self._rank_and_select_top_results(scored_results, len(scored_results))
         
-        # Step 5: Format results for output
-        formatted_results = self._format_results_for_output(top_results, return_distances)
+        # Step 5: Filter by minimum similarity threshold (AFTER reranking)
+        filtered_results = self._filter_by_similarity(ranked_results)
+        
+        if not filtered_results:
+            self._print(f"⚠️  No results above similarity threshold ({self.min_similarity}%)")
+            return []
+        
+        # Step 6: Select final top-k from filtered and ranked results
+        final_results = filtered_results[:top_k]
+        
+        # Step 7: Format results for output
+        formatted_results = self._format_results_for_output(final_results, return_distances)
         
         elapsed = time.time() - start_time
         self._print(f"✓ Found {len(formatted_results)} results in {elapsed:.2f}s")
