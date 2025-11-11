@@ -97,7 +97,7 @@ MODEL_CONFIG = {
     },
     "Qwen3-8B-Q5_K_M": {
         "path": "models/llamacpp/Qwen3-8B-Q5_K_M.gguf",
-        "n_ctx": 32768,  # Reduced from 16384 for better VRAM efficiency
+        "n_ctx": 32768,  # Reduced from 16384, 32768 for better VRAM efficiency
         "temperature": 0.7,
         "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
         "top_k": 20,  # Added - recommended by Qwen team
@@ -110,7 +110,10 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-8B-Q4_K_M.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
         "n_gpu_layers": -1,
         "verbose": False
     }

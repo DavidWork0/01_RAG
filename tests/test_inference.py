@@ -6,6 +6,7 @@ Tests performance, logs results, and generates reports.
 
 Usage:
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode all
+    python test_inference.py --model Qwen3-8B-Q4_K_M --mode quick
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode single --question-id 1
     python test_inference.py --show-stats
     python test_inference.py --export-report

@@ -1,0 +1,4 @@
+CLEANING:
+if docker running: docker system prune -a --volumes
+Then
+cleanup_docker.bat

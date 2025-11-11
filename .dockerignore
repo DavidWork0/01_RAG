@@ -1,0 +1,86 @@
+# Docker ignore file to exclude unnecessary files from the build context
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+license/
+
+# Test files and logs (keep only structure)
+tests/__pycache__/
+tests/logs/*
+!tests/logs/.gitkeep
+
+# Data (except structure - will be mounted)
+data/backup/
+data/test/
+
+# Obsolete code
+src/obsolate/
+src/ideas/
+
+# Batch files (Windows specific)
+*.bat
+
+# Large model files will be mounted as volumes
+# But keep the directory structure
+models/llamacpp/*.gguf
+models/huggingface/*/
+
+# Output directories (will be in volumes)
+data/output/*/
+!data/output/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.env.*
+
+# Docker files (already in context)
+.dockerignore
