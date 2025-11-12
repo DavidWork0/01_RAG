@@ -6,12 +6,16 @@ __pycache__/
 *$py.class
 *.so
 .Python
+*.pyc
+.pytest_cache/
+.coverage
 
 # Virtual environments
 .venv/
 venv/
 env/
 ENV/
+.virtualenv/
 
 # IDE
 .vscode/
@@ -19,60 +23,73 @@ ENV/
 *.swp
 *.swo
 *~
+.spyderproject
+.spyproject
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Git
 .git/
 .gitignore
 .gitattributes
+.github/
 
 # Documentation
 *.md
 !README.md
-docs/
-license/
+01_RAG/docs/
+01_RAG/license/
 
 # Test files and logs (keep only structure)
-tests/__pycache__/
-tests/logs/*
-!tests/logs/.gitkeep
+01_RAG/tests/__pycache__/
+01_RAG/tests/logs/*
+!01_RAG/tests/logs/.gitkeep
+pytest.ini
+.pytest_cache/
 
 # Data (except structure - will be mounted)
-data/backup/
-data/test/
+01_RAG/data/backup/
+01_RAG/data/test/
 
 # Obsolete code
-src/obsolate/
-src/ideas/
+01_RAG/src/obsolate/
+01_RAG/src/ideas/
 
 # Batch files (Windows specific)
 *.bat
+*.ps1
 
 # Large model files will be mounted as volumes
 # But keep the directory structure
-models/llamacpp/*.gguf
-models/huggingface/*/
+01_RAG/models/llamacpp/*.gguf
+01_RAG/models/huggingface/*/
+*.bin
+*.safetensors
+*.onnx
 
 # Output directories (will be in volumes)
-data/output/*/
-!data/output/.gitkeep
+01_RAG/data/output/*/
+!01_RAG/data/output/.gitkeep
 
 # Logs
-logs/
+01_RAG/logs/
 *.log
 
 # Temporary files
 tmp/
 temp/
 *.tmp
+*.temp
+*.cache
 
 # Build artifacts
 build/
 dist/
 *.egg-info/
+*.egg
 
 # Jupyter notebooks
 *.ipynb
@@ -81,6 +98,19 @@ dist/
 # Environment files
 .env
 .env.*
+.envrc
 
 # Docker files (already in context)
 .dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# PyTorch/ML specific
+wandb/
+mlruns/
+.tensorboard/
+checkpoints/
+
+# Requirements files (keep only the ones you copy)
+requirements_project.txt
+!requirements_project_without_torch.txt

@@ -1,0 +1,111 @@
+# Stage 1: Build stage - compile Python 3.11.9
+FROM nvidia/cuda:12.8.0-cudnn-devel-ubuntu24.04 AS builder
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    libncurses5-dev \
+    libgdbm-dev \
+    libnsl-dev \
+    libsqlite3-dev \
+    libreadline-dev \
+    libbz2-dev \
+    libexpat1-dev \
+    zlib1g-dev \
+    liblzma-dev \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and compile Python 3.11.9
+RUN wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz && \
+    tar -xzf Python-3.11.9.tgz && \
+    cd Python-3.11.9 && \
+    ./configure --prefix=/usr/local --enable-optimizations && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && \
+    rm -rf Python-3.11.9 Python-3.11.9.tgz
+
+# Stage 2: Runtime stage - use devel for CUDA compilation support
+FROM nvidia/cuda:12.8.0-cudnn-devel-ubuntu24.04
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    CUDA_HOME=/usr/local/cuda \
+    PATH=/usr/local/cuda/bin:/usr/local/bin:${PATH} \
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+
+# Install runtime dependencies and build tools for llama-cpp-python
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl3 \
+    libffi8 \
+    libsqlite3-0 \
+    libreadline8 \
+    libbz2-1.0 \
+    zlib1g \
+    liblzma5 \
+    ca-certificates \
+    git \
+    build-essential \
+    cmake \
+    gcc \
+    g++ \
+    ninja-build \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled Python from builder stage
+COPY --from=builder /usr/local /usr/local
+
+# Create symlinks
+RUN ln -sf /usr/local/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/local/bin/python3.11 /usr/bin/python3
+
+WORKDIR /app
+
+# Create virtual environment
+RUN python -m venv /app/.venv
+
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Upgrade pip
+RUN python -m pip install --upgrade pip --verbose
+
+# Install PyTorch and dependencies with verbose output
+RUN pip install --verbose torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+RUN pip install --verbose "transformers[torch]" accelerate
+
+# --- Build llama-cpp-python from source with CUDA support RTX4060ti -> CUDA_DOCKER_ARCH=89 ---
+# Add stub library path to fix libcuda.so.1 linking issue at build time
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
+    git clone --branch v0.3.16 --depth 1 https://github.com/abetlen/llama-cpp-python.git /tmp/llama-cpp-python && \
+    cd /tmp/llama-cpp-python && \
+    git submodule update --init --recursive --depth 1 && \
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} \
+    CUDA_DOCKER_ARCH=89 \
+    CMAKE_ARGS="-DGGML_CUDA=ON -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_SERVER=OFF" \
+    pip install --verbose . && \
+    cd /app && \
+    rm -rf /tmp/llama-cpp-python && \
+    rm /usr/local/cuda/lib64/stubs/libcuda.so.1
+
+# Copy and install requirements with verbose output
+COPY requirements_project_without_torch.txt .
+RUN pip install --verbose -r requirements_project_without_torch.txt
+
+# Install ONNX GPU support for sentence-transformers (after requirements)
+RUN pip install --verbose --no-deps optimum[onnxruntime-gpu]
+
+# Copy the entire 01_RAG project structure
+COPY 01_RAG/ ./
+
+EXPOSE 8501
+
+# Run the Streamlit application
+CMD ["streamlit", "run", "src/streamlit_modern_multiuser.py", "--server.port=8501", "--server.address=0.0.0.0"]

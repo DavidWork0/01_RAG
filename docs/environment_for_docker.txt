@@ -1,0 +1,82 @@
+python --version
+Python 3.11.9
+
+nvcc --version
+
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2025 NVIDIA Corporation
+Built on Wed_Jan_15_19:38:46_Pacific_Standard_Time_2025
+Cuda compilation tools, release 12.8, V12.8.61
+Build cuda_12.8.r12.8/compiler.35404655_0
+
+nvidia-smi
+
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 581.57                 Driver Version: 581.57         CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 4060 Ti   WDDM  |   00000000:01:00.0  On |                  N/A |
+|  0%   37C    P8             14W /  165W |    1089MiB /  16380MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
+
+Docker setting up:
+
+1. docker with linux and nvidia-smi
+
+2. NVIDIA Container Toolkit
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+-comes preinstalled in used container.
+
+Install sequence:
+note tried to install before project_requirements.txt but it was a fail
+python -m pip install --upgrade pip
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 
+pip install transformers
+o	pip install accelerate
+
+pip install -U "sentence-transformers[onnx-gpu]
+
+for data pipeline:
+pip install fitz <- maybe can be left out
+python3 -m pip install -r requirements_project_without_torch.txt
+pip cache purge
+pip uninstall llama-cpp-python -y
+
+CMAKE_ARGS="-DGGML_CUDA=on" FORCE_CMAKE=1 pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir --verbose
+
+apt-get update && apt-get install -y liblzma5 <- this can added to dockerfile as well before:
+	# Minimal runtime deps (if needed later)
+		RUN apt-get update && apt-get install -y --no-install-recommends \
+    		ca-certificates \
+    		liblzma5 \
+    		&& rm -rf /var/lib/apt/lists/*
+
+
+ apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    wget \
+    ca-certificates \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libncursesw5-dev \
+    libgdbm-dev \
+    liblzma-dev \
+    liblzma5 \
+    libffi-dev \
+    uuid-dev \
+    xz-utils \
+    tk-dev \
+    git \
+    curl \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*

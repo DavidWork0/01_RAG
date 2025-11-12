@@ -1,0 +1,41 @@
+services:
+  linux_with_cuda_complete:
+    build:
+      context: .
+      dockerfile: Dockerfile_multi
+    image: linux_with_cuda_complete:latest
+    container_name: linux_with_cuda-complete-container
+    ports:
+      - "127.0.0.1:8501:8501" # Streamlit default port exposed to localhost only for security
+    
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/app/models
+      - TORCH_HOME=/app/models
+      - TRANSFORMERS_CACHE=/app/models
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - TORCH_CUDNN_BENCHMARK=1
+    
+    volumes:
+      - ./01_RAG/src:/app/src
+      - ./01_RAG/models:/app/models
+      - ./01_RAG/data:/app/data
+      - ./01_RAG/logs:/app/logs
+    
+    
+    restart: unless-stopped
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"

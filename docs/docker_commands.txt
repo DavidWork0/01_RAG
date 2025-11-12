@@ -1,0 +1,16 @@
+CLEANING:
+if docker running: docker system prune -a --volumes
+Then
+cleanup_docker.bat
+
+docker-compose exec llm-app nvidia-smi
+docker-compose up -d (detached)
+docker-compose down
+
+docker compose build --no-cache
+
+
+docker-compose down; docker-compose build --no-cache; docker-compose up               power shell in one
+
+
+. .venv/bin/activate in folder projects currently

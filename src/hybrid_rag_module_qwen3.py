@@ -220,7 +220,11 @@ class HybridRAGQwen3_Module:
         client = chromadb.PersistentClient(path=self.db_path)
         
         try:
-            collection = client.get_collection(
+            # Use get_or_create_collection to avoid deserialization issues
+            # This will reuse existing data but override the stored embedding function
+            # with our current one, preventing "Could not import module" errors
+            # when the database was created in a different environment
+            collection = client.get_or_create_collection(
                 name=self.collection_name,
                 embedding_function=self.embedding_fn
             )
