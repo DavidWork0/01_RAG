@@ -66,13 +66,16 @@ COPY --from=builder /usr/local /usr/local
 RUN ln -sf /usr/local/bin/python3.11 /usr/bin/python && \
     ln -sf /usr/local/bin/python3.11 /usr/bin/python3
 
-WORKDIR /app
+# Create project directory structure first
+RUN mkdir -p /app/01_RAG
+
+WORKDIR /app/01_RAG
 
 # Create virtual environment
-RUN python -m venv /app/.venv
+RUN python -m venv /app/01_RAG/.venv
 
-ENV VIRTUAL_ENV=/app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/app/01_RAG/.venv
+ENV PATH="/app/01_RAG/.venv/bin:$PATH"
 
 # Upgrade pip
 RUN python -m pip install --upgrade pip --verbose
@@ -91,7 +94,7 @@ RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/lib
     CUDA_DOCKER_ARCH=89 \
     CMAKE_ARGS="-DGGML_CUDA=ON -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_SERVER=OFF" \
     pip install --verbose . && \
-    cd /app && \
+    cd /app/01_RAG && \
     rm -rf /tmp/llama-cpp-python && \
     rm /usr/local/cuda/lib64/stubs/libcuda.so.1
 
@@ -102,10 +105,17 @@ RUN pip install --verbose -r requirements_project_without_torch.txt
 # Install ONNX GPU support for sentence-transformers (after requirements)
 RUN pip install --verbose --no-deps optimum[onnxruntime-gpu]
 
-# Copy the entire 01_RAG project structure
-COPY 01_RAG/ ./
+# Copy the entire project structure into /app/01_RAG
+COPY src/ ./src/
+COPY data/ ./data/
+COPY models/ ./models/
+COPY logs/ ./logs/
 
+# Set working directory to src for running the application
+WORKDIR /app/01_RAG/src
+
+# Expose the Streamlit default port
 EXPOSE 8501
 
 # Run the Streamlit application
-CMD ["streamlit", "run", "src/streamlit_modern_multiuser.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "streamlit_modern_multiuser.py", "--server.port=8501", "--server.address=0.0.0.0"]

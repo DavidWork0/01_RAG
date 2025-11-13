@@ -19,19 +19,15 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
-      - HF_HOME=/app/models
-      - TORCH_HOME=/app/models
-      - TRANSFORMERS_CACHE=/app/models
+      - HF_HOME=/app/01_RAG/models
+      - TORCH_HOME=/app/01_RAG/models
+      - TRANSFORMERS_CACHE=/app/01_RAG/models
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
       - TORCH_CUDNN_BENCHMARK=1
     
-    volumes:
-      - ./01_RAG/src:/app/src
-      - ./01_RAG/models:/app/models
-      - ./01_RAG/data:/app/data
-      - ./01_RAG/logs:/app/logs
-    
-    
+    # No bind mounts: project files are copied into the image at build time
+    # (This improves IO performance and prevents host mounts from hiding in-image files)
+
     restart: unless-stopped
     
     logging:
