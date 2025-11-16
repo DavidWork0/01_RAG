@@ -7,6 +7,7 @@ Tests performance, logs results, and generates reports.
 Usage:
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode all
     python test_inference.py --model Qwen3-8B-Q4_K_M --mode quick
+    python test_inference.py --model Qwen3-8B-Q5_K_M --mode all
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode single --question-id 1
     python test_inference.py --show-stats
     python test_inference.py --export-report
@@ -21,6 +22,7 @@ import argparse
 import json
 import time
 import re
+import hashlib
 from typing import Dict, List, Optional
 
 # Add project root and src to path
@@ -31,6 +33,14 @@ sys.path.insert(0, str(project_root / 'src'))
 # Import required modules
 from src.hybrid_rag_module_qwen3 import HybridRAGQwen3_Module
 from src.inference_logger import InferenceLogger
+
+# Import hardware information module
+try:
+    from hardware_info import get_all_hardware_info, format_hardware_info
+    HARDWARE_INFO_AVAILABLE = True
+except ImportError:
+    HARDWARE_INFO_AVAILABLE = False
+    print("⚠️  Warning: hardware_info module not available. Hardware information will not be logged.")
 
 # Import shared configuration
 from src.model_config import (
@@ -47,12 +57,98 @@ from src.model_config import (
     parse_thinking_response,
     load_llm_model,
     generate_llm_response,
-    PROMPT_TEMPLATE
+    PROMPT_TEMPLATE,
+    MAX_TOKENS_OPTIONS,
+    SYSTEM_MESSAGE_INTERNVL,
+    SYSTEM_MESSAGE_STANDARD,
+    PROMPT_TEMPLATE_WITH_HISTORY,
+    DEFAULT_MODEL
+)
+
+# Import RAG configuration
+from src.rag_config import (
+    CHUNK_STRATEGY,
+    FIXED_SIZE_CHUNK_SIZE,
+    FIXED_SIZE_OVERLAP,
+    CHUNK_SIZE_MAX_BY_SENTENCE,
+    EMBEDDING_DIMENSION,
+    COLLECTION_NAME,
+    BATCH_SIZE,
+    DEFAULT_TOP_K,
+    MIN_SIMILARITY_THRESHOLD,
+    SEMANTIC_WEIGHT,
+    KEYWORD_WEIGHT,
+    INITIAL_K_MULTIPLIER,
+    INITIAL_K_CAP,
+    KEYWORD_SCORING_METHOD,
+    MAX_EMBEDDING_LENGTH,
+    PADDING,
+    TRUNCATION,
+    get_db_path,
+    get_device,
+    get_torch_dtype
 )
 
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
+
+def compute_file_hash(file_path: Path) -> str:
+    """
+    Compute SHA256 hash of a file.
+    
+    Args:
+        file_path: Path to the file
+    
+    Returns:
+        Hexadecimal hash string, or "FILE_NOT_FOUND" if file doesn't exist
+    """
+    if not file_path.exists():
+        return "FILE_NOT_FOUND"
+    
+    try:
+        sha256_hash = hashlib.sha256()
+        with open(file_path, 'rb') as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+    except Exception as e:
+        return f"ERROR: {str(e)}"
+
+
+def get_python_file_hashes() -> Dict[str, str]:
+    """
+    Get hashes of all critical Python files in the project.
+    
+    Returns:
+        Dictionary mapping file paths to their SHA256 hashes
+    """
+    critical_files = [
+        # Core modules
+        project_root / "src" / "model_config.py",
+        project_root / "src" / "rag_config.py",
+        project_root / "src" / "hybrid_rag_module_qwen3.py",
+        project_root / "src" / "inference_logger.py",
+        project_root / "src" / "data_pipeline_pdf.py",
+        project_root / "src" / "chunk_qwen3_0_6B.py",
+        project_root / "src" / "pre_chunking.py",
+        project_root / "src" / "streamlit_modern_multiuser.py",
+        # InternVL modules
+        project_root / "src" / "intevl3_5" / "InternVL35_2B_reducedv2_single.py",
+        project_root / "src" / "intevl3_5" / "InternVL35_4B_reducedv2_single.py",
+        # Test files
+        project_root / "tests" / "test_inference.py",
+        project_root / "tests" / "test_full.py",
+        project_root / "tests" / "test_basics.py",
+    ]
+    
+    file_hashes = {}
+    for file_path in critical_files:
+        relative_path = file_path.relative_to(project_root)
+        file_hashes[str(relative_path)] = compute_file_hash(file_path)
+    
+    return file_hashes
+
 
 def load_test_questions(questions_path: str) -> List[Dict]:
     """Load test questions from JSON file."""
@@ -86,7 +182,7 @@ def create_session_log_file(model_name: str) -> tuple[Path, str]:
 
 def write_log_header(log_file: Path, model_name: str, args):
     """
-    Write header information to the log file.
+    Write comprehensive header information to the log file.
     
     Args:
         log_file: Path to the log file
@@ -94,50 +190,273 @@ def write_log_header(log_file: Path, model_name: str, args):
         args: Command line arguments
     """
     with open(log_file, 'w', encoding='utf-8') as f:
-        f.write("="*80 + "\n")
+        f.write("="*100 + "\n")
         f.write("INFERENCE TEST SESSION LOG\n")
-        f.write("="*80 + "\n\n")
+        f.write("="*100 + "\n\n")
         
-        # Session information
-        f.write(f"Session Start Time: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write(f"Model: {model_name}\n")
-        f.write(f"Test Mode: {args.mode}\n")
+        # =====================================================================
+        # PROJECT INFORMATION
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*40 + "PROJECT INFORMATION" + " "*39 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
+        
+        f.write(f"Project Name:           01_RAG (Hybrid RAG System)\n")
+        f.write(f"Project Root:           {project_root}\n")
+        f.write(f"Session Start Time:     {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Session ID:             {log_file.stem}\n")
+        f.write(f"Test Mode:              {args.mode}\n")
         if args.mode == 'single':
-            f.write(f"Question ID: {args.question_id}\n")
+            f.write(f"Question ID:            {args.question_id}\n")
+        f.write(f"Selected Model:         {model_name}\n")
         f.write(f"\n")
         
-        # Configuration from inference_config
-        f.write("-"*80 + "\n")
-        f.write("CONFIGURATION PARAMETERS\n")
-        f.write("-"*80 + "\n\n")
+        # =====================================================================
+        # HARDWARE INFORMATION
+        # =====================================================================
+        if HARDWARE_INFO_AVAILABLE:
+            f.write("╔" + "═"*98 + "╗\n")
+            f.write("║" + " "*39 + "HARDWARE INFORMATION" + " "*39 + "║\n")
+            f.write("╚" + "═"*98 + "╝\n\n")
+            
+            try:
+                hw_info = get_all_hardware_info()
+                
+                # OS Information
+                os_info = hw_info['os']
+                f.write(f"Operating System:\n")
+                f.write("-"*100 + "\n")
+                f.write(f"  System:                 {os_info['system']}\n")
+                f.write(f"  Release:                {os_info['release']}\n")
+                f.write(f"  Version:                {os_info['version']}\n")
+                f.write(f"  Platform:               {os_info['platform']}\n")
+                f.write(f"  Python Version:         {os_info['python_version']}\n")
+                f.write(f"  Python Implementation:  {os_info['python_implementation']}\n")
+                f.write(f"\n")
+                
+                # CPU Information
+                cpu_info = hw_info['cpu']
+                f.write(f"CPU:\n")
+                f.write("-"*100 + "\n")
+                f.write(f"  Processor:              {cpu_info['processor']}\n")
+                f.write(f"  Architecture:           {cpu_info['architecture']}\n")
+                f.write(f"  Physical Cores:         {cpu_info['physical_cores']}\n")
+                f.write(f"  Logical Cores:          {cpu_info['logical_cores']}\n")
+                f.write(f"  Max Frequency:          {cpu_info['max_frequency']}\n")
+                f.write(f"  Current Frequency:      {cpu_info['current_frequency']}\n")
+                f.write(f"\n")
+                
+                # RAM Information
+                ram_info = hw_info['ram']
+                f.write(f"RAM:\n")
+                f.write("-"*100 + "\n")
+                f.write(f"  Total:                  {ram_info['total']}\n")
+                f.write(f"  Available:              {ram_info['available']}\n")
+                f.write(f"  Used:                   {ram_info['used']}\n")
+                f.write(f"  Percent Used:           {ram_info['percent_used']}\n")
+                f.write(f"\n")
+                
+                # GPU Information
+                f.write(f"GPU(s):\n")
+                f.write("-"*100 + "\n")
+                for gpu in hw_info['gpus']:
+                    f.write(f"  GPU {gpu['index']}:\n")
+                    f.write(f"    Name:                 {gpu['name']}\n")
+                    f.write(f"    Vendor:               {gpu.get('vendor', 'Unknown')}\n")
+                    if gpu.get('driver_version') != 'N/A':
+                        f.write(f"    Driver Version:       {gpu['driver_version']}\n")
+                    f.write(f"    Memory Total:         {gpu['memory_total']}\n")
+                    if gpu['memory_used'] != 'N/A':
+                        f.write(f"    Memory Used:          {gpu['memory_used']}\n")
+                        f.write(f"    Memory Free:          {gpu['memory_free']}\n")
+                    if gpu.get('temperature') and gpu['temperature'] != 'N/A':
+                        f.write(f"    Temperature:          {gpu['temperature']}\n")
+                    if gpu.get('utilization') and gpu['utilization'] != 'N/A':
+                        f.write(f"    Utilization:          {gpu['utilization']}\n")
+                    if gpu.get('compute_capability'):
+                        f.write(f"    Compute Capability:   {gpu['compute_capability']}\n")
+                f.write(f"\n")
+                
+                # CUDA Information
+                cuda_info = hw_info['cuda']
+                f.write(f"CUDA:\n")
+                f.write("-"*100 + "\n")
+                f.write(f"  Available:              {cuda_info['available']}\n")
+                f.write(f"  Version:                {cuda_info['version']}\n")
+                f.write(f"  Device Count:           {cuda_info['device_count']}\n")
+                if cuda_info['current_device'] != 'N/A':
+                    f.write(f"  Current Device:         {cuda_info['current_device']}\n")
+                f.write(f"\n")
+                
+                # Disk Information
+                disk_info = hw_info['disk']
+                f.write(f"Disk (Working Directory):\n")
+                f.write("-"*100 + "\n")
+                f.write(f"  Total:                  {disk_info['total']}\n")
+                f.write(f"  Used:                   {disk_info['used']}\n")
+                f.write(f"  Free:                   {disk_info['free']}\n")
+                f.write(f"  Percent Used:           {disk_info['percent_used']}\n")
+                f.write(f"\n")
+                
+            except Exception as e:
+                f.write(f"⚠️  Error collecting hardware information: {str(e)}\n\n")
+        else:
+            f.write("⚠️  Hardware information module not available.\n\n")
+        
+        # =====================================================================
+        # FILE INTEGRITY (SHA256 HASHES)
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*36 + "FILE INTEGRITY HASHES" + " "*41 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
+        
+        f.write("Python Source File Hashes (SHA256):\n")
+        f.write("-"*100 + "\n")
+        
+        file_hashes = get_python_file_hashes()
+        for file_path, file_hash in sorted(file_hashes.items()):
+            f.write(f"  {file_path:<60} {file_hash}\n")
+        f.write(f"\n")
+        
+        # =====================================================================
+        # LLM MODEL CONFIGURATION (model_config.py)
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*37 + "LLM MODEL CONFIGURATION" + " "*38 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
         
         model_config = get_model_config(model_name)
-        f.write(f"LLM Model Configuration:\n")
-        f.write(f"  Model Path: {model_config['path']}\n")
-        f.write(f"  Context Size (n_ctx): {model_config['n_ctx']}\n")
-        f.write(f"  Temperature: {model_config['temperature']}\n")
-        f.write(f"  Top P: {model_config['top_p']}\n")
-        f.write(f"  GPU Layers: {model_config['n_gpu_layers']}\n")
+        f.write(f"Current Model Settings [{model_name}]:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Model Path:             {model_config['path']}\n")
+        f.write(f"  Context Size (n_ctx):   {model_config['n_ctx']}\n")
+        f.write(f"  Temperature:            {model_config['temperature']}\n")
+        f.write(f"  Top P:                  {model_config['top_p']}\n")
+        if 'top_k' in model_config:
+            f.write(f"  Top K:                  {model_config['top_k']}\n")
+        if 'min_p' in model_config:
+            f.write(f"  Min P:                  {model_config['min_p']}\n")
+        if 'repeat_penalty' in model_config:
+            f.write(f"  Repeat Penalty:         {model_config['repeat_penalty']}\n")
+        f.write(f"  GPU Layers:             {model_config['n_gpu_layers']}\n")
+        f.write(f"  Verbose:                {model_config['verbose']}\n")
         f.write(f"\n")
         
-        f.write(f"RAG Configuration:\n")
-        f.write(f"  Database Path: {DEFAULT_DB_PATH}\n")
-        f.write(f"  Embedding Model: {EMBEDDING_MODEL}\n")
-        f.write(f"  Top K Results: {TOP_K_RESULTS}\n")
+        f.write(f"All Available Models:\n")
+        f.write("-"*100 + "\n")
+        for idx, available_model in enumerate(get_available_models(), 1):
+            marker = " ← SELECTED" if available_model == model_name else ""
+            f.write(f"  {idx:2}. {available_model}{marker}\n")
         f.write(f"\n")
         
-        f.write(f"Inference Settings:\n")
-        f.write(f"  Max Tokens: {args.max_tokens}\n")
-        f.write(f"  Default Max Tokens: {DEFAULT_MAX_TOKENS}\n")
+        f.write(f"Default Model:          {DEFAULT_MODEL}\n")
         f.write(f"\n")
         
-        f.write(f"System Message:\n")
+        # =====================================================================
+        # INFERENCE CONFIGURATION (model_config.py)
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*38 + "INFERENCE CONFIGURATION" + " "*37 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
+        
+        f.write(f"Token Settings:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Max Tokens (Current):   {args.max_tokens}\n")
+        f.write(f"  Default Max Tokens:     {DEFAULT_MAX_TOKENS}\n")
+        f.write(f"  Available Options:      {MAX_TOKENS_OPTIONS}\n")
+        f.write(f"\n")
+        
+        f.write(f"Test Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Test Questions Path:    {TEST_QUESTIONS_PATH}\n")
+        f.write(f"\n")
+        
+        # =====================================================================
+        # RAG SYSTEM CONFIGURATION (rag_config.py)
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*38 + "RAG SYSTEM CONFIGURATION" + " "*36 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
+        
+        f.write(f"Database Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Database Path:          {args.db_path}\n")
+        f.write(f"  Default DB Path:        {DEFAULT_DB_PATH}\n")
+        f.write(f"  Collection Name:        {COLLECTION_NAME}\n")
+        f.write(f"\n")
+        
+        f.write(f"Embedding Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Embedding Model:        {EMBEDDING_MODEL}\n")
+        f.write(f"  Embedding Dimension:    {EMBEDDING_DIMENSION}\n")
+        f.write(f"  Max Embedding Length:   {MAX_EMBEDDING_LENGTH} tokens\n")
+        f.write(f"  Device:                 {get_device()}\n")
+        f.write(f"  Torch Dtype:            {get_torch_dtype()}\n")
+        f.write(f"  Padding:                {PADDING}\n")
+        f.write(f"  Truncation:             {TRUNCATION}\n")
+        f.write(f"  Batch Size:             {BATCH_SIZE}\n")
+        f.write(f"\n")
+        
+        f.write(f"Chunking Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Chunk Strategy:         {CHUNK_STRATEGY}\n")
+        if CHUNK_STRATEGY == "fixed_size":
+            f.write(f"  Fixed Chunk Size:       {FIXED_SIZE_CHUNK_SIZE} chars\n")
+            f.write(f"  Fixed Overlap:          {FIXED_SIZE_OVERLAP} chars\n")
+        f.write(f"  Sentence Max Size:      {CHUNK_SIZE_MAX_BY_SENTENCE} chars\n")
+        f.write(f"\n")
+        
+        f.write(f"Retrieval Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Top K Results:          {TOP_K_RESULTS}\n")
+        f.write(f"  Default Top K:          {DEFAULT_TOP_K}\n")
+        f.write(f"  Min Similarity:         {MIN_SIMILARITY_THRESHOLD}%\n")
+        f.write(f"\n")
+        
+        f.write(f"Hybrid Search Configuration:\n")
+        f.write("-"*100 + "\n")
+        f.write(f"  Semantic Weight:        {SEMANTIC_WEIGHT}\n")
+        f.write(f"  Keyword Weight:         {KEYWORD_WEIGHT}\n")
+        f.write(f"  Keyword Scoring:        {KEYWORD_SCORING_METHOD}\n")
+        f.write(f"  Initial K Multiplier:   {INITIAL_K_MULTIPLIER}\n")
+        f.write(f"  Initial K Cap:          {INITIAL_K_CAP}\n")
+        f.write(f"\n")
+        
+        # =====================================================================
+        # PROMPT TEMPLATES
+        # =====================================================================
+        f.write("╔" + "═"*98 + "╗\n")
+        f.write("║" + " "*41 + "PROMPT TEMPLATES" + " "*41 + "║\n")
+        f.write("╚" + "═"*98 + "╝\n\n")
+        
+        f.write(f"System Message (InternVL Models):\n")
+        f.write("-"*100 + "\n")
+        for line in SYSTEM_MESSAGE_INTERNVL.split('\n'):
+            f.write(f"  {line}\n")
+        f.write(f"\n")
+        
+        f.write(f"System Message (Standard Models):\n")
+        f.write("-"*100 + "\n")
+        for line in SYSTEM_MESSAGE_STANDARD.split('\n'):
+            f.write(f"  {line}\n")
+        f.write(f"\n")
+        
+        f.write(f"Current Model System Message:\n")
+        f.write("-"*100 + "\n")
         system_msg = get_system_message(model_name)
         for line in system_msg.split('\n'):
             f.write(f"  {line}\n")
         f.write(f"\n")
         
-        f.write("="*80 + "\n\n")
+        f.write(f"Base Prompt Template:\n")
+        f.write("-"*100 + "\n")
+        for line in PROMPT_TEMPLATE.split('\n'):
+            f.write(f"  {line}\n")
+        f.write(f"\n")
+        
+        f.write("="*100 + "\n")
+        f.write("END OF HEADER - TEST RESULTS BEGIN BELOW\n")
+        f.write("="*100 + "\n\n")
 
 
 def append_test_result(log_file: Path, question: Dict, result: Dict, raw_response: str, chunks: List[Dict]):

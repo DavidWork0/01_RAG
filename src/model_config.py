@@ -95,9 +95,9 @@ MODEL_CONFIG = {
         "n_gpu_layers": -1,
         "verbose": False
     },
-    "Qwen3-8B-Q5_K_M": {
-        "path": "models/llamacpp/Qwen3-8B-Q5_K_M.gguf",
-        "n_ctx": 32768,  # Reduced from 16384, 32768 for better VRAM efficiency
+    "Qwen3-8B-Q4_K_M": {
+        "path": "models/llamacpp/Qwen3-8B-Q4_K_M.gguf",
+        "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
         "top_k": 20,  # Added - recommended by Qwen team
@@ -106,9 +106,9 @@ MODEL_CONFIG = {
         "n_gpu_layers": -1,
         "verbose": False
     },
-    "Qwen3-8B-Q4_K_M": {
-        "path": "models/llamacpp/Qwen3-8B-Q4_K_M.gguf",
-        "n_ctx": 32768,
+        "Qwen3-8B-Q5_K_M": {
+        "path": "models/llamacpp/Qwen3-8B-Q5_K_M.gguf",
+        "n_ctx": 32768,  # Reduced from 16384, 32768 for better VRAM efficiency
         "temperature": 0.7,
         "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
         "top_k": 20,  # Added - recommended by Qwen team
@@ -122,9 +122,9 @@ MODEL_CONFIG = {
 
 # Default model to use this is used by the Streamlit app on startup
 #DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
-DEFAULT_MODEL = "InternVL3_5-2B-Q8_0"
+#DEFAULT_MODEL = "InternVL3_5-2B-Q8_0"
 #DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
-#DEFAULT_MODEL = "Qwen3-8B-Q5_K_M"
+DEFAULT_MODEL = "Qwen3-8B-Q5_K_M"
 
 
 # =============================================================================
@@ -191,6 +191,7 @@ Question: {query}<|im_end|>
 
 # Path to test questions (relative to project root)
 TEST_QUESTIONS_PATH = "data/test/inference_test_questions.json"
+#TEST_QUESTIONS_PATH= "data/test/refined_inference_test_questions.json"
 
 # Log directory for inference tests (relative to project root)
 TEST_LOG_DIR = "data/test/logs"
