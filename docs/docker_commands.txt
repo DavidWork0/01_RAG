@@ -17,3 +17,7 @@ docker-compose down; docker-compose build --no-cache; docker-compose up         
 
 Copy:
 docker cp test_full.py linux_with_cuda-complete-container:/app/01_RAG/tests
+
+
+docker cp src linux_with_cuda-complete-container:/app/01_RAG
+docker cp tests linux_with_cuda-complete-container:/app/01_RAG

@@ -471,7 +471,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 input_container = st.container()
 
 with input_container:
-    # User input area and send button removed ctrll+enter for simplicity
+    # User input area and send button removed ctrl+enter for simplicity
     user_input = st.text_area(
         "Type your message...",
         value="",

@@ -9,6 +9,9 @@ Usage:
     python test_inference.py --model Qwen3-8B-Q4_K_M --mode quick
     python test_inference.py --model Qwen3-8B-Q5_K_M --mode all
     python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode all
+    python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode quick
+    python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment
+    python test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode single --question-id 1
     python test_inference.py --show-stats
     python test_inference.py --export-report
@@ -42,6 +45,19 @@ try:
 except ImportError:
     HARDWARE_INFO_AVAILABLE = False
     print("⚠️  Warning: hardware_info module not available. Hardware information will not be logged.")
+
+# Import environment collector module
+try:
+    from environment_collector import (
+        get_filtered_environment_variables,
+        get_python_environment,
+        get_installed_packages,
+        write_environment_report
+    )
+    ENVIRONMENT_COLLECTOR_AVAILABLE = True
+except ImportError:
+    ENVIRONMENT_COLLECTOR_AVAILABLE = False
+    print("⚠️  Warning: environment_collector module not available. Environment information will not be logged.")
 
 # Import shared configuration
 from src.model_config import (
@@ -133,7 +149,7 @@ def get_python_file_hashes() -> Dict[str, str]:
         project_root / "src" / "data_pipeline_pdf.py",
         project_root / "src" / "chunk_qwen3_0_6B.py",
         project_root / "src" / "pre_chunking.py",
-        project_root / "src" / "streamlit_modern_multiuser.py",
+        project_root / "src" / "dashboard.py",
         # InternVL modules
         project_root / "src" / "intevl3_5" / "InternVL35_2B_reducedv2_single.py",
         project_root / "src" / "intevl3_5" / "InternVL35_4B_reducedv2_single.py",
@@ -141,6 +157,9 @@ def get_python_file_hashes() -> Dict[str, str]:
         project_root / "tests" / "test_inference.py",
         project_root / "tests" / "test_full.py",
         project_root / "tests" / "test_basics.py",
+        project_root / "tests" / "test_reranking.py",
+        project_root / "tests" / "hardware_info.py",
+        project_root / "tests" / "environment_collector.py",
     ]
     
     file_hashes = {}
@@ -181,7 +200,7 @@ def create_session_log_file(model_name: str) -> tuple[Path, str]:
     return log_file, session_name
 
 
-def write_log_header(log_file: Path, model_name: str, args):
+def write_log_header(log_file: Path, model_name: str, args, include_environment: bool = False):
     """
     Write comprehensive header information to the log file.
     
@@ -189,6 +208,7 @@ def write_log_header(log_file: Path, model_name: str, args):
         log_file: Path to the log file
         model_name: Name of the model being tested
         args: Command line arguments
+        include_environment: Include environment variables and Python environment info
     """
     with open(log_file, 'w', encoding='utf-8') as f:
         f.write("="*100 + "\n")
@@ -339,6 +359,8 @@ def write_log_header(log_file: Path, model_name: str, args):
             f.write(f"  Min P:                  {model_config['min_p']}\n")
         if 'repeat_penalty' in model_config:
             f.write(f"  Repeat Penalty:         {model_config['repeat_penalty']}\n")
+        if 'seed' in model_config:
+            f.write(f"  Seed:                   {model_config['seed']} (for deterministic responses)\n")
         f.write(f"  GPU Layers:             {model_config['n_gpu_layers']}\n")
         f.write(f"  Verbose:                {model_config['verbose']}\n")
         f.write(f"\n")
@@ -454,6 +476,69 @@ def write_log_header(log_file: Path, model_name: str, args):
         for line in PROMPT_TEMPLATE.split('\n'):
             f.write(f"  {line}\n")
         f.write(f"\n")
+        
+        # =====================================================================
+        # ENVIRONMENT INFORMATION (Optional)
+        # =====================================================================
+        if include_environment and ENVIRONMENT_COLLECTOR_AVAILABLE:
+            f.write("╔" + "═"*98 + "╗\n")
+            f.write("║" + " "*35 + "ENVIRONMENT INFORMATION" + " "*40 + "║\n")
+            f.write("╚" + "═"*98 + "╝\n\n")
+            
+            # Environment Variables
+            f.write("Environment Variables (Sensitive values redacted):\n")
+            f.write("-"*100 + "\n")
+            env_vars = get_filtered_environment_variables()
+            for key, value in sorted(env_vars.items()):
+                # Truncate very long values
+                if len(value) > 150:
+                    value = value[:147] + "..."
+                f.write(f"  {key:<45} = {value}\n")
+            f.write(f"\n")
+            
+            # Python Environment
+            py_env = get_python_environment()
+            f.write("Python Environment Details:\n")
+            f.write("-"*100 + "\n")
+            f.write(f"  Python Version:         {py_env['python_version'].split()[0]}\n")
+            f.write(f"  Python Implementation:  {py_env['python_implementation']}\n")
+            f.write(f"  Python Compiler:        {py_env['python_compiler']}\n")
+            f.write(f"  Platform:               {py_env['platform']}\n")
+            f.write(f"  Executable:             {py_env['executable']}\n")
+            f.write(f"  Is Virtual Env:         {py_env['is_virtual_env']}\n")
+            if py_env.get('virtual_env_type'):
+                f.write(f"  Virtual Env Type:       {py_env['virtual_env_type']}\n")
+            if py_env.get('virtual_env_path'):
+                f.write(f"  Virtual Env Path:       {py_env['virtual_env_path']}\n")
+            f.write(f"  Default Encoding:       {py_env['default_encoding']}\n")
+            f.write(f"\n")
+            
+            # Python Path
+            f.write("Python Path (sys.path):\n")
+            f.write("-"*100 + "\n")
+            for i, path in enumerate(py_env['path'], 1):
+                f.write(f"  {i:2}. {path}\n")
+            f.write(f"\n")
+            
+            # Installed Packages Summary
+            packages = get_installed_packages()
+            f.write(f"Installed Packages: {len(packages)} total\n")
+            f.write("-"*100 + "\n")
+            f.write("Key packages relevant to this project:\n")
+            
+            # List important packages
+            important_packages = [
+                'torch', 'transformers', 'chromadb', 'streamlit', 'llama-cpp-python',
+                'numpy', 'pandas', 'pillow', 'pytest', 'openpyxl'
+            ]
+            
+            for pkg in packages:
+                if pkg['name'].lower() in important_packages:
+                    f.write(f"  {pkg['name']:<30} {pkg['version']}\n")
+            f.write(f"\n")
+            
+            f.write("Note: Full package list and pip freeze output saved to separate environment report file.\n")
+            f.write(f"\n")
         
         f.write("="*100 + "\n")
         f.write("END OF HEADER - TEST RESULTS BEGIN BELOW\n")
@@ -859,6 +944,9 @@ Examples:
   # Run all tests with a specific model
   python test_inference.py --model InternVL3_5-2B-Q6_K --mode all
   
+  # Run all tests with environment information included
+  python test_inference.py --model InternVL3_5-2B-Q6_K --mode all --include-environment
+  
   # Run quick test (5 selected questions)
   python test_inference.py --model InternVL3_5-2B-Q6_K --mode quick
   
@@ -918,6 +1006,12 @@ Examples:
         '--export-report',
         action='store_true',
         help='Export test results to Excel report'
+    )
+    
+    parser.add_argument(
+        '--include-environment',
+        action='store_true',
+        help='Include environment variables and Python environment in session log'
     )
     
     args = parser.parse_args()
@@ -982,9 +1076,23 @@ Examples:
     
     # Create session log file
     log_file, session_name = create_session_log_file(args.model)
-    write_log_header(log_file, args.model, args)
+    write_log_header(log_file, args.model, args, include_environment=args.include_environment)
     print(f"📄 Session log created: {log_file}")
     print(f"📋 Session name: {session_name}")
+    
+    # Create separate environment report if requested
+    if args.include_environment and ENVIRONMENT_COLLECTOR_AVAILABLE:
+        env_report_file = log_file.parent / f"{log_file.stem}_environment.txt"
+        print(f"📝 Generating detailed environment report...")
+        write_environment_report(
+            output_path=env_report_file,
+            include_env_vars=True,
+            include_python_env=True,
+            include_packages=True,
+            include_pip_freeze=True,
+            filter_sensitive=True
+        )
+        print(f"✅ Environment report saved: {env_report_file}")
     
     # Run tests
     if args.mode == 'single':

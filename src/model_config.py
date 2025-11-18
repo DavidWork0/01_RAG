@@ -103,6 +103,7 @@ MODEL_CONFIG = {
         "top_k": 20,  # Added - recommended by Qwen team
         "min_p": 0.0,  # Added - recommended for consistency
         "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -114,6 +115,7 @@ MODEL_CONFIG = {
         "top_k": 20,  # Added - recommended by Qwen team
         "min_p": 0.0,  # Added - recommended for consistency
         "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     }
@@ -157,7 +159,17 @@ Step-by-step reasoning and evidence analysis...
 Your clear and concise answer here."""
 
 # System message for other models (without thinking)
-SYSTEM_MESSAGE_STANDARD = """You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system. Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
+SYSTEM_MESSAGE_STANDARD = """You are an AI assistant for a Retrieval-Augmented Generation (RAG) system focused on technical documentation.
+
+Key principles:
+- Prioritize retrieved context over general knowledge
+- Extract and synthesize ALL relevant information from the context
+- Structure responses clearly with proper formatting (bullet points, sections, etc.)
+- If context is insufficient, state this clearly before providing general knowledge
+- Cite specific sections when referencing context (e.g., "According to the manual...")
+- Be precise, accurate, and comprehensive in your answers"""
+
+SYSTEM_MESSAGE_STANDARD_OLD = """You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system. Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
 -If the context contains the answer, use it directly and clearly attribute or reference it when appropriate.
 -If the context does not contain relevant information, respond concisely using general knowledge without inventing details or assuming missing information.
 -Always provide structured, accurate, and easy-to-read responses.
@@ -328,16 +340,22 @@ def load_llm_model(model_name: str, project_root):
     # Instantiate model with config parameters
     # Note: For multi-user scenarios, each call creates a separate model instance
     # to avoid KV cache contamination between users
-    llm = Llama(
-        model_path=str(model_path),
-        n_ctx=config["n_ctx"],
-        n_gpu_layers=config["n_gpu_layers"],
-        temperature=config["temperature"],
-        verbose=config["verbose"],
-        # KV cache is managed per-instance; in streamlit with @st.cache_resource,
-        # one instance is shared, so we rely on thread locking to prevent
-        # concurrent access that could mix KV cache states
-    )
+    llm_params = {
+        "model_path": str(model_path),
+        "n_ctx": config["n_ctx"],
+        "n_gpu_layers": config["n_gpu_layers"],
+        "temperature": config["temperature"],
+        "verbose": config["verbose"]
+    }
+    
+    # Add seed if specified in config for deterministic responses
+    if "seed" in config:
+        llm_params["seed"] = config["seed"]
+    
+    llm = Llama(**llm_params)
+    # KV cache is managed per-instance; in streamlit with @st.cache_resource,
+    # one instance is shared, so we rely on thread locking to prevent
+    # concurrent access that could mix KV cache states
     
     return llm
 
@@ -403,11 +421,11 @@ def generate_llm_response(
             prompt = f"""<|im_start|>system
 {system_message}<|im_end|>
 {history_str}<|im_start|>user
-⚠️ Note: No relevant information was found in the knowledge base for this question.
+Knowledge base search: No relevant documents found.
 
 Question: {query}
 
-Please answer based on your general knowledge, but clearly state that this answer is not based on the provided documents.<|im_end|>
+Provide an answer based on general knowledge. Begin your response by stating: "I couldn't find this information in the provided documents."<|im_end|>
 <|im_start|>assistant
 """
     else:
@@ -423,11 +441,11 @@ Please answer based on your general knowledge, but clearly state that this answe
             prompt = f"""<|im_start|>system
 {system_message}<|im_end|>
 <|im_start|>user
-⚠️ Note: No relevant information was found in the knowledge base for this question.
+Knowledge base search: No relevant documents found.
 
 Question: {query}
 
-Please answer based on your general knowledge, but clearly state that this answer is not based on the provided documents.<|im_end|>
+Provide an answer based on general knowledge. Begin your response by stating: "I couldn't find this information in the provided documents."<|im_end|>
 <|im_start|>assistant
 """
     

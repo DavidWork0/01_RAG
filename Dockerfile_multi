@@ -80,8 +80,8 @@ ENV PATH="/app/01_RAG/.venv/bin:$PATH"
 # Upgrade pip
 RUN python -m pip install --upgrade pip --verbose
 
-# Install PyTorch and dependencies with verbose output
-RUN pip install --verbose torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+# Install PyTorch 2.7.1 with CUDA 12.8 and dependencies with verbose output
+RUN pip install --verbose torch==2.7.1+cu128 torchvision==0.22.1+cu128 torchaudio==2.7.1+cu128 --index-url https://download.pytorch.org/whl/cu128
 RUN pip install --verbose "transformers[torch]" accelerate
 
 # --- Build llama-cpp-python from source with CUDA support RTX4060ti -> CUDA_DOCKER_ARCH=89 ---
