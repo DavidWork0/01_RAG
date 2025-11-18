@@ -220,7 +220,11 @@ class HybridRAGQwen3_Module:
         client = chromadb.PersistentClient(path=self.db_path)
         
         try:
-            collection = client.get_collection(
+            # Use get_or_create_collection to avoid deserialization issues
+            # This will reuse existing data but override the stored embedding function
+            # with our current one, preventing "Could not import module" errors
+            # when the database was created in a different environment
+            collection = client.get_or_create_collection(
                 name=self.collection_name,
                 embedding_function=self.embedding_fn
             )
@@ -364,14 +368,19 @@ class HybridRAGQwen3_Module:
             semantic_results['metadatas'][0],
             semantic_results['distances'][0]
         ):
+            # Quantize distance to reduce floating-point noise
+            dist_quantized = round(dist, 6)
+            
             # Calculate keyword match score
             keyword_score = self._calculate_keyword_score_simple(doc, keywords)
+            keyword_score_quantized = round(keyword_score, 6)
             
-            # Combine scores
+            # Combine scores using quantized values
             # Note: Lower distance is better, higher keyword match is better
-            combined_score = (self.semantic_weight * dist) - (self.keyword_weight * keyword_score)
+            combined_score = (self.semantic_weight * dist_quantized) - (self.keyword_weight * keyword_score_quantized)
+            combined_score_quantized = round(combined_score, 6)
             
-            scored_results.append((doc, meta, dist, keyword_score, combined_score))
+            scored_results.append((doc, meta, dist_quantized, keyword_score_quantized, combined_score_quantized))
         
         return scored_results
     

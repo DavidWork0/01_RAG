@@ -1,7 +1,6 @@
 @echo off
 cd /d %~dp0
 set PYTHON=..\\.venv\Scripts\python.exe
-set STREAMLIT=..\\.venv\Scripts\streamlit.exe
 
 REM Capture start time
 set START_TIME=%TIME%
