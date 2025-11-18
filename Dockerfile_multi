@@ -117,9 +117,13 @@ WORKDIR /app/01_RAG/src
 
 # Expose the Streamlit default port
 EXPOSE 8501
+EXPOSE 8502
+
+
+CMD ["tail", "-f", "/dev/null"]
 
 # Run the Streamlit application
-CMD ["streamlit", "run", "streamlit_modern_multiuser.py", "--server.port=8501", "--server.address=0.0.0.0"]
+#CMD ["streamlit", "run", "streamlit_modern_multiuser.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 # Run the test_inference.py script by default python test_inference.py --model Qwen3-8B-Q5_K_M --mode quick
 #CMD ["python3", "test_inference.py", "--model", "Qwen3-8B-Q5_K_M", "--mode", "all"]

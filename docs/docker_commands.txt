@@ -14,3 +14,6 @@ docker-compose down; docker-compose build --no-cache; docker-compose up         
 
 
 . .venv/bin/activate in folder projects currently
+
+Copy:
+docker cp test_full.py linux_with_cuda-complete-container:/app/01_RAG/tests

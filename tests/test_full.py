@@ -5,7 +5,7 @@ Tests the complete pipeline:
 1. data_pipeline_pdf.py - PDF processing and image extraction
 2. pre_chunking.py - Text cleaning
 3. chunk_qwen3_0_6B.py - Chunking and embedding database creation
-4. streamlit_modern_multiuser.py - RAG query system
+4. dashboard.py - RAG query system
 
 Author: Generated for 01_RAG project
 Date: November 3, 2025
@@ -633,16 +633,16 @@ class TestRAGConfiguration(unittest.TestCase):
             self.skipTest("rag_config not available")
 
 
-class TestStreamlitIntegration(unittest.TestCase):
-    """Test suite for streamlit_modern_multiuser.py integration points"""
+class TestDashboardIntegration(unittest.TestCase):
+    """Test suite for dashboard.py integration points"""
     
     def test_parse_thinking_response_with_thinking_tags(self):
         """Test parsing response with thinking tags"""
         # Import locally to avoid issues
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("streamlit dashboard not available")
         
         response = """
         <think>
@@ -663,9 +663,9 @@ class TestStreamlitIntegration(unittest.TestCase):
     def test_parse_thinking_response_without_tags(self):
         """Test parsing response without thinking tags"""
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("streamlit dashboard not available")
         
         response = "This is a simple answer without thinking tags."
         
@@ -678,9 +678,9 @@ class TestStreamlitIntegration(unittest.TestCase):
     def test_parse_thinking_response_thinking_variant(self):
         """Test parsing with <thinking> tags instead of <think>"""
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("streamlit dashboard not available")
         
         response = """
         <thinking>
@@ -1115,7 +1115,7 @@ def run_pipeline_health_check():
         "pre_chunking": False,
         "chunk_qwen3_0_6B": False,
         "hybrid_rag_module": False,
-        "streamlit_app": False
+        "dashboard": False
     }
     
     # Check 1: data_pipeline_pdf
@@ -1158,11 +1158,11 @@ def run_pipeline_health_check():
     # Check 5: streamlit app
     try:
         # Already imported at module level, just check if it's available
-        import streamlit_modern_multiuser
-        checks["streamlit_app"] = True
-        print("[OK] streamlit_modern_multiuser.py - Import successful")
+        import dashboard
+        checks["dashboard"] = True
+        print("[OK] dashboard.py - Import successful")
     except Exception as e:
-        print(f"[FAIL] streamlit_modern_multiuser.py - Import failed: {e}")
+        print(f"[FAIL] dashboard.py - Import failed: {e}")
     
     # Summary
     print("\n" + "-"*60)
@@ -1207,7 +1207,7 @@ if __name__ == '__main__':
     suite.addTests(loader.loadTestsFromTestCase(TestChunkingAndEmbedding))
     suite.addTests(loader.loadTestsFromTestCase(TestHybridRAGModule))
     suite.addTests(loader.loadTestsFromTestCase(TestRAGConfiguration))
-    suite.addTests(loader.loadTestsFromTestCase(TestStreamlitIntegration))
+    suite.addTests(loader.loadTestsFromTestCase(TestDashboardIntegration))
     suite.addTests(loader.loadTestsFromTestCase(TestPipelineIntegration))
     suite.addTests(loader.loadTestsFromTestCase(TestErrorHandling))
     suite.addTests(loader.loadTestsFromTestCase(TestChunkingEdgeCases))

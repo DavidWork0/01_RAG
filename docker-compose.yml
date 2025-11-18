@@ -7,6 +7,7 @@ services:
     container_name: linux_with_cuda-complete-container
     ports:
       - "127.0.0.1:8501:8501" # Streamlit default port exposed to localhost only for security
+      - "127.0.0.1:8502:8502" # Additional Streamlit port exposed to localhost only for security
     
     deploy:
       resources:
