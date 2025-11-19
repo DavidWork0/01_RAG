@@ -9,7 +9,7 @@ Usage:
     python test_inference.py --model Qwen3-8B-Q4_K_M --mode quick
     python test_inference.py --model Qwen3-8B-Q5_K_M --mode all
     python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode all
-    python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode quick
+    python test_inference.py --model Qwen3-8B-Q5_K_M --mode quick
     python3 test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment
     python test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment
     python test_inference.py --model InternVL3_5-2B-Q6_K --mode single --question-id 1

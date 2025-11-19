@@ -1,0 +1,8 @@
+FROM jenkins/jenkins:lts
+USER root
+
+# Install Docker CLI so Jenkins can start sibling containers
+RUN apt-get update && apt-get install -y docker.io
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*

@@ -109,7 +109,6 @@ RUN pip install --verbose --no-deps optimum[onnxruntime-gpu]
 COPY src/ ./src/
 COPY data/ ./data/
 COPY models/ ./models/
-COPY logs/ ./logs/
 COPY tests/ ./tests/
 
 # Set working directory to src for running the application
