@@ -1,30 +1,35 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint=""'
+            reuseNode true
+        }
+    }
+
+    environment {
+        // Point to the models baked into the image at /app/01_RAG/models
+        HF_HOME = '/app/01_RAG/models'
+        WORKDIR = '/app/01_RAG/tests'
+    }
 
     stages {
         stage('Run Tests') {
             steps {
                 script {
-                    echo 'Running tests using docker-compose...'
+                    echo 'Running tests inside linux_with_cuda_complete container...'
                     
-                    // Run tests inside the container defined in docker-compose.yml
-                    // We mount the current workspace src and tests to override the image's code
-                    // while preserving the models located at /app/01_RAG/models in the image.
-                    // We use --rm to clean up the container after execution.
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
                     
-                    sh '''
-                        docker-compose run --rm \
-                        -v ${WORKSPACE}/src:/app/01_RAG/src \
-                        -v ${WORKSPACE}/tests:/app/01_RAG/tests \
-                        linux_with_cuda_complete \
-                        /bin/bash -c " \
-                            .venv/bin/python tests/test_full.py && \
-                            .venv/bin/python tests/test_reranking.py && \
-                            .venv/bin/python tests/test_load_model.py && \
-                            .venv/bin/python tests/test_similarity_filter.py && \
-                            .venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment \
-                        "
-                    '''
+                    sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
+                    CMD ["python3", "test_inference.py", "--model", "Qwen3-8B-Q5_K_M", "--mode", "all"]
+                    sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
         }
