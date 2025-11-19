@@ -33,7 +33,7 @@ INPUT_FOLDER_UNCLEANED = os.path.join(PROJECT_ROOT, "data", "output", "final_mer
 # Model cache directory for docker environment
 # Check for HF_HOME environment variable first (used in Docker)
 if os.environ.get('HF_HOME'):
-    MODEL_CACHE_DIR = os.path.join(os.environ['HF_HOME'], 'huggingface')
+    MODEL_CACHE_DIR = os.path.join(os.environ['HF_HOME'])
 else:
     MODEL_CACHE_DIR = os.path.join(PROJECT_ROOT, 'models', 'huggingface')
 
