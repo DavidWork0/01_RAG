@@ -174,6 +174,7 @@ class HybridRAGQwen3_Module:
         self._print(f"\n Loading embedding model...")
         start_time = time.time()
         
+        self._print(f"\n 1...")
         # Load tokenizer and model (offline mode - no internet connection needed)
         tokenizer = AutoTokenizer.from_pretrained(
             self.embedding_model,
@@ -181,7 +182,7 @@ class HybridRAGQwen3_Module:
             trust_remote_code=True,
             local_files_only=True
         )
-        
+        self._print(f"\n 2...")
         model = AutoModel.from_pretrained(
             self.embedding_model,
             cache_dir=self.model_cache_dir,
@@ -191,7 +192,7 @@ class HybridRAGQwen3_Module:
         ).to(self.device)
         
         model.eval()  # Set to evaluation mode
-        
+        self._print(f"\n 3...")
         embedding_fn = Qwen3EmbeddingFunction(tokenizer, model, self.device)
         
         elapsed = time.time() - start_time
