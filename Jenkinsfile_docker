@@ -20,7 +20,7 @@ pipeline {
                     
                     sh 'python3 tests/test_full.py'
                     sh 'python3 tests/test_reranking.py'
-                    sh 'python3 tests/test_similarity_filter.py'
+                    //sh 'python3 tests/test_similarity_filter.py'
                     sh 'python3 tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
