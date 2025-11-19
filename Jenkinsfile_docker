@@ -21,16 +21,15 @@ pipeline {
                 script {
                     echo 'Running tests inside linux_with_cuda_complete container...'
                     
-                    // Make scripts executable
-                    sh 'chmod +x tests/*.sh'
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
                     
-                    // Run test scripts
-                    sh './tests/run_test_full.sh'
-                    sh './tests/run_test_reranking.sh'
-                    sh './tests/run_test_load_model.sh'
-                    sh './tests/run_test_similarity_filter.sh'
-                    sh './tests/run_test_inference.sh'
-                    sh './tests/run_test_inference_env.sh'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
         }
