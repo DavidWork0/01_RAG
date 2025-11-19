@@ -152,6 +152,8 @@ class HybridRAGQwen3_Module:
         self._print(f"Initializing Hybrid RAG System")
         self._print(f"  Embedding Model: {embedding_model}")
         self._print(f"  Database Path: {db_path}")
+        self._print(f"  Model Cache: {self.model_cache_dir}")
+        self._print(f"  Local Files Only: True")
         self._print(f"  Device: {self.device}")
         
         self.tokenizer, self.model, self.embedding_fn = self._load_embedding_model()
