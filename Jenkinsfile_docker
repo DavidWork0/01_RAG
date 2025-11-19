@@ -9,6 +9,11 @@ pipeline {
         }
     }
 
+    environment {
+        // Point to the models baked into the image at /app/01_RAG/models
+        HF_HOME = '/app/01_RAG/models'
+    }
+
     stages {
         stage('Run Tests') {
             steps {
