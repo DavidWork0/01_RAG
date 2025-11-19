@@ -16,6 +16,10 @@ services:
       - .:/var/jenkins_home/local_repo
     # Run as root to ensure access to docker socket and mounted volumes
     user: root
+    
+    # Add environment variable to allow local checkout in Git plugin
+    environment:
+      - JAVA_OPTS=-Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true
 
 volumes:
   jenkins_home:
