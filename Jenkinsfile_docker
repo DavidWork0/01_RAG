@@ -24,12 +24,12 @@ pipeline {
                     // Use the python environment pre-installed in the image
                     // The image has the venv at /app/01_RAG/.venv
                     
-                    sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
+                    sh '/app/01_RAG/python3 tests/test_full.py'
+                    sh '/app/01_RAG/python3 tests/test_reranking.py'
+                    sh '/app/01_RAG/python3 tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all'
+                    sh '/app/01_RAG/python3 tests/test_load_model.py'
+                    sh '/app/01_RAG/python3 tests/test_similarity_filter.py'
+                    sh '/app/01_RAG/python3 tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
         }
