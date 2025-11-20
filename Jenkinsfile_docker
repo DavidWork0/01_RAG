@@ -11,6 +11,7 @@ pipeline {
 
     environment {
         // Ensure all huggingface caches resolve to the baked-in models
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
         HF_HOME = '/app/01_RAG/models/huggingface'
         HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
         TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
