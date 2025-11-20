@@ -1,11 +1,14 @@
 pipeline {
     agent {
         docker {
-            // Use the project's existing image which has all dependencies and CUDA support
-            image 'linux_with_cuda_complete:latest'
-            // Pass GPU access to the container
-            args '--gpus all --entrypoint=""'
-            reuseNode true
+                    def hasGithubNotify = false
+                    try {
+                        steps.githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
+                        hasGithubNotify = true
+                    } catch (MissingMethodException ignored) {
+                        echo 'githubNotify step not available; skipping GitHub status updates.'
+                    }
+                    env.GITHUB_NOTIFY_AVAILABLE = hasGithubNotify.toString()
         }
     }
 
@@ -44,21 +47,21 @@ pipeline {
             post {
                 success {
                     script {
-                        if (steps.respondsTo('githubNotify')) {
+                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
                             githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
                         }
                     }
                 }
                 failure {
                     script {
-                        if (steps.respondsTo('githubNotify')) {
+                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
                             githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
                         }
                     }
                 }
                 aborted {
                     script {
-                        if (steps.respondsTo('githubNotify')) {
+                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
                             githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
                         }
                     }
