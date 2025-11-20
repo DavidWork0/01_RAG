@@ -43,18 +43,24 @@ pipeline {
             }
             post {
                 success {
-                    if (steps.respondsTo('githubNotify')) {
-                        githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
+                    script {
+                        if (steps.respondsTo('githubNotify')) {
+                            githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
+                        }
                     }
                 }
                 failure {
-                    if (steps.respondsTo('githubNotify')) {
-                        githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
+                    script {
+                        if (steps.respondsTo('githubNotify')) {
+                            githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
+                        }
                     }
                 }
                 aborted {
-                    if (steps.respondsTo('githubNotify')) {
-                        githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
+                    script {
+                        if (steps.respondsTo('githubNotify')) {
+                            githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
+                        }
                     }
                 }
             }
