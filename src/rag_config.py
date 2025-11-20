@@ -30,8 +30,14 @@ DEFAULT_INPUT_FOLDER = os.path.join(PROJECT_ROOT, "data", "output", "final_merge
 # Alternative input folder (uncleaned)
 INPUT_FOLDER_UNCLEANED = os.path.join(PROJECT_ROOT, "data", "output", "final_merged")
 
-# Model cache directory for docker environment
-MODEL_CACHE_DIR = os.path.join(PROJECT_ROOT, 'models', 'huggingface')
+# Model cache directory can be overridden via environment to support
+# Jenkins/docker setups where the repo checkout does not contain the
+# heavyweight model artifacts.
+_DEFAULT_MODEL_CACHE_DIR = os.path.join(PROJECT_ROOT, 'models', 'huggingface')
+MODEL_CACHE_DIR = os.environ.get('RAG_MODEL_CACHE_DIR') \
+    or os.environ.get('HF_HOME') \
+    or os.environ.get('HUGGINGFACE_HUB_CACHE') \
+    or _DEFAULT_MODEL_CACHE_DIR
 
 # =============================================================================
 # EMBEDDING MODEL CONFIGURATION

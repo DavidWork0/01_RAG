@@ -10,8 +10,11 @@ pipeline {
     }
 
     environment {
-        // Point to the models baked into the image at /app/01_RAG/models
-        HF_HOME = '/app/01_RAG/models'
+        // Ensure all huggingface caches resolve to the baked-in models
+        HF_HOME = '/app/01_RAG/models/huggingface'
+        HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+        TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+        RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
         WORKDIR = '/app/01_RAG/tests'
     }
 
