@@ -24,6 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
+                    githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
                     echo 'Running tests inside linux_with_cuda_complete container...'
                     
                     // Use the python environment pre-installed in the image
@@ -34,6 +35,17 @@ pipeline {
                     sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
+                }
+            }
+            post {
+                success {
+                    githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
+                }
+                failure {
+                    githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
+                }
+                aborted {
+                    githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
                 }
             }
         }
