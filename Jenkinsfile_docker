@@ -1,14 +1,11 @@
 pipeline {
     agent {
         docker {
-                    def hasGithubNotify = false
-                    try {
-                        steps.githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
-                        hasGithubNotify = true
-                    } catch (MissingMethodException ignored) {
-                        echo 'githubNotify step not available; skipping GitHub status updates.'
-                    }
-                    env.GITHUB_NOTIFY_AVAILABLE = hasGithubNotify.toString()
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint=""'
+            reuseNode true
         }
     }
 
@@ -27,11 +24,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    if (steps.respondsTo('githubNotify')) {
-                        githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
-                    } else {
+                    def hasGithubNotify = false
+                    try {
+                        steps.githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
+                        hasGithubNotify = true
+                    } catch (MissingMethodException ignored) {
                         echo 'githubNotify step not available; skipping GitHub status updates.'
                     }
+                    env.GITHUB_NOTIFY_AVAILABLE = hasGithubNotify.toString()
                     echo 'Running tests inside linux_with_cuda_complete container...'
                     
                     // Use the python environment pre-installed in the image
