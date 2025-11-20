@@ -24,47 +24,16 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def hasGithubNotify = false
-                    try {
-                        steps.githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
-                        hasGithubNotify = true
-                    } catch (MissingMethodException ignored) {
-                        echo 'githubNotify step not available; skipping GitHub status updates.'
-                    }
-                    env.GITHUB_NOTIFY_AVAILABLE = hasGithubNotify.toString()
                     echo 'Running tests inside linux_with_cuda_complete container...'
-                    
+
                     // Use the python environment pre-installed in the image
                     // The image has the venv at /app/01_RAG/.venv
-                    
+
                     sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
-                }
-            }
-            post {
-                success {
-                    script {
-                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
-                            githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
-                        }
-                    }
-                }
-                failure {
-                    script {
-                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
-                            githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
-                        }
-                    }
-                }
-                aborted {
-                    script {
-                        if (env.GITHUB_NOTIFY_AVAILABLE == 'true') {
-                            githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
-                        }
-                    }
                 }
             }
         }
