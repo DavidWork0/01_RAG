@@ -47,6 +47,36 @@ jobs:
       env:
         PYTHONIOENCODING: utf-8
     
+    - name: Trigger Jenkins docker pipeline
+      if: success()
+      env:
+        JENKINS_URL: ${{ secrets.JENKINS_URL }}
+        JENKINS_USER: ${{ secrets.JENKINS_USER }}
+        JENKINS_API_TOKEN: ${{ secrets.JENKINS_API_TOKEN }}
+        JENKINS_JOB: ${{ secrets.JENKINS_JOB }}
+      run: |
+        if [ -z "$JENKINS_URL" ] || [ -z "$JENKINS_USER" ] || [ -z "$JENKINS_API_TOKEN" ] || [ -z "$JENKINS_JOB" ]; then
+          echo "Required Jenkins secrets are missing. Skipping Jenkins trigger."
+          exit 0
+        fi
+
+        echo "Requesting Jenkins crumb..."
+        CRUMB_RESPONSE=$(curl -s -u "$JENKINS_USER:$JENKINS_API_TOKEN" "$JENKINS_URL/crumbIssuer/api/json" || true)
+        if [ -n "$CRUMB_RESPONSE" ]; then
+          CRUMB=$(python -c "import json,sys; data=json.loads(sys.argv[1]); print(data.get('crumb',''))" "$CRUMB_RESPONSE")
+        fi
+
+        echo "Triggering Jenkins job $JENKINS_JOB..."
+        if [ -n "$CRUMB" ]; then
+          curl -s -o /dev/null -w "%{http_code}" -X POST "$JENKINS_URL/job/$JENKINS_JOB/build" \
+            -u "$JENKINS_USER:$JENKINS_API_TOKEN" \
+            -H "Jenkins-Crumb: $CRUMB"
+        else
+          curl -s -o /dev/null -w "%{http_code}" -X POST "$JENKINS_URL/job/$JENKINS_JOB/build" \
+            -u "$JENKINS_USER:$JENKINS_API_TOKEN"
+        fi
+        echo "Jenkins job triggered."
+    
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v4
