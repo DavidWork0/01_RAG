@@ -24,7 +24,11 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
+                    if (steps.respondsTo('githubNotify')) {
+                        githubNotify context: 'jenkins/docker-tests', status: 'PENDING', description: 'Docker pipeline running'
+                    } else {
+                        echo 'githubNotify step not available; skipping GitHub status updates.'
+                    }
                     echo 'Running tests inside linux_with_cuda_complete container...'
                     
                     // Use the python environment pre-installed in the image
@@ -39,13 +43,19 @@ pipeline {
             }
             post {
                 success {
-                    githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
+                    if (steps.respondsTo('githubNotify')) {
+                        githubNotify context: 'jenkins/docker-tests', status: 'SUCCESS', description: 'All docker-based tests passed'
+                    }
                 }
                 failure {
-                    githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
+                    if (steps.respondsTo('githubNotify')) {
+                        githubNotify context: 'jenkins/docker-tests', status: 'FAILURE', description: 'Docker-based tests failed'
+                    }
                 }
                 aborted {
-                    githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
+                    if (steps.respondsTo('githubNotify')) {
+                        githubNotify context: 'jenkins/docker-tests', status: 'ERROR', description: 'Docker pipeline aborted'
+                    }
                 }
             }
         }
