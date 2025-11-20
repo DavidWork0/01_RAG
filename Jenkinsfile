@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        // Force Git to keep LF endings everywhere so hash comparisons stay stable
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+    }
 
     stages {
         stage('Setup Environment') {
