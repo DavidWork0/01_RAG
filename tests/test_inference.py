@@ -112,7 +112,9 @@ from src.rag_config import (
 
 def compute_file_hash(file_path: Path) -> str:
     """
-    Compute SHA256 hash of a file.
+    Compute SHA256 hash of a file with normalized content.
+    Removes all whitespace and newlines to ensure cross-platform compatibility
+    (Windows uses CRLF, Linux uses LF).
     
     Args:
         file_path: Path to the file
@@ -124,10 +126,16 @@ def compute_file_hash(file_path: Path) -> str:
         return "FILE_NOT_FOUND"
     
     try:
+        # Read file content as text
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        
+        # Remove all whitespace characters (spaces, tabs, newlines, carriage returns)
+        normalized_content = ''.join(content.split())
+        
+        # Compute hash of normalized content
         sha256_hash = hashlib.sha256()
-        with open(file_path, 'rb') as f:
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
+        sha256_hash.update(normalized_content.encode('utf-8'))
         return sha256_hash.hexdigest()
     except Exception as e:
         return f"ERROR: {str(e)}"
@@ -331,7 +339,7 @@ def write_log_header(log_file: Path, model_name: str, args, include_environment:
         f.write("║" + " "*36 + "FILE INTEGRITY HASHES" + " "*41 + "║\n")
         f.write("╚" + "═"*98 + "╝\n\n")
         
-        f.write("Python Source File Hashes (SHA256):\n")
+        f.write("Python Source File Hashes (SHA256) with python content normalization:\n")
         f.write("-"*100 + "\n")
         
         file_hashes = get_python_file_hashes()
