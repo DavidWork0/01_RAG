@@ -11,8 +11,16 @@ on:
 jobs:
   Unit_Tests:
     runs-on: ubuntu-latest
-    
     steps:
+    - name: Show disk usage before cleanup
+      run: df -h
+    - name: Clean up disk space
+      run: |
+        sudo rm -rf /usr/lib/jvm /usr/share/dotnet /usr/share/swift /usr/local/lib/android
+        sudo docker image prune --all --force
+        sudo docker builder prune -a
+    - name: Show disk usage after cleanup
+      run: df -h
     - name: Checkout code
       uses: actions/checkout@v4
     
