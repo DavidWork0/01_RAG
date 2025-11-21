@@ -33,11 +33,44 @@ INPUT_FOLDER_UNCLEANED = os.path.join(PROJECT_ROOT, "data", "output", "final_mer
 # Model cache directory can be overridden via environment to support
 # Jenkins/docker setups where the repo checkout does not contain the
 # heavyweight model artifacts.
-_DEFAULT_MODEL_CACHE_DIR = os.path.join(PROJECT_ROOT, 'models', 'huggingface')
-MODEL_CACHE_DIR = os.environ.get('RAG_MODEL_CACHE_DIR') \
-    or os.environ.get('HF_HOME') \
-    or os.environ.get('HUGGINGFACE_HUB_CACHE') \
-    or _DEFAULT_MODEL_CACHE_DIR
+_DEFAULT_MODEL_CACHE_DIR = Path(PROJECT_ROOT) / 'models' / 'huggingface'
+
+def _normalize_hf_cache_path(path: Path) -> Path:
+    """Ensure the cache path points to the huggingface cache directory."""
+    path = path.expanduser()
+    if path.name == 'huggingface':
+        return path
+    candidate = path / 'huggingface'
+    if candidate.exists():
+        return candidate
+    return path
+
+def _resolve_model_cache_dir() -> Path:
+    env_candidates = [
+        os.environ.get('RAG_MODEL_CACHE_DIR'),
+        os.environ.get('HF_HOME'),
+        os.environ.get('HUGGINGFACE_HUB_CACHE'),
+        os.environ.get('TRANSFORMERS_CACHE'),
+    ]
+    for candidate in env_candidates:
+        if not candidate:
+            continue
+        normalized = _normalize_hf_cache_path(Path(candidate))
+        if normalized.exists():
+            return normalized
+    return _DEFAULT_MODEL_CACHE_DIR
+
+MODEL_CACHE_DIR = str(_resolve_model_cache_dir())
+
+# Ensure downstream HuggingFace clients default to the same cache directory.
+for _env_var in (
+    'HF_HOME',
+    'HUGGINGFACE_HUB_CACHE',
+    'TRANSFORMERS_CACHE',
+    'RAG_MODEL_CACHE_DIR'
+):
+    os.environ[_env_var] = MODEL_CACHE_DIR
+del _env_var
 
 # =============================================================================
 # EMBEDDING MODEL CONFIGURATION
