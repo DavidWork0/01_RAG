@@ -163,6 +163,7 @@ def get_python_file_hashes() -> Dict[str, str]:
         project_root / "src" / "intevl3_5" / "InternVL35_4B_reducedv2_single.py",
         # Test files
         project_root / "tests" / "test_inference.py",
+        project_root / "tests" / "test_similarity_filter.py",
         project_root / "tests" / "test_full.py",
         project_root / "tests" / "test_basics.py",
         project_root / "tests" / "test_reranking.py",
