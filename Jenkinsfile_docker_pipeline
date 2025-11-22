@@ -22,14 +22,15 @@ pipeline {
     }
 
     stages {
-        stage('Run Tests') {
+        stage('Run Pipeline components') {
             steps {
                 script {
-                    echo 'Running tests inside linux_with_cuda_complete container...'
-
+                    echo 'Running pipeline inside linux_with_cuda_complete container...'
                     // Use the python environment pre-installed in the image
                     // The image has the venv at /app/01_RAG/.venv
-                    sh '/app/01_RAG/.venv/bin/python src/runner_pipeline.sh'
+                    sh '/app/01_RAG/.venv/bin/python src/data_pipeline_pdf.py'
+                    sh '/app/01_RAG/.venv/bin/python src/pre_chunking.py'
+                    sh '/app/01_RAG/.venv/bin/python src/chunk_qwen3_0_6B.py'
                 }
             }
         }
