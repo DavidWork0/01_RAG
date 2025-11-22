@@ -22,12 +22,14 @@ def initialize_model():
         torch_dtype=torch.bfloat16,  # Changed from 'dtype' to 'torch_dtype'
         low_cpu_mem_usage=True,
         use_flash_attn=False,
-        trust_remote_code=True
+        trust_remote_code=True,
+        local_files_only=True
     ).eval().to(device)
 
     tokenizer = AutoTokenizer.from_pretrained(
         LOCAL_MODEL_PATH, 
-        trust_remote_code=True
+        trust_remote_code=True,
+        local_files_only=True
     )
 
     return model, device, tokenizer
