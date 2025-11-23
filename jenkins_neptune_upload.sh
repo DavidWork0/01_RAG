@@ -60,19 +60,47 @@ fi
 echo "🏷️  Tags: $TAGS"
 echo ""
 
-# Change to project root
-cd /app/01_RAG
+# Detect project root (Jenkins workspace or Docker /app path)
+if [ -f "tests/test_inference.py" ]; then
+    PROJECT_ROOT=$(pwd)
+    echo "📂 Project root: $PROJECT_ROOT (current directory)"
+elif [ -d "/app/01_RAG" ]; then
+    PROJECT_ROOT="/app/01_RAG"
+    cd "$PROJECT_ROOT"
+    echo "📂 Project root: $PROJECT_ROOT (Docker path)"
+else
+    echo "❌ ERROR: Cannot find project root"
+    exit 1
+fi
+
+# Detect Python executable
+if [ -f "$PROJECT_ROOT/.venv/bin/python" ]; then
+    PYTHON="$PROJECT_ROOT/.venv/bin/python"
+elif [ -f "/app/01_RAG/.venv/bin/python" ]; then
+    PYTHON="/app/01_RAG/.venv/bin/python"
+else
+    PYTHON="python"
+fi
+echo "🐍 Python: $PYTHON"
+echo ""
 
 # Install neptune if not already installed
 echo "📦 Checking neptune installation..."
-if ! /app/01_RAG/.venv/bin/python -c "import neptune" 2>/dev/null; then
+if ! $PYTHON -c "import neptune" 2>/dev/null; then
     echo "   Installing neptune..."
-    /app/01_RAG/.venv/bin/pip install neptune --quiet
+    $PYTHON -m pip install neptune --quiet
     echo "   ✅ Neptune installed"
 else
     echo "   ✅ Neptune already installed"
 fi
 echo ""
+
+# Check if logs directory exists
+if [ ! -d "$PROJECT_ROOT/tests/logs/sessions" ]; then
+    echo "⚠️  Warning: Log directory not found: $PROJECT_ROOT/tests/logs/sessions"
+    echo "   Creating directory..."
+    mkdir -p "$PROJECT_ROOT/tests/logs/sessions"
+fi
 
 # Run the uploader
 echo "🚀 Starting upload to Neptune.ai..."
@@ -80,20 +108,23 @@ echo ""
 
 case "$UPLOAD_MODE" in
     latest)
-        /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+        $PYTHON src/neptune_uploader.py \
             --upload-latest \
-            --tags $TAGS
+            --tags $TAGS \
+            --log-dir "$PROJECT_ROOT/tests/logs"
         ;;
     all)
-        /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+        $PYTHON src/neptune_uploader.py \
             --upload-all \
             --limit 10 \
-            --tags $TAGS
+            --tags $TAGS \
+            --log-dir "$PROJECT_ROOT/tests/logs"
         ;;
     inference)
-        /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+        $PYTHON src/neptune_uploader.py \
             --upload-inference-logs \
-            --tags $TAGS
+            --tags $TAGS \
+            --log-dir "$PROJECT_ROOT/tests/logs"
         ;;
     *)
         echo "❌ ERROR: Invalid NEPTUNE_UPLOAD_MODE: $UPLOAD_MODE"
