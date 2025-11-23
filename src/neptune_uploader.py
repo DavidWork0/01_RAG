@@ -368,17 +368,29 @@ class NeptuneUploader:
             # Create summary charts (Neptune will auto-generate some visualizations)
             print("📊 Creating summary visualizations...")
             
-            # Average response time per question
+            # Response time per question
             if session_data["test_results"]:
                 avg_times = [r["response_time"] for r in session_data["test_results"]]
                 for idx, time in enumerate(avg_times, 1):
                     run["charts/response_times_by_question"].append(time, step=idx)
             
-            # Chunks retrieved distribution
+            # Chunks retrieved per question
             if session_data["test_results"]:
                 chunks = [r["chunks_retrieved"] for r in session_data["test_results"]]
                 for idx, chunk_count in enumerate(chunks, 1):
                     run["charts/chunks_by_question"].append(chunk_count, step=idx)
+            
+            # Answer length per question
+            if session_data["test_results"]:
+                answer_lengths = [r["answer_length"] for r in session_data["test_results"]]
+                for idx, length in enumerate(answer_lengths, 1):
+                    run["charts/answer_length_by_question"].append(length, step=idx)
+            
+            # Success rate per question
+            if session_data["test_results"]:
+                success_values = [1 if r["success"] else 0 for r in session_data["test_results"]]
+                for idx, success in enumerate(success_values, 1):
+                    run["charts/success_by_question"].append(success, step=idx)
             
             print(f"\n✅ Session uploaded successfully!")
             print(f"🔗 View in Neptune: {run.get_url()}")
