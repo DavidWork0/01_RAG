@@ -25,6 +25,9 @@ services:
       - TRANSFORMERS_CACHE=/app/01_RAG/models
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
       - TORCH_CUDNN_BENCHMARK=1
+      - NEPTUNE_API_TOKEN=${NEPTUNE_API_TOKEN}
+      - NEPTUNE_PROJECT=davidwork0/rag-tests
+      - NEPTUNE_UPLOAD_MODE=latest
     
     # No bind mounts: project files are copied into the image at build time
     # (This improves IO performance and prevents host mounts from hiding in-image files)
