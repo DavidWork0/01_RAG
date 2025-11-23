@@ -149,6 +149,7 @@ def get_python_file_hashes() -> Dict[str, str]:
         Dictionary mapping file paths to their SHA256 hashes
     """
     critical_files = [
+        # Idea add jenkinsfiles etc here
         # Core modules
         project_root / "src" / "model_config.py",
         project_root / "src" / "rag_config.py",
@@ -158,6 +159,7 @@ def get_python_file_hashes() -> Dict[str, str]:
         project_root / "src" / "chunk_qwen3_0_6B.py",
         project_root / "src" / "pre_chunking.py",
         project_root / "src" / "dashboard.py",
+        project_root / "src" / "neptune_uploader.py",
         # InternVL modules
         project_root / "src" / "intevl3_5" / "InternVL35_2B_reducedv2_single.py",
         project_root / "src" / "intevl3_5" / "InternVL35_4B_reducedv2_single.py",
@@ -169,6 +171,9 @@ def get_python_file_hashes() -> Dict[str, str]:
         project_root / "tests" / "test_reranking.py",
         project_root / "tests" / "hardware_info.py",
         project_root / "tests" / "environment_collector.py",
+        project_root / "tests" / "test_neptune_integration.py",
+
+
     ]
     
     file_hashes = {}

@@ -48,7 +48,7 @@ pipeline {
                     sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode quick --include-environment'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
         }
