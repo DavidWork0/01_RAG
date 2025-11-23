@@ -1,0 +1,25 @@
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins_server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # Mount docker socket to allow spawning sibling containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount the current project directory to be accessible as a "local repo"
+      - .:/var/jenkins_home/local_repo
+    # Run as root to ensure access to docker socket and mounted volumes
+    user: root
+    
+    # Add environment variable to allow local checkout in Git plugin
+    environment:
+      - JAVA_OPTS=-Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true
+
+volumes:
+  jenkins_home:

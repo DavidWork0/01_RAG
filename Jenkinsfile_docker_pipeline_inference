@@ -1,0 +1,63 @@
+pipeline {
+    agent {
+        docker {
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint=""'
+            reuseNode true
+        }
+    }
+
+    stages {
+        stage('Run Pipeline components') {
+            environment {
+                // Ensure all huggingface caches resolve to the baked-in models
+                GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+                HF_HOME = '/app/01_RAG/models/huggingface'
+                HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+                TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+                RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+                RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+                RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+                WORKDIR = '/app/01_RAG/src'
+            }
+            steps {
+                script {
+                    echo 'Running pipeline inside linux_with_cuda_complete container...'
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
+                    sh '/app/01_RAG/.venv/bin/python src/data_pipeline_pdf.py'
+                    sh '/app/01_RAG/.venv/bin/python src/pre_chunking.py'
+                    sh '/app/01_RAG/.venv/bin/python src/chunk_qwen3_0_6B.py'
+                }
+            }
+        }
+    
+        stage('Run unit and Inference Tests') {
+            environment {
+                // Ensure all huggingface caches resolve to the baked-in models
+                GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+                HF_HOME = '/app/01_RAG/models/huggingface'
+                HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+                TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+                RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+                RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+                RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+                WORKDIR = '/app/01_RAG/tests'
+            }
+            steps {
+                script {
+                    echo 'Running unit and inference tests inside linux_with_cuda_complete container...'
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
+                    sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
+                }
+            }
+        }
+    }
+}

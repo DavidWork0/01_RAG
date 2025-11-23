@@ -9,6 +9,8 @@ Author: Generated for 01_RAG project
 Date: November 6, 2025
 """
 
+import os
+
 # =============================================================================
 # RAG SYSTEM CONFIGURATION
 # =============================================================================
@@ -324,12 +326,35 @@ def load_llm_model(model_name: str, project_root):
     # Get model configuration
     config = get_model_config(model_name)
     
-    # Resolve model path
-    model_path = Path(project_root) / config["path"]
-    
-    # Check if model exists
-    if not model_path.exists():
-        raise FileNotFoundError(f"Model file not found: {model_path}")
+    # Resolve model path using project root first, then fallbacks (useful for Jenkins/docker)
+    rel_model_path = Path(config["path"])
+    search_roots = [Path(project_root)]
+    env_root_candidates = [
+        os.environ.get('RAG_PROJECT_ROOT_OVERRIDE'),
+        os.environ.get('RAG_MODEL_ROOT'),
+        os.environ.get('RAG_PROJECT_ROOT_FALLBACK')
+    ]
+    for root in env_root_candidates:
+        if root:
+            search_roots.append(Path(root))
+    candidate_paths = [(root / rel_model_path) for root in search_roots]
+    llama_models_dir = os.environ.get('RAG_LLM_MODELS_DIR')
+    if llama_models_dir:
+        llama_base = Path(llama_models_dir)
+        try:
+            relative_to_llama = rel_model_path.relative_to(Path('models') / 'llamacpp')
+            candidate_paths.append(llama_base / relative_to_llama)
+        except ValueError:
+            candidate_paths.append(llama_base / rel_model_path.name)
+    direct_override = os.environ.get('RAG_LLM_MODEL_PATH')
+    if direct_override:
+        candidate_paths.append(Path(direct_override))
+    model_path = next((path for path in candidate_paths if path.exists()), None)
+    if model_path is None:
+        searched_locations = '\n  - '.join(str(path) for path in candidate_paths)
+        raise FileNotFoundError(
+            f"Model file '{rel_model_path.name}' not found in any of the searched locations:\n  - {searched_locations}"
+        )
     
     # Import llama_cpp here to avoid import errors if not installed
     try:

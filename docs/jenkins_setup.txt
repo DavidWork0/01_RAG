@@ -1,0 +1,52 @@
+To initialize a local Jenkins server that can run your tests (including the GPU-accelerated ones), I've set up a Docker-based solution.
+
+This setup runs Jenkins in a container and allows it to spawn your existing linux_with_cuda_complete container to run the tests.
+
+Step 1: Build your Project Image
+
+	First, ensure your main project image is built, as Jenkins will use it to run the tests.
+
+Step 2: Start Jenkins
+
+	Run the following command to start the Jenkins server:
+
+Step 3: Configure Jenkins
+
+	Open Jenkins: Go to http://localhost:8080 in your browser.
+Unlock Jenkins:
+	Run docker logs jenkins_server to find the initial admin password.
+Paste it into the setup wizard.
+Install Plugins:
+Choose "Install suggested plugins".
+Crucial: After the initial setup, go to Manage Jenkins -> Plugins -> Available plugins and install the Docker Pipeline plugin.
+Create Admin User: Follow the prompts to create your user.
+Step 4: Create the Test Job
+Click New Item.
+Enter a name (e.g., RAG_Tests).
+Select Pipeline and click OK.
+Scroll down to the Pipeline section.
+Change Definition to Pipeline script from SCM.
+Change SCM to Git.
+Repository URL: Enter /var/jenkins_home/local_repo (This maps to your local folder).
+Note: If git complains about "dubious ownership", you can just use "Pipeline script" and paste the content of Jenkinsfile_docker directly.
+Script Path: Change Jenkinsfile to Jenkinsfile_docker.
+Click Save.
+
+Troubleshooting:
+If you see "Unable to find Jenkinsfile_docker", it means the file hasn't been committed to git yet.
+Option A (Recommended): Commit the file
+1. Open a terminal in your project folder
+2. Run: git add Jenkinsfile_docker
+3. Run: git commit -m "Add Jenkinsfile for Docker"
+4. Run the build again
+
+Option B (Quick): Use direct script
+1. Go to Configure your job
+2. Change Definition from "Pipeline script from SCM" to "Pipeline script"
+3. Copy the content of Jenkinsfile_docker and paste it into the text area
+4. Click Save
+
+Step 5: Run
+Click Build Now. You can now observe the console output and test results online in the Jenkins UI.
+
+Note: This setup uses Jenkinsfile_docker, which I created to specifically use your linux_with_cuda_complete image. This ensures your tests have access to the GPU and all pre-installed dependencies.

@@ -8,8 +8,9 @@ import os
 
 
 # Get the absolute path to the models directory
+# Use environment variable override if set (for Docker/Jenkins), otherwise calculate from script location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+PROJECT_ROOT = os.environ.get('RAG_PROJECT_ROOT_OVERRIDE', os.path.dirname(os.path.dirname(SCRIPT_DIR)))
 LOCAL_MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "huggingface", "InternVL3_5-2B")
 
 def initialize_model():
@@ -22,12 +23,14 @@ def initialize_model():
         torch_dtype=torch.bfloat16,  # Changed from 'dtype' to 'torch_dtype'
         low_cpu_mem_usage=True,
         use_flash_attn=False,
-        trust_remote_code=True
+        trust_remote_code=True,
+        local_files_only=True
     ).eval().to(device)
 
     tokenizer = AutoTokenizer.from_pretrained(
         LOCAL_MODEL_PATH, 
-        trust_remote_code=True
+        trust_remote_code=True,
+        local_files_only=True
     )
 
     return model, device, tokenizer

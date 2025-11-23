@@ -5,7 +5,7 @@ Tests the complete pipeline:
 1. data_pipeline_pdf.py - PDF processing and image extraction
 2. pre_chunking.py - Text cleaning
 3. chunk_qwen3_0_6B.py - Chunking and embedding database creation
-4. streamlit_modern_multiuser.py - RAG query system
+4. dashboard.py - RAG query system
 
 Author: Generated for 01_RAG project
 Date: November 3, 2025
@@ -582,15 +582,15 @@ class TestHybridRAGModule(unittest.TestCase):
 
 
 class TestStreamlitIntegration(unittest.TestCase):
-    """Test suite for streamlit_modern_multiuser.py integration points"""
+    """Test suite for dashboard.py integration points"""
     
     def test_parse_thinking_response_with_thinking_tags(self):
         """Test parsing response with thinking tags"""
         # Import locally to avoid issues
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("dashboard not available")
         
         response = """
         <think>
@@ -611,9 +611,9 @@ class TestStreamlitIntegration(unittest.TestCase):
     def test_parse_thinking_response_without_tags(self):
         """Test parsing response without thinking tags"""
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("dashboard not available")
         
         response = "This is a simple answer without thinking tags."
         
@@ -626,9 +626,9 @@ class TestStreamlitIntegration(unittest.TestCase):
     def test_parse_thinking_response_thinking_variant(self):
         """Test parsing with <thinking> tags instead of <think>"""
         try:
-            from streamlit_modern_multiuser import parse_thinking_response
+            from dashboard import parse_thinking_response
         except ImportError:
-            self.skipTest("streamlit_modern_multiuser not available")
+            self.skipTest("dashboard not available")
         
         response = """
         <thinking>
@@ -836,11 +836,11 @@ def run_pipeline_health_check():
     # Check 5: streamlit app
     try:
         # Already imported at module level, just check if it's available
-        import streamlit_modern_multiuser
+        import dashboard
         checks["streamlit_app"] = True
-        print("[OK] streamlit_modern_multiuser.py - Import successful")
+        print("[OK] dashboard.py - Import successful")
     except Exception as e:
-        print(f"[FAIL] streamlit_modern_multiuser.py - Import failed: {e}")
+        print(f"[FAIL] dashboard.py - Import failed: {e}")
     
     # Summary
     print("\n" + "-"*60)
