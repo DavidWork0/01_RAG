@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_multi
-    image: linux_with_cuda_complete:latest
-    container_name: linux_with_cuda-complete-container
+    image: linux_with_cuda_complete_neptunai:latest
+    container_name: linux_with_cuda-complete_neptunai-container
     ports:
       - "127.0.0.1:8501:8501" # Streamlit default port exposed to localhost only for security
       - "127.0.0.1:8502:8502" # Additional Streamlit port exposed to localhost only for security
