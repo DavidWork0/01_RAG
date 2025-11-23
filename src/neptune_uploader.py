@@ -309,7 +309,7 @@ class NeptuneUploader:
         run = neptune.init_run(
             project=self.project,
             api_token=self.api_token,
-            run=custom_run_id,
+            custom_run_id=custom_run_id,
             tags=tags or [],
             name=session_data["session_name"],
             description=description or f"RAG Test Session: {session_data['session_name']}"
@@ -537,7 +537,7 @@ class NeptuneUploader:
         run = neptune.init_run(
             project=self.project,
             api_token=self.api_token,
-            run=custom_run_id,
+            custom_run_id=custom_run_id,
             tags=tags or ["inference_logs"],
             name=run_name,
             description="Inference logs from InferenceLogger"
