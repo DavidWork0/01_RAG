@@ -345,7 +345,7 @@ class HybridRAGQwen3_Module:
         Returns:
             Set of extracted keywords
         """
-        #keywords = self._extract_keywords(query)
+        keywords = self._extract_keywords(query)
         self._print(f"   Keywords: {keywords if keywords else 'none'}")
         return keywords
     
