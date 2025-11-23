@@ -235,13 +235,23 @@ def main():
     
     # Test 6: Full Upload (optional)
     if not args.skip_upload and creds_ok:
-        print("\n⚠️  About to upload test data to Neptune.ai")
-        print("   This will create a new run in your project.")
-        response = input("   Continue? (y/n): ")
-        if response.lower() == 'y':
-            results.append(("Full Upload", test_full_upload(api_token, project)))
+        # Check if running in non-interactive environment (like Jenkins)
+        import sys
+        if not sys.stdin.isatty():
+            print("\n⚠️  Non-interactive environment detected (Jenkins/Docker)")
+            print("   Skipping upload test - use --skip-upload flag explicitly")
+            print("   To test upload in Jenkins, run: python src/neptune_uploader.py --upload-latest")
         else:
-            print("   Skipped full upload test")
+            print("\n⚠️  About to upload test data to Neptune.ai")
+            print("   This will create a new run in your project.")
+            try:
+                response = input("   Continue? (y/n): ")
+                if response.lower() == 'y':
+                    results.append(("Full Upload", test_full_upload(api_token, project)))
+                else:
+                    print("   Skipped full upload test")
+            except EOFError:
+                print("\n   Skipped full upload test (non-interactive environment)")
     
     # Summary
     print("\n" + "="*80)

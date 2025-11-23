@@ -56,10 +56,6 @@ pipeline {
         
         stage('Upload to Neptune') {
             // This stage uploads test results to Neptune.ai for visualization
-            // To enable: 
-            // 1. Uncomment NEPTUNE_API_TOKEN and NEPTUNE_PROJECT in environment section
-            // 2. Configure NEPTUNE_API_TOKEN as Jenkins secret credential
-            // 3. Set NEPTUNE_PROJECT to your project name
             // See docs/neptune_integration.md for details
             when {
                 expression { 
