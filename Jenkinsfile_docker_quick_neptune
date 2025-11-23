@@ -23,7 +23,7 @@ pipeline {
         // Neptune.ai configuration (optional - comment out if not using)
         NEPTUNE_API_TOKEN = credentials('neptune-api-token')
         NEPTUNE_PROJECT = 'davidwork0/rag-tests'
-        NEPTUNE_UPLOAD_MODE = 'latest_jenkins_run'
+        NEPTUNE_UPLOAD_MODE = 'latest'  // Options: 'latest', 'all', 'inference'
     }
 
     stages {
