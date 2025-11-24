@@ -1,0 +1,65 @@
+Relevant Questions (Based on Document)
+1. Can I make an instance owner with the name "instanceowner" on RHEL?
+Answer: Yes, but with conditions. "Instanceowner" is frequently used as a placeholder variable in the documentation (e.g., su - instanceowner). However, the document states that the instance owner must be a valid user ID that exists on the operating system and must not be associated with any other directory server instance. As long as "instanceowner" is created as a valid user on RHEL (meeting OS length and character requirements) and is not already in use by another instance, it is permitted.
+
+2. What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)
+Answer: The correct switch is -K. The command syntax for using an encrypted connection with a specific keyfile is idsldapsearch -Z -K keyfile -P keyfilepwd ....
+
+3. Where are DB2 install logs stored when I finished with the install?
+Answer: The DB2 installation logs are typically stored in the install location directory (or temporary folder depending on OS) with filenames such as DB2setup.log or db2inst.log. The documentation mentions checking DB2setup.log in the install location if installation fails (e.g., due to password complexity).
+
+4. I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both "masters". What is the name of this topology setup?
+Answer: This topology is called Peer-to-peer replication. The documentation instructs you to "Configure the target directory server as a peer" to establish this setup where multiple servers act as masters.
+
+5. I've completed the install of ISVD10 on RHEL, but when I try to use the "idsldapsearch" command from my bash shell, I'm presented with an error saying that there is no such command. I'm logged in as the user "root". What is the issue and how can I solve it?
+Answer: The issue is that the links to the client utilities are not created automatically during installation.
+
+Solution: You must run the idslink command (e.g., idslink -g) to create the necessary symbolic links (like /usr/bin/idsldapsearch) pointing to the installation directory.
+
+6. How can I add my custom schema file?
+Answer: You can add a custom schema file using the Configuration Tool or the command-line utility.
+
+Configuration Tool: Go to "Manage schema files" -> "Add schema file".
+
+Command Line: Use the idsldapmodify command with a file containing the changetype: modify and add: attributetypes/objectclasses directives directed at cn=schema. (Note: The document also mentions adding a V3.modifiedschema file manually in some contexts, but the tool is preferred).
+
+7. What's this error: GLPMIG074E ?
+Answer: GLPMIG074E corresponds to the error message: "Remote migration is detected on the system when the server instance already exists."
+
+8. What command is used to list all instances on a linux install of ISVD?
+Answer: The command is idsilist. Running idsilist -a will show all instances with complete information.
+
+9. What does LDIF stand for?
+Answer: LDIF stands for LDAP Data Interchange Format.
+
+10. I'm done with the install of everything on a RHEL machine. I've install WAS and WAT as well. I need to start the websphere server though, and I forgot where the file is for this. Can you tell me how I can start the WAS WAT server? Also suggest a way to auto-start this after a reboot of the server.
+Answer:
+
+To Start: You can start the server manually using the shell script located at:
+[WAS_home]/profiles/TDSWebAdminProfile/bin/startServer.sh server1
+
+Auto-start: The documentation specifically details creating a Windows Service for auto-start (using WASService.exe -startType automatic). For Linux, it does not explicitly detail a built-in ISVD command to auto-start WAS (unlike idsslapd which uses inittab). You would typically need to create a system service (e.g., systemd unit) or add the startServer.sh command to your system's startup scripts manually.
+
+Non-Relevant Questions (Not in Document)
+The following answers are based on general knowledge as they are not contained in the provided technical documentation.
+
+11. What is the average lifespan of an African elephant in the wild?
+Answer: The document does not contain this information. Generally, African elephants live up to 60-70 years in the wild.
+
+12. How many species of penguins exist in Antarctica?
+Answer: The document does not contain this information. Generally, there are only a few species that breed exclusively on the Antarctic continent (Emperor and Adélie), though others visit.
+
+13. What do giant pandas primarily eat in their natural habitat?
+Answer: The document does not contain this information. Giant pandas primarily eat bamboo.
+
+14. Can dolphins recognize themselves in a mirror?
+Answer: The document does not contain this information. Yes, dolphins are known to demonstrate self-awareness and can recognize themselves in mirrors.
+
+15. What is the fastest land animal and how fast can it run?
+Answer: The document does not contain this information. The cheetah is the fastest land animal, capable of reaching speeds up to 80-128 km/h (50-80 mph).
+
+16. How do octopuses change their skin color and texture?
+Answer: The document does not contain this information. They use specialized cells called chromatophores (for color) and muscles in their skin (for texture).
+
+17. What is the primary difference between African and Asian elephants?
+Answer: The document does not contain this information. Key differences include ear size (African are larger and shaped like Africa), head shape (African are rounded, Asian have a twin-domed head), and size (African are generally larger).
