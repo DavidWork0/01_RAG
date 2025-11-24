@@ -1,70 +1,149 @@
-"""Verify random chunk extraction completeness."""
+"""
+Pytest for verifying random chunk extraction completeness.
+
+Tests random sample of chunks to ensure consistent extraction quality.
+"""
 import sys
 import random
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tests.extract_inference_data import extract_from_latest_log
+# Add project root to path
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
-data = extract_from_latest_log()
+import pytest
 
-# Collect all chunks from all questions
-all_chunks = []
-for q_idx, question in enumerate(data):
-    for c_idx, chunk in enumerate(question['chunks']):
-        all_chunks.append({
-            'question_id': question['question_id'],
-            'chunk_num': chunk['chunk_number'],
-            'chunk': chunk,
-            'q_idx': q_idx,
-            'c_idx': c_idx
-        })
+# Import with try/except for better error handling
+try:
+    from tests.extract_inference_data import extract_from_latest_log, find_latest_log
+except ImportError:
+    import extract_inference_data
+    extract_from_latest_log = extract_inference_data.extract_from_latest_log
+    find_latest_log = extract_inference_data.find_latest_log
 
-print(f"\nTotal chunks available: {len(all_chunks)}")
 
-# Select 10 random chunks
-random.seed(42)  # For reproducibility
-sample_chunks = random.sample(all_chunks, min(10, len(all_chunks)))
-
-print("\n" + "="*80)
-print("RANDOM CHUNK VERIFICATION")
-print("="*80 + "\n")
-
-for i, item in enumerate(sample_chunks, 1):
-    chunk = item['chunk']
-    print(f"{i}. Question {item['question_id']}, Chunk {item['chunk_num']}:")
-    print(f"   Source: {chunk['source']}")
-    print(f"   Index: {chunk['chunk_index']}")
-    print(f"   Similarity: {chunk['similarity_score']}%")
-    print(f"   Length: {len(chunk['content'])} chars")
+@pytest.fixture(scope="module")
+def extracted_data():
+    """Fixture to extract data once for all tests."""
+    sessions_dir = Path(__file__).parent / "logs" / "sessions"
+    log_file = find_latest_log(sessions_dir)
     
-    # Check if content looks complete (not truncated)
-    content = chunk['content']
-    has_ellipsis = content.endswith('...')
-    has_newlines = '\n' in content
-    word_count = len(content.split())
+    if not log_file:
+        pytest.skip("No session log files found")
     
-    print(f"   Ends with '...': {has_ellipsis}")
-    print(f"   Contains newlines: {has_newlines}")
-    print(f"   Word count: {word_count}")
-    
-    # Show first and last 100 chars
-    if len(content) > 200:
-        print(f"   First 100 chars: {content[:100].replace(chr(10), ' ')[:100]}...")
-        print(f"   Last 100 chars: ...{content[-100:].replace(chr(10), ' ')[-100:]}")
-    else:
-        print(f"   Full content: {content.replace(chr(10), ' ')[:150]}...")
-    
-    # Check for potential truncation issues
-    if len(content) < 50 and not has_ellipsis:
-        print("   ⚠️ WARNING: Very short chunk without ellipsis - possible truncation")
-    elif not has_newlines and len(content) > 100:
-        print("   ⚠️ WARNING: Long chunk without newlines - possible formatting issue")
-    else:
-        print("   ✅ Looks complete")
-    
-    print()
+    data = extract_from_latest_log(sessions_dir)
+    return data
 
-print("="*80)
-print("VERIFICATION COMPLETE")
-print("="*80)
+
+@pytest.fixture(scope="module")
+def all_chunks(extracted_data):
+    """Fixture to collect all chunks from all questions."""
+    chunks = []
+    for q_idx, question in enumerate(extracted_data):
+        for c_idx, chunk in enumerate(question['chunks']):
+            chunks.append({
+                'question_id': question['question_id'],
+                'chunk_num': chunk['chunk_number'],
+                'chunk': chunk,
+                'q_idx': q_idx,
+                'c_idx': c_idx
+            })
+    return chunks
+
+
+@pytest.fixture(scope="module")
+def sample_chunks(all_chunks):
+    """Fixture to get 10 random chunks for testing."""
+    random.seed(42)  # For reproducibility
+    return random.sample(all_chunks, min(10, len(all_chunks)))
+
+
+def test_random_chunks_available(all_chunks):
+    """Test that chunks are available for random sampling."""
+    assert len(all_chunks) > 0, "No chunks available for testing"
+    assert len(all_chunks) >= 10, f"Expected at least 10 chunks, got {len(all_chunks)}"
+
+
+def test_random_chunks_substantial_length(sample_chunks):
+    """Test that random chunks have substantial content length."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        content_length = len(chunk['content'])
+        assert content_length > 500, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} too short: {content_length} chars"
+
+
+def test_random_chunks_have_newlines(sample_chunks):
+    """Test that random chunks contain newlines (paragraph breaks)."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        content = chunk['content']
+        assert '\n' in content, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} missing newlines"
+
+
+def test_random_chunks_end_correctly(sample_chunks):
+    """Test that random chunks end with ellipsis as expected."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        content = chunk['content'].strip()
+        if len(content) > 100:  # Only check longer chunks
+            assert content.endswith('...'), \
+                f"Chunk Q{item['question_id']}-{item['chunk_num']} doesn't end with '...'"
+
+
+def test_random_chunks_word_count(sample_chunks):
+    """Test that random chunks have reasonable word count."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        word_count = len(chunk['content'].split())
+        assert word_count > 50, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} has too few words: {word_count}"
+
+
+def test_random_chunks_not_empty(sample_chunks):
+    """Test that no random chunks are empty or suspiciously short."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        content = chunk['content']
+        
+        assert content, f"Chunk Q{item['question_id']}-{item['chunk_num']} is empty"
+        assert len(content) >= 50, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} suspiciously short: {len(content)} chars"
+
+
+def test_random_chunks_metadata_valid(sample_chunks):
+    """Test that random chunk metadata is valid."""
+    for item in sample_chunks:
+        chunk = item['chunk']
+        
+        # Check source
+        assert chunk['source'], f"Chunk Q{item['question_id']}-{item['chunk_num']} missing source"
+        
+        # Check similarity score
+        score = chunk['similarity_score']
+        assert 0 <= score <= 100, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} invalid similarity: {score}"
+        
+        # Check chunk number
+        assert chunk['chunk_number'] > 0, \
+            f"Chunk Q{item['question_id']}-{item['chunk_num']} invalid chunk_number"
+
+
+def test_random_chunks_formatting_consistent(sample_chunks):
+    """Test that random chunks have consistent formatting."""
+    long_chunks = [item for item in sample_chunks if len(item['chunk']['content']) > 100]
+    
+    for item in long_chunks:
+        chunk = item['chunk']
+        content = chunk['content']
+        
+        # Should have newlines for long content
+        assert '\n' in content, \
+            f"Long chunk Q{item['question_id']}-{item['chunk_num']} missing paragraph breaks"
+
+
+if __name__ == "__main__":
+    # Allow running directly for debugging
+    pytest.main([__file__, "-v"])
