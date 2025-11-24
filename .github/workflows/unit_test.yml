@@ -68,5 +68,5 @@ jobs:
       with:
         name: test-results
         path: |
-          tests/logs/
+          tests/unittest_logs/
           *.log
