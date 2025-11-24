@@ -28,10 +28,15 @@ except ImportError:
 def extracted_data():
     """Fixture to extract data once for all tests."""
     sessions_dir = Path(__file__).parent / "logs" / "sessions"
+    
+    # Skip if sessions directory doesn't exist (CI/CD environment)
+    if not sessions_dir.exists():
+        pytest.skip("Session logs directory not available (CI/CD environment)", allow_module_level=True)
+    
     log_file = find_latest_log(sessions_dir)
     
     if not log_file:
-        pytest.skip("No session log files found")
+        pytest.skip("No session log files found", allow_module_level=True)
     
     data = extract_from_latest_log(sessions_dir)
     return data
