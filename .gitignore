@@ -62,6 +62,16 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Exclude test logs from the general logs ignore (but keep most log files ignored)
+!tests/logs/
+!tests/logs/sessions/
+tests/logs/inference_log.jsonl
+# Keep only one sample session log for CI/CD testing
+!tests/logs/sessions/test_session_*.log
+tests/logs/sessions/test_session_Qwen3-8B-Q5_K_M_20251119_*.log
+tests/logs/sessions/test_session_Qwen3-8B-Q5_K_M_20251121_080738*.log
+# Keep the most recent one: test_session_Qwen3-8B-Q5_K_M_20251121_121533.log
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
