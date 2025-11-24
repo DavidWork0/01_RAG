@@ -6,10 +6,22 @@ including embedded paragraphs and blank lines.
 """
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 import pytest
-from tests.extract_inference_data import extract_from_latest_log, find_latest_log
+
+# Import with try/except for better error handling
+try:
+    from tests.extract_inference_data import extract_from_latest_log, find_latest_log
+except ImportError:
+    # Try direct import if tests module is not available
+    import extract_inference_data
+    extract_from_latest_log = extract_inference_data.extract_from_latest_log
+    find_latest_log = extract_inference_data.find_latest_log
 
 
 @pytest.fixture(scope="module")
