@@ -764,6 +764,7 @@ def run_single_test(
     if HARDWARE_INFO_AVAILABLE:
         try:
             import psutil
+            import torch
             if torch.cuda.is_available():
                 # GPU metrics
                 gpu_mem = torch.cuda.memory_allocated() / (1024 ** 2)  # MB
@@ -777,7 +778,7 @@ def run_single_test(
         except:
             pass  # Silently skip if hardware monitoring fails
     
-    # Log the inference
+    # Log the inference (pass hardware metrics in metadata so they're saved to JSON log)
     log_entry = logger.log_inference(
         question_id=q_id,
         question=q_text,
@@ -788,13 +789,14 @@ def run_single_test(
         thinking=thinking,
         sources=results,
         error=error_msg,
-        session_name=session_name
+        session_name=session_name,
+        metadata=hw_metrics  # Pass hardware metrics in metadata
     )
     
-    # Add hardware metrics and other data to log entry for session logging
+    # Add other data to log entry for session logging
     log_entry['raw_response'] = raw_response or ""
     log_entry['chunks'] = results or []
-    log_entry.update(hw_metrics)  # Add hardware metrics
+    # Hardware metrics are now in log_entry['metadata']
     
     # Append to session log file if provided
     if log_file and log_file.exists():
