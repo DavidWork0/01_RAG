@@ -759,6 +759,24 @@ def run_single_test(
     
     response_time = time.time() - start_time
     
+    # Collect hardware metrics after test for Neptune monitoring
+    hw_metrics = {}
+    if HARDWARE_INFO_AVAILABLE:
+        try:
+            import psutil
+            if torch.cuda.is_available():
+                # GPU metrics
+                gpu_mem = torch.cuda.memory_allocated() / (1024 ** 2)  # MB
+                gpu_util = torch.cuda.utilization() if hasattr(torch.cuda, 'utilization') else 0
+                hw_metrics['gpu_memory_used'] = gpu_mem
+                hw_metrics['gpu_utilization'] = gpu_util
+            
+            # CPU and RAM metrics
+            hw_metrics['cpu_percent'] = psutil.cpu_percent(interval=0.1)
+            hw_metrics['ram_used_mb'] = psutil.virtual_memory().used / (1024 ** 2)
+        except:
+            pass  # Silently skip if hardware monitoring fails
+    
     # Log the inference
     log_entry = logger.log_inference(
         question_id=q_id,
@@ -773,9 +791,10 @@ def run_single_test(
         session_name=session_name
     )
     
-    # Add raw response and chunks to log entry for session logging
+    # Add hardware metrics and other data to log entry for session logging
     log_entry['raw_response'] = raw_response or ""
     log_entry['chunks'] = results or []
+    log_entry.update(hw_metrics)  # Add hardware metrics
     
     # Append to session log file if provided
     if log_file and log_file.exists():

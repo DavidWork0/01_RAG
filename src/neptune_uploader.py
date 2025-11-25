@@ -348,14 +348,37 @@ class NeptuneUploader:
             
             # Upload individual test results as metrics
             print("📝 Uploading test results...")
-            for result in session_data["test_results"]:
+            for idx, result in enumerate(session_data["test_results"], 1):
                 q_id = result["question_id"]
-                run[f"tests/q{q_id}/response_time"].append(result["response_time"])
-                run[f"tests/q{q_id}/chunks_retrieved"].append(result["chunks_retrieved"])
-                run[f"tests/q{q_id}/answer_length"].append(result["answer_length"])
-                run[f"tests/q{q_id}/success"].append(1 if result["success"] else 0)
+                run[f"tests/q{q_id}/response_time"].append(result["response_time"], step=idx)
+                run[f"tests/q{q_id}/chunks_retrieved"].append(result["chunks_retrieved"], step=idx)
+                run[f"tests/q{q_id}/answer_length"].append(result["answer_length"], step=idx)
+                run[f"tests/q{q_id}/success"].append(1 if result["success"] else 0, step=idx)
                 run[f"tests/q{q_id}/question"] = result["question"]
                 run[f"tests/q{q_id}/category"] = result["category"]
+                
+                # Log hardware metrics for each test if available
+                # This allows hardware monitoring over time in Neptune charts
+                if result.get("gpu_memory_used"):
+                    run["hardware_monitoring/gpu_memory_used_mb"].append(
+                        result["gpu_memory_used"], 
+                        step=idx
+                    )
+                if result.get("gpu_utilization"):
+                    run["hardware_monitoring/gpu_utilization_percent"].append(
+                        result["gpu_utilization"],
+                        step=idx
+                    )
+                if result.get("cpu_percent"):
+                    run["hardware_monitoring/cpu_utilization_percent"].append(
+                        result["cpu_percent"],
+                        step=idx
+                    )
+                if result.get("ram_used_mb"):
+                    run["hardware_monitoring/ram_used_mb"].append(
+                        result["ram_used_mb"],
+                        step=idx
+                    )
             
             # Upload the actual log file
             print("📄 Uploading log file...")
