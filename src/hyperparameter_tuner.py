@@ -359,7 +359,7 @@ def chunk_size_optimization():
         param_grid = {
             'CHUNK_STRATEGY': ['fixed_size'],
             'FIXED_SIZE_CHUNK_SIZE': [500, 750, 1000, 1250, 1500, 2000, 2500],
-            'FIXED_SIZE_OVERLAP': [100, 250, 400, 550],
+            'FIXED_SIZE_OVERLAP': [100, 250, 400],
             'BATCH_SIZE': [50, 150]
         }
         

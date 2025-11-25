@@ -305,15 +305,15 @@ def chunk_size_optimization_with_neptune(
     tuner.config_modifier.backup_config()
     tuner.start_neptune_run(
         tags=["chunk_size_optimization", "grid_search"],
-        description="Grid search over chunk sizes and overlaps"
+        description="Grid search over chunk sizes and overlaps (56 experiments: 7 sizes × 4 overlaps × 2 batch_sizes)"
     )
     
     try:
         param_grid = {
             'CHUNK_STRATEGY': ['fixed_size'],
-            'FIXED_SIZE_CHUNK_SIZE': [500, 1000],
-            'FIXED_SIZE_OVERLAP': [200, 250],
-            'BATCH_SIZE': [50]
+            'FIXED_SIZE_CHUNK_SIZE': [500, 750, 1000, 1250, 1500, 2000, 3000],
+            'FIXED_SIZE_OVERLAP': [100, 250, 400],
+            'BATCH_SIZE': [50, 150, 250]
         }
         
         tuner.run_grid_search(param_grid)
