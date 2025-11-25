@@ -249,9 +249,16 @@ class HyperparameterTuner:
         
         print(f"\n🔬 Starting grid search with {len(combinations)} combinations")
         print("="*70)
+        print(f"\nParameter grid:")
+        for key, values in param_grid.items():
+            print(f"  {key}: {values}")
+        print(f"\nTotal combinations: {len(combinations)}")
+        print("="*70)
         
         for i, combination in enumerate(combinations, 1):
             params = dict(zip(keys, combination))
+            
+            print(f"\n[Progress: {i}/{len(combinations)}]")
             
             # Create descriptive name from parameter values
             param_str = "_".join([f"{k.replace('FIXED_SIZE_', '').replace('CHUNK_SIZE_MAX_BY_', '').replace('CHUNK_', '').lower()}{v}" 
