@@ -26,7 +26,7 @@ pipeline {
         
         // Hyperparameter tuning mode
         // Options: 'quick' (3 experiments), 'chunk_size' (20 experiments), 'batch_size' (5 experiments)
-        TUNING_MODE = 'chunk_size'
+        TUNING_MODE = 'quick'
     }
 
     stages {
