@@ -154,6 +154,32 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             # Also log experiment name in a separate namespace for reference
             self.neptune_run[f"experiment_names/{exp_idx}"] = exp_name
             
+            # Log parameters as time series for tracking across experiments
+            params = experiment["parameters"]
+            if "CHUNK_STRATEGY" in params:
+                # Convert strategy to numeric for charting (fixed_size=1, by_sentence=2)
+                strategy_val = 1 if params["CHUNK_STRATEGY"] == "fixed_size" else 2
+                self.neptune_run["charts/chunk_strategy"].append(strategy_val, step=exp_idx)
+            
+            if "FIXED_SIZE_CHUNK_SIZE" in params:
+                self.neptune_run["charts/chunk_size"].append(
+                    params["FIXED_SIZE_CHUNK_SIZE"],
+                    step=exp_idx
+                )
+            
+            if "FIXED_SIZE_OVERLAP" in params:
+                self.neptune_run["charts/overlap"].append(
+                    params["FIXED_SIZE_OVERLAP"],
+                    step=exp_idx
+                )
+            
+            if "BATCH_SIZE" in params:
+                self.neptune_run["charts/batch_size"].append(
+                    params["BATCH_SIZE"],
+                    step=exp_idx
+                )
+            
+            # Log metrics
             if metrics:
                 if "total_time_seconds" in metrics:
                     self.neptune_run["charts/execution_time"].append(
