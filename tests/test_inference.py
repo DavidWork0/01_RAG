@@ -759,44 +759,7 @@ def run_single_test(
     
     response_time = time.time() - start_time
     
-    # Collect hardware metrics after test for Neptune monitoring
-    hw_metrics = {}
-    try:
-        import psutil
-        import torch
-        
-        # CPU and RAM metrics (always available if psutil works)
-        hw_metrics['cpu_percent'] = psutil.cpu_percent(interval=0.1)
-        hw_metrics['ram_used_mb'] = psutil.virtual_memory().used / (1024 ** 2)
-        
-        # GPU metrics (only if CUDA is available)
-        if torch.cuda.is_available():
-            try:
-                # GPU memory usage
-                gpu_mem = torch.cuda.memory_allocated() / (1024 ** 2)  # MB
-                hw_metrics['gpu_memory_used'] = gpu_mem
-                
-                # GPU utilization using pynvml (nvidia-ml-py)
-                try:
-                    import pynvml
-                    pynvml.nvmlInit()
-                    handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-                    util = pynvml.nvmlDeviceGetUtilizationRates(handle)
-                    hw_metrics['gpu_utilization'] = util.gpu
-                    pynvml.nvmlShutdown()
-                except:
-                    # Fallback: estimate utilization from memory usage
-                    gpu_total = torch.cuda.get_device_properties(0).total_memory / (1024 ** 2)
-                    hw_metrics['gpu_utilization'] = (gpu_mem / gpu_total * 100) if gpu_total > 0 else 0
-            except Exception as gpu_error:
-                if verbose:
-                    print(f"⚠️  GPU metrics collection failed: {gpu_error}")
-    except Exception as e:
-        # Silently skip if hardware monitoring fails, but log for debugging
-        if verbose:
-            print(f"⚠️  Hardware metrics collection skipped: {e}")
-    
-    # Log the inference (pass hardware metrics in metadata so they're saved to JSON log)
+    # Log the inference
     log_entry = logger.log_inference(
         question_id=q_id,
         question=q_text,
@@ -807,14 +770,12 @@ def run_single_test(
         thinking=thinking,
         sources=results,
         error=error_msg,
-        session_name=session_name,
-        metadata=hw_metrics  # Pass hardware metrics in metadata
+        session_name=session_name
     )
     
     # Add other data to log entry for session logging
     log_entry['raw_response'] = raw_response or ""
     log_entry['chunks'] = results or []
-    # Hardware metrics are now in log_entry['metadata']
     
     # Append to session log file if provided
     if log_file and log_file.exists():
