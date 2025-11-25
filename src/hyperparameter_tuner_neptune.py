@@ -148,28 +148,39 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             for key, value in metrics.items():
                 self.neptune_run[f"experiments/{exp_name}/metrics/{key}"] = value
             
-            # Log time series for comparative charts
+            # Log time series for comparative charts with experiment name as step label
             exp_idx = len(self.results)
+            
+            # Use experiment name (which includes parameter combination) for better chart readability
+            step_context = {"experiment": exp_name}
+            
             if metrics:
                 if "total_time_seconds" in metrics:
                     self.neptune_run["charts/execution_time"].append(
                         metrics["total_time_seconds"],
-                        step=exp_idx
+                        step=exp_idx,
+                        **step_context
                     )
                 if "total_chunks" in metrics:
                     self.neptune_run["charts/total_chunks"].append(
                         metrics["total_chunks"],
-                        step=exp_idx
+                        step=exp_idx,
+                        **step_context
                     )
                 if "chunk_size_avg" in metrics:
                     self.neptune_run["charts/avg_chunk_size"].append(
                         metrics["chunk_size_avg"],
-                        step=exp_idx
+                        step=exp_idx,
+                        **step_context
                     )
             
             # Log success/failure
             success_val = 1 if experiment["status"] == "success" else 0
-            self.neptune_run["charts/success_rate"].append(success_val, step=exp_idx)
+            self.neptune_run["charts/success_rate"].append(
+                success_val,
+                step=exp_idx,
+                **step_context
+            )
             
         except Exception as e:
             print(f"⚠️  Failed to log experiment to Neptune: {e}")
