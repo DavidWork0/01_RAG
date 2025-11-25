@@ -34,7 +34,7 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
     
     def __init__(
         self,
-        results_dir: str = None,
+        results_dir: Optional[str] = None,
         neptune_project: Optional[str] = None,
         neptune_api_token: Optional[str] = None,
         enable_neptune: bool = True
@@ -43,11 +43,18 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
         Initialize Neptune-integrated hyperparameter tuner.
         
         Args:
-            results_dir: Directory for saving results
+            results_dir: Directory for saving results (defaults to tests/logs/hyperparameter_tuning)
             neptune_project: Neptune.ai project name (or use NEPTUNE_PROJECT env var)
             neptune_api_token: Neptune.ai API token (or use NEPTUNE_API_TOKEN env var)
             enable_neptune: Whether to enable Neptune logging
         """
+        # Import here to get the default RESULTS_DIR
+        from hyperparameter_tuner import RESULTS_DIR as DEFAULT_RESULTS_DIR
+        
+        # Use provided results_dir or fall back to default
+        if results_dir is None:
+            results_dir = DEFAULT_RESULTS_DIR
+        
         super().__init__(results_dir)
         
         self.enable_neptune = enable_neptune and NEPTUNE_AVAILABLE
