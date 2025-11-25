@@ -106,7 +106,7 @@ pipeline {
                 }
             }
         }
-        
+
     post {
         always {
             script {
@@ -134,4 +134,5 @@ pipeline {
             echo '❌ Hyperparameter tuning pipeline failed. Check logs for details.'
         }
     }
+}
 }
