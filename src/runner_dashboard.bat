@@ -8,4 +8,4 @@ echo ====================================
 
 echo.
 echo Press Ctrl+C to stop the application when done.
-%STREAMLIT% run streamlit.py
+%STREAMLIT% run dashboard.py
