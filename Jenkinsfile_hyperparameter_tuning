@@ -52,6 +52,30 @@ pipeline {
             }
         }
         
+        stage('Verify Files') {
+            steps {
+                script {
+                    echo 'Verifying hyperparameter tuning files...'
+                    sh '''
+                        echo "Current workspace: ${WORKSPACE}"
+                        echo "Checking for hyperparameter_tuner_neptune.py..."
+                        
+                        # Check workspace (where Jenkins checks out code)
+                        if [ -f "${WORKSPACE}/src/hyperparameter_tuner_neptune.py" ]; then
+                            echo "✓ Found in workspace: ${WORKSPACE}/src/"
+                            ls -lh "${WORKSPACE}/src/hyperparameter_tuner*.py"
+                        fi
+                        
+                        # Check /app/01_RAG (if different)
+                        if [ -d "/app/01_RAG/src" ]; then
+                            echo "Checking /app/01_RAG/src/..."
+                            ls -lh /app/01_RAG/src/hyperparameter_tuner*.py 2>/dev/null || echo "  (not found in /app/01_RAG/src)"
+                        fi
+                    '''
+                }
+            }
+        }
+        
         stage('Run Hyperparameter Tuning') {
             steps {
                 script {
@@ -59,9 +83,9 @@ pipeline {
                     echo 'This will test multiple configurations and upload results to Neptune.ai'
                     echo ''
                     
-                    // Run the Neptune-integrated hyperparameter tuner
+                    // Run from workspace where code is checked out
                     sh """
-                        cd /app/01_RAG/src
+                        cd ${WORKSPACE}/src
                         /app/01_RAG/.venv/bin/python hyperparameter_tuner_neptune.py \
                             --mode ${env.TUNING_MODE}
                     """
