@@ -16,7 +16,7 @@ import os
 # =============================================================================
 
 # Database path (relative to project root)
-DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_cleaned"
+DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned"
 
 # Embedding model for RAG
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
