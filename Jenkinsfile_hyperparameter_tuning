@@ -114,7 +114,7 @@ pipeline {
                     
                     // Find the latest tuning session JSON
                     sh """
-                        cd /app/01_RAG
+                        cd \${WORKSPACE}
                         LATEST_JSON=\$(ls -t tests/logs/hyperparameter_tuning/tuning_session_*.json 2>/dev/null | head -1)
                         
                         if [ -n "\$LATEST_JSON" ]; then
