@@ -148,38 +148,34 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             for key, value in metrics.items():
                 self.neptune_run[f"experiments/{exp_name}/metrics/{key}"] = value
             
-            # Log time series for comparative charts with experiment name as step label
+            # Log time series for comparative charts
             exp_idx = len(self.results)
             
-            # Use experiment name (which includes parameter combination) for better chart readability
-            step_context = {"experiment": exp_name}
+            # Also log experiment name in a separate namespace for reference
+            self.neptune_run[f"experiment_names/{exp_idx}"] = exp_name
             
             if metrics:
                 if "total_time_seconds" in metrics:
                     self.neptune_run["charts/execution_time"].append(
                         metrics["total_time_seconds"],
-                        step=exp_idx,
-                        **step_context
+                        step=exp_idx
                     )
                 if "total_chunks" in metrics:
                     self.neptune_run["charts/total_chunks"].append(
                         metrics["total_chunks"],
-                        step=exp_idx,
-                        **step_context
+                        step=exp_idx
                     )
                 if "chunk_size_avg" in metrics:
                     self.neptune_run["charts/avg_chunk_size"].append(
                         metrics["chunk_size_avg"],
-                        step=exp_idx,
-                        **step_context
+                        step=exp_idx
                     )
             
             # Log success/failure
             success_val = 1 if experiment["status"] == "success" else 0
             self.neptune_run["charts/success_rate"].append(
                 success_val,
-                step=exp_idx,
-                **step_context
+                step=exp_idx
             )
             
         except Exception as e:
