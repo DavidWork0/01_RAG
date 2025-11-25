@@ -107,57 +107,6 @@ pipeline {
             }
         }
         
-        stage('Generate Summary Report') {
-            steps {
-                script {
-                    echo 'Generating summary report from results...'
-                    
-                    // Find the latest tuning session JSON
-                    sh """
-                        cd \${WORKSPACE}
-                        LATEST_JSON=\$(ls -t tests/logs/hyperparameter_tuning/tuning_session_*.json 2>/dev/null | head -1)
-                        
-                        if [ -n "\$LATEST_JSON" ]; then
-                            echo "Latest tuning session: \$LATEST_JSON"
-                            echo ""
-                            echo "=== SUMMARY ==="
-                            /app/01_RAG/.venv/bin/python -c "
-import json
-import sys
-
-with open('\$LATEST_JSON', 'r') as f:
-    data = json.load(f)
-
-print(f'Total Experiments: {data[\"total_experiments\"]}')
-successful = [r for r in data['results'] if r['status'] == 'success']
-failed = [r for r in data['results'] if r['status'] != 'success']
-print(f'Successful: {len(successful)}')
-print(f'Failed: {len(failed)}')
-
-if successful:
-    print('')
-    print('Top 3 Fastest Configurations:')
-    sorted_by_time = sorted(successful, key=lambda x: x.get('duration_seconds', float('inf')))[:3]
-    for i, result in enumerate(sorted_by_time, 1):
-        print(f'  {i}. {result[\"name\"]}')
-        print(f'     Duration: {result.get(\"duration_seconds\", \"N/A\"):.2f}s')
-        params = result['parameters']
-        for k, v in params.items():
-            print(f'       {k}: {v}')
-        if result.get('metrics'):
-            print(f'       Total Chunks: {result[\"metrics\"].get(\"total_chunks\", \"N/A\")}')
-            print(f'       Avg Chunk Size: {result[\"metrics\"].get(\"chunk_size_avg\", \"N/A\")}')
-        print('')
-"
-                        else
-                            echo "No tuning results found"
-                        fi
-                    """
-                }
-            }
-        }
-    }
-    
     post {
         always {
             script {
