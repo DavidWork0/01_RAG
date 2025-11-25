@@ -56,36 +56,36 @@ pipeline {
             steps {
                 script {
                     echo 'Verifying hyperparameter tuning files...'
-                    sh '''
-                        echo "Workspace: ${WORKSPACE}"
+                    sh """
+                        echo "Workspace: \${WORKSPACE}"
                         
-                        if [ -f "${WORKSPACE}/src/hyperparameter_tuner_neptune.py" ]; then
+                        if [ -f "\${WORKSPACE}/src/hyperparameter_tuner_neptune.py" ]; then
                             echo "✓ hyperparameter_tuner_neptune.py found"
                         else
                             echo "✗ hyperparameter_tuner_neptune.py NOT found"
-                            echo "Contents of ${WORKSPACE}/src/:"
-                            ls -la "${WORKSPACE}/src/" | grep -E "hyperparameter|\.py$" || echo "(no matching files)"
+                            echo "Contents of \${WORKSPACE}/src/:"
+                            ls -la "\${WORKSPACE}/src/" | grep hyperparameter || echo "(no matching files)"
                             exit 1
                         fi
                         
-                        if [ -f "${WORKSPACE}/src/hyperparameter_tuner.py" ]; then
+                        if [ -f "\${WORKSPACE}/src/hyperparameter_tuner.py" ]; then
                             echo "✓ hyperparameter_tuner.py found"
                         else
                             echo "✗ hyperparameter_tuner.py NOT found"
                         fi
                         
-                        if [ -f "${WORKSPACE}/src/rag_config.py" ]; then
+                        if [ -f "\${WORKSPACE}/src/rag_config.py" ]; then
                             echo "✓ rag_config.py found"
                         else
                             echo "✗ rag_config.py NOT found"
                         fi
                         
-                        if [ -f "${WORKSPACE}/src/chunk_qwen3_0_6B.py" ]; then
+                        if [ -f "\${WORKSPACE}/src/chunk_qwen3_0_6B.py" ]; then
                             echo "✓ chunk_qwen3_0_6B.py found"
                         else
                             echo "✗ chunk_qwen3_0_6B.py NOT found"
                         fi
-                    '''
+                    """
                 }
             }
         }
