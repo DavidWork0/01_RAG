@@ -278,8 +278,8 @@ def chunk_size_optimization_with_neptune(
     try:
         param_grid = {
             'CHUNK_STRATEGY': ['fixed_size'],
-            'FIXED_SIZE_CHUNK_SIZE': [500, 750, 1000, 1250, 1500],
-            'FIXED_SIZE_OVERLAP': [100, 150, 200, 250],
+            'FIXED_SIZE_CHUNK_SIZE': [500, 1000],
+            'FIXED_SIZE_OVERLAP': [200, 250],
             'BATCH_SIZE': [50]
         }
         
