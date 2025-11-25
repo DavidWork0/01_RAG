@@ -106,7 +106,8 @@ pipeline {
                 }
             }
         }
-
+    }
+    
     post {
         always {
             script {
