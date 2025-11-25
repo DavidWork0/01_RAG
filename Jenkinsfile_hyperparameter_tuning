@@ -57,19 +57,33 @@ pipeline {
                 script {
                     echo 'Verifying hyperparameter tuning files...'
                     sh '''
-                        echo "Current workspace: ${WORKSPACE}"
-                        echo "Checking for hyperparameter_tuner_neptune.py..."
+                        echo "Workspace: ${WORKSPACE}"
                         
-                        # Check workspace (where Jenkins checks out code)
                         if [ -f "${WORKSPACE}/src/hyperparameter_tuner_neptune.py" ]; then
-                            echo "✓ Found in workspace: ${WORKSPACE}/src/"
-                            ls -lh "${WORKSPACE}/src/hyperparameter_tuner*.py"
+                            echo "✓ hyperparameter_tuner_neptune.py found"
+                        else
+                            echo "✗ hyperparameter_tuner_neptune.py NOT found"
+                            echo "Contents of ${WORKSPACE}/src/:"
+                            ls -la "${WORKSPACE}/src/" | grep -E "hyperparameter|\.py$" || echo "(no matching files)"
+                            exit 1
                         fi
                         
-                        # Check /app/01_RAG (if different)
-                        if [ -d "/app/01_RAG/src" ]; then
-                            echo "Checking /app/01_RAG/src/..."
-                            ls -lh /app/01_RAG/src/hyperparameter_tuner*.py 2>/dev/null || echo "  (not found in /app/01_RAG/src)"
+                        if [ -f "${WORKSPACE}/src/hyperparameter_tuner.py" ]; then
+                            echo "✓ hyperparameter_tuner.py found"
+                        else
+                            echo "✗ hyperparameter_tuner.py NOT found"
+                        fi
+                        
+                        if [ -f "${WORKSPACE}/src/rag_config.py" ]; then
+                            echo "✓ rag_config.py found"
+                        else
+                            echo "✗ rag_config.py NOT found"
+                        fi
+                        
+                        if [ -f "${WORKSPACE}/src/chunk_qwen3_0_6B.py" ]; then
+                            echo "✓ chunk_qwen3_0_6B.py found"
+                        else
+                            echo "✗ chunk_qwen3_0_6B.py NOT found"
                         fi
                     '''
                 }
