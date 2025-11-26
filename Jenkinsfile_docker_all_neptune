@@ -43,7 +43,7 @@ pipeline {
                     // Run answer evaluation on the last inference session
                     sh '''
                         /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
-                            --gold-standard /app/01_RAG/data/test/sonar-reasoning-pro_gold_standard_dataset.json \
+                            --gold-standard /app/01_RAG/data/test/sonar_gold_standard_dataset.json \
                             --inference-log /app/01_RAG/tests/logs/inference_log.jsonl \
                             --num-inference-eval 1 \
                             --max-questions 10 \
