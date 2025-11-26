@@ -190,22 +190,50 @@ def load_test_questions(questions_path: str) -> List[Dict]:
         return []
 
 
-def create_session_log_file(model_name: str) -> tuple[Path, str]:
+def create_session_log_file(model_name: str, db_path: str = None, top_k: int = None, similarity_threshold: float = None, test_questions_path: str = None) -> tuple[Path, str]:
     """
     Create a detailed log file for the current test session.
     
     Args:
         model_name: Name of the model being tested
+        db_path: Path to database (for tagging)
+        top_k: Top K results parameter (for tagging)
+        similarity_threshold: Similarity threshold (for tagging)
+        test_questions_path: Path to test questions (for tagging)
     
     Returns:
-        Tuple of (Path to the created log file, session name)
+        Tuple of (Path to the created log file, session name with tags)
     """
     timestamp = time.strftime("%Y%m%d_%H%M%S")
+    
+    # Use defaults if not provided
+    db_path = db_path or DEFAULT_DB_PATH
+    top_k = top_k or TOP_K_RESULTS
+    similarity_threshold = similarity_threshold or SIMILARITY_THRESHOLD
+    test_questions_path = test_questions_path or TEST_QUESTIONS_PATH
+    
+    # Create session name with configuration tags
     session_name = f"test_session_{model_name}_{timestamp}"
+    
+    # Store tags in metadata (will be used by Neptune uploader)
+    session_tags = {
+        'model': model_name,
+        'db_path': db_path,
+        'top_k': top_k,
+        'similarity_threshold': similarity_threshold,
+        'test_questions_path': test_questions_path
+    }
+    
     log_dir = project_root / "tests" / "logs" / "sessions"
     log_dir.mkdir(parents=True, exist_ok=True)
     
     log_file = log_dir / f"{session_name}.log"
+    
+    # Write tags to a separate JSON file for Neptune uploader to read
+    tags_file = log_dir / f"{session_name}_tags.json"
+    with open(tags_file, 'w', encoding='utf-8') as f:
+        json.dump(session_tags, f, indent=2)
+    
     return log_file, session_name
 
 
@@ -1084,7 +1112,13 @@ Examples:
         sys.exit(1)
     
     # Create session log file
-    log_file, session_name = create_session_log_file(args.model)
+    log_file, session_name = create_session_log_file(
+        model_name=args.model,
+        db_path=args.db_path,
+        top_k=TOP_K_RESULTS,
+        similarity_threshold=SIMILARITY_THRESHOLD,
+        test_questions_path=TEST_QUESTIONS_PATH
+    )
     write_log_header(log_file, args.model, args, include_environment=args.include_environment)
     print(f"📄 Session log created: {log_file}")
     print(f"📋 Session name: {session_name}")

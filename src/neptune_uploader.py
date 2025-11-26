@@ -303,6 +303,31 @@ class NeptuneUploader:
         print("📖 Parsing session log...")
         session_data = self.parse_session_log(session_log_path)
         
+        # Load session tags if available
+        tags_file = session_log_path.parent / f"{session_log_path.stem}_tags.json"
+        session_tags = {}
+        if tags_file.exists():
+            try:
+                import json
+                with open(tags_file, 'r', encoding='utf-8') as f:
+                    session_tags = json.load(f)
+                print(f"📋 Loaded session tags: {session_tags}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to load session tags: {e}")
+        
+        # Build enhanced tags list
+        enhanced_tags = list(tags or [])
+        if session_tags:
+            # Add model name tag
+            if 'model' in session_tags:
+                enhanced_tags.append(f"model-{session_tags['model']}")
+            # Add top_k tag
+            if 'top_k' in session_tags:
+                enhanced_tags.append(f"top_k-{session_tags['top_k']}")
+            # Add similarity threshold tag
+            if 'similarity_threshold' in session_tags:
+                enhanced_tags.append(f"sim_thresh-{session_tags['similarity_threshold']}")
+        
         # Initialize Neptune run
         print("🚀 Initializing Neptune run...")
         custom_run_id = f"{session_data['session_name']}_{session_data['metadata'].get('model_name', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -310,7 +335,7 @@ class NeptuneUploader:
             project=self.project,
             api_token=self.api_token,
             custom_run_id=custom_run_id,
-            tags=tags or [],
+            tags=enhanced_tags,
             name=session_data["session_name"],
             description=description or f"RAG Test Session: {session_data['session_name']}"
         )
@@ -322,6 +347,12 @@ class NeptuneUploader:
             print("📊 Uploading metadata...")
             for key, value in session_data["metadata"].items():
                 run[f"metadata/{key}"] = value
+            
+            # Upload session tags as metadata
+            if session_tags:
+                print("🏷️  Uploading session tags...")
+                for key, value in session_tags.items():
+                    run[f"config/{key}"] = value
             
             # Upload hardware info
             print("🖥️  Uploading hardware information...")
@@ -648,6 +679,27 @@ class NeptuneUploader:
             run["evaluation/embedding_model"] = eval_data.get('embedding_model', '')
             run["evaluation/gold_standard_path"] = eval_data.get('gold_standard_path', '')
             run["evaluation/inference_log_path"] = eval_data.get('inference_log_path', '')
+            
+            # Upload session tags if available
+            session_tags = eval_data.get('session_tags', {})
+            if session_tags:
+                print("🏷️  Uploading session configuration tags...")
+                for key, value in session_tags.items():
+                    run[f"config/{key}"] = value
+                
+                # Add session tags to Neptune tags for filtering
+                enhanced_tags = list(tags or [])
+                if 'model' in session_tags:
+                    enhanced_tags.append(f"model-{session_tags['model']}")
+                if 'top_k' in session_tags:
+                    enhanced_tags.append(f"top_k-{session_tags['top_k']}")
+                if 'similarity_threshold' in session_tags:
+                    enhanced_tags.append(f"sim_thresh-{session_tags['similarity_threshold']}")
+                
+                # Update run tags (note: this appends to existing tags)
+                for tag in enhanced_tags:
+                    if tag not in (tags or []):
+                        run["sys/tags"].add(tag)
             
             if is_multi_session:
                 # Multi-session evaluation

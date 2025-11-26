@@ -62,7 +62,11 @@ pipeline {
                         'Qwen3-8B-Q6_K',
                         'InternVL3_5-2B-Q6_K',
                         'InternVL3_5-2B-Q8_0',
-                        'internvl3_5-8b-q4_k_m'
+                        'internvl3_5-8b-q4_k_m',
+                        'internvl3-2b-instruct-q5_k_m',
+                        'Qwen3-4B-Instruct-2507-UD-Q6_K_XL',
+                        'OpenGVLab_InternVL3_5-8B-Q6_K',
+                        'Qwen3-4B-Instruct-2507-Q8_0'
                     ]
                     
                     echo "=========================================="

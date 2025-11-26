@@ -493,9 +493,13 @@ class AnswerEvaluator:
                 # Use the same inference_index that was used for evaluation
                 session_name = self.inference_logs[first_qid][actual_inference_index].get('session_name', 'unknown')
         
+        # Try to load session tags if available
+        session_tags = self._load_session_tags(session_name)
+        
         return {
             'evaluation_timestamp': datetime.now().isoformat(),
             'session_name': session_name,
+            'session_tags': session_tags,
             'gold_standard_path': str(self.gold_standard_path),
             'inference_log_path': str(self.inference_log_path),
             'embedding_model': self.embedding_model_name,
@@ -580,6 +584,12 @@ class AnswerEvaluator:
             # Print summary for this session
             self._print_session_summary(session_result, i + 1, num_to_eval)
         
+        # Load session tags from first session if available
+        session_tags = {}
+        if all_session_results and len(all_session_results) > 0:
+            first_session_name = all_session_results[0].get('session_name', '')
+            session_tags = self._load_session_tags(first_session_name)
+        
         return {
             'evaluation_timestamp': datetime.now().isoformat(),
             'gold_standard_path': str(self.gold_standard_path),
@@ -587,8 +597,27 @@ class AnswerEvaluator:
             'embedding_model': self.embedding_model_name,
             'num_sessions_evaluated': num_to_eval,
             'max_questions_limit': self.max_questions,
+            'session_tags': session_tags,
             'sessions': all_session_results,
         }
+    
+    def _load_session_tags(self, session_name: str) -> Dict:
+        """Load session tags from tags file if available."""
+        if not session_name or session_name == 'unknown':
+            return {}
+        
+        # Look for tags file in sessions directory
+        tags_file = self.inference_log_path.parent / 'sessions' / f'{session_name}_tags.json'
+        
+        if tags_file.exists():
+            try:
+                import json
+                with open(tags_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        
+        return {}
     
     def _calculate_aggregate_stats(self, results: List[Dict]) -> Dict:
         """Calculate aggregate statistics."""
