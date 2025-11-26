@@ -191,7 +191,7 @@ BATCH_SIZE = 50
 # =============================================================================
 
 # Default number of results to retrieve
-DEFAULT_TOP_K = 10
+DEFAULT_TOP_K = 20
 
 # Minimum similarity score threshold (0-100)
 # Results with similarity scores below this threshold will be filtered out

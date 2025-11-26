@@ -42,7 +42,7 @@ MODEL_CONFIG = {
         "verbose": False
     },
     "InternVL3_5-8B-Q4_K_M": {
-        "path": "models/llamacpp/InternVL3_5-8B-Q4_K_M.gguf",
+        "path": "models/llamacpp/internvl3_5-8b-q4_k_m.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
@@ -61,7 +61,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-4B-Instruct-2507-UD-Q6_K_XL.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -69,7 +73,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-8B-Q6_K.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -93,7 +101,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-4B-Instruct-2507-Q8_0.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
