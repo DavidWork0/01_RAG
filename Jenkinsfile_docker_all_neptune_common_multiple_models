@@ -55,15 +55,15 @@ pipeline {
         stage('Multi-Model Testing') {
             steps {
                 script {
-                    // Define models to test in order
+                    // Define models to test in order (must match exact names from get_available_models())
                     def models = [
                         'Qwen3-8B-Q4_K_M',
                         'Qwen3-8B-Q5_K_M',
                         'Qwen3-8B-Q6_K',
                         'InternVL3_5-2B-Q6_K',
                         'InternVL3_5-2B-Q8_0',
-                        'internvl3_5-8b-q4_k_m',
-                        'internvl3-2b-instruct-q5_k_m',
+                        'InternVL3_5-8B-Q4_K_M',
+                        'InternVL3-2B-Instruct-Q5_K_M',
                         'Qwen3-4B-Instruct-2507-UD-Q6_K_XL',
                         'OpenGVLab_InternVL3_5-8B-Q6_K',
                         'Qwen3-4B-Instruct-2507-Q8_0'
@@ -187,14 +187,14 @@ pipeline {
                 archiveArtifacts artifacts: 'tests/logs/**/*.log', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'tests/logs/**/*.csv', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'tests/logs/**/*.json', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'tests/logs/answer_evaluation_results.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/sessions/**/*', allowEmptyArchive: true
             }
         }
         success {
             echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo ' Pipeline failed. Check logs for details.'
+            echo '❌ Pipeline failed. Check logs for details.'
         }
     }
 }

@@ -206,6 +206,11 @@ class AnswerEvaluator:
             except LookupError:
                 print("Downloading NLTK punkt tokenizer...")
                 nltk.download('punkt', quiet=True)
+            try:
+                nltk.data.find('tokenizers/punkt_tab')
+            except LookupError:
+                print("Downloading NLTK punkt_tab tokenizer...")
+                nltk.download('punkt_tab', quiet=True)
             print("[OK] NLTK initialized")
         
         if SKLEARN_AVAILABLE:
