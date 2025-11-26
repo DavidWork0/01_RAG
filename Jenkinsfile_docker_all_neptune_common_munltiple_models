@@ -1,0 +1,196 @@
+pipeline {
+    agent {
+        docker {
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint=""'
+            reuseNode true
+        }
+    }
+
+    environment {
+        // Ensure all huggingface caches resolve to the baked-in models
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+        HF_HOME = '/app/01_RAG/models/huggingface'
+        HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+        TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+        RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+        RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+        RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+        WORKDIR = '/app/01_RAG/tests'
+        
+        // Neptune.ai configuration (optional - comment out if not using)
+        NEPTUNE_API_TOKEN = credentials('neptune-api-token')
+        NEPTUNE_PROJECT = 'davidwork0/rag-tests'
+        NEPTUNE_UPLOAD_MODE = 'latest'  // Options: 'latest', 'all', 'inference'
+    }
+
+    stages {
+        stage('Install Neptune') {
+            steps {
+                script {
+                    echo 'Installing Neptune.ai package...'
+                    sh '/app/01_RAG/.venv/bin/pip install neptune'
+                }
+            }
+        }
+
+        stage('Run Basic Tests') {
+            steps {
+                script {
+                    echo 'Running basic system tests inside linux_with_cuda_complete container...'
+
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
+
+                    sh '/app/01_RAG/.venv/bin/python tests/test_full.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
+                }
+            }
+        }
+        
+        stage('Multi-Model Testing') {
+            steps {
+                script {
+                    // Define models to test in order
+                    def models = [
+                        'Qwen3-8B-Q4_K_M',
+                        'Qwen3-8B-Q5_K_M',
+                        'Qwen3-8B-Q6_K',
+                        'InternVL3_5-2B-Q6_K',
+                        'InternVL3_5-2B-Q8_0',
+                        'internvl3_5-8b-q4_k_m'
+                    ]
+                    
+                    echo "=========================================="
+                    echo "Starting Multi-Model Testing Pipeline"
+                    echo "Total Models: ${models.size()}"
+                    echo "=========================================="
+                    
+                    def modelResults = [:]
+                    def failedModels = []
+                    
+                    for (int i = 0; i < models.size(); i++) {
+                        def model = models[i]
+                        def modelNumber = i + 1
+                        
+                        echo "\n"
+                        echo "=========================================="
+                        echo "Model ${modelNumber}/${models.size()}: ${model}"
+                        echo "=========================================="
+                        
+                        try {
+                            // Stage 1: Run Inference Tests
+                            stage("${modelNumber}. Inference - ${model}") {
+                                echo "Running inference tests for ${model}..."
+                                sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
+                                echo "✅ Inference completed for ${model}"
+                            }
+                            
+                            // Stage 2: Evaluate Answers
+                            stage("${modelNumber}. Evaluate - ${model}") {
+                                echo "Evaluating answer quality for ${model}..."
+                                sh """
+                                    /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
+                                        --gold-standard data/test/sonar_gold_standard_dataset.json \
+                                        --inference-log tests/logs/inference_log.jsonl \
+                                        --num-inference-eval 1 \
+                                        --max-questions 10 \
+                                        --output-json tests/logs/answer_evaluation_results_${model}.json
+                                """
+                                echo "✅ Evaluation completed for ${model}"
+                            }
+                            
+                            // Stage 3: Upload to Neptune
+                            stage("${modelNumber}. Upload - ${model}") {
+                                if (env.NEPTUNE_API_TOKEN != null && env.NEPTUNE_PROJECT != null) {
+                                    echo "Uploading results to Neptune.ai for ${model}..."
+                                    
+                                    try {
+                                        // Upload inference test results
+                                        sh 'bash jenkins_neptune_upload.sh'
+                                        
+                                        // Upload answer evaluation metrics
+                                        sh """
+                                            /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+                                                --upload-evaluation \
+                                                --evaluation-file tests/logs/answer_evaluation_results_${model}.json \
+                                                --tags jenkins evaluation build-${BUILD_NUMBER} model-${model}
+                                        """
+                                        
+                                        echo "✅ Neptune upload completed for ${model}"
+                                    } catch (Exception e) {
+                                        echo "⚠️  Warning: Neptune upload failed for ${model}: ${e.message}"
+                                    }
+                                } else {
+                                    echo "⚠️  Neptune credentials not configured, skipping upload for ${model}"
+                                }
+                            }
+                            
+                            modelResults[model] = 'SUCCESS'
+                            echo "✅ All stages completed successfully for ${model}"
+                            
+                        } catch (Exception e) {
+                            modelResults[model] = 'FAILED'
+                            failedModels.add(model)
+                            echo "❌ Failed processing model ${model}: ${e.message}"
+                            echo "Continuing with next model..."
+                        }
+                        
+                        echo "\n"
+                    }
+                    
+                    // Print summary
+                    echo "\n"
+                    echo "=========================================="
+                    echo "Multi-Model Testing Summary"
+                    echo "=========================================="
+                    echo "Total Models Tested: ${models.size()}"
+                    echo "Successful: ${models.size() - failedModels.size()}"
+                    echo "Failed: ${failedModels.size()}"
+                    echo ""
+                    
+                    models.each { model ->
+                        def status = modelResults[model]
+                        def icon = status == 'SUCCESS' ? '✅' : '❌'
+                        echo "${icon} ${model}: ${status}"
+                    }
+                    
+                    if (failedModels.size() > 0) {
+                        echo ""
+                        echo "Failed Models: ${failedModels.join(', ')}"
+                    }
+                    echo "=========================================="
+                    
+                    // Fail the build if any critical models failed (optional)
+                    // Uncomment the following lines if you want the pipeline to fail when any model fails
+                    // if (failedModels.size() > 0) {
+                    //     error("Pipeline completed with ${failedModels.size()} failed model(s)")
+                    // }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                echo 'Cleaning up...'
+                // Archive test logs and evaluation results as Jenkins artifacts
+                archiveArtifacts artifacts: 'tests/logs/**/*.log', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.csv', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/answer_evaluation_results.json', allowEmptyArchive: true
+            }
+        }
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo ' Pipeline failed. Check logs for details.'
+        }
+    }
+}
