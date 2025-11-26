@@ -15,7 +15,7 @@ Date: November 26, 2025
 # =============================================================================
 
 # Default path to gold standard dataset (relative to project root)
-DEFAULT_GOLD_STANDARD_PATH = "data/test/sonar_gold_standard_dataset.json"
+DEFAULT_GOLD_STANDARD_PATH = "data/test/sonar-reasoning-pro_gold_standard_dataset.json"
 
 # Default path to inference log file (relative to project root)
 DEFAULT_INFERENCE_LOG_PATH = "tests/logs/inference_log.jsonl"
