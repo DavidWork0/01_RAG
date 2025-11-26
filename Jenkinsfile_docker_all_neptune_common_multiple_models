@@ -62,7 +62,7 @@ pipeline {
                         'Qwen3-8B-Q6_K',
                         'InternVL3_5-2B-Q6_K',
                         'InternVL3_5-2B-Q8_0',
-                        'InternVL3_5-8B-Q4_K_M',
+                        'internvl3_5-8b-q4_k_m',
                         'InternVL3-2B-Instruct-Q5_K_M',
                         'Qwen3-4B-Instruct-2507-UD-Q6_K_XL',
                         'OpenGVLab_InternVL3_5-8B-Q6_K',
