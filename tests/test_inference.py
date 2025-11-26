@@ -716,7 +716,6 @@ def run_single_test(
     question: Dict,
     logger: InferenceLogger,
     max_tokens: int = 2048,
-    top_k: int = TOP_K_RESULTS,
     verbose: bool = True,
     log_file: Optional[Path] = None,
     session_name: Optional[str] = None
@@ -756,8 +755,8 @@ def run_single_test(
     try:
         # Search for relevant chunks
         if verbose:
-            print(f"🔍 Searching knowledge base (top_k={top_k})...")
-        results = rag_system.search(query=q_text, top_k=top_k)
+            print(f"🔍 Searching knowledge base...")
+        results = rag_system.search(query=q_text, top_k=TOP_K_RESULTS)
         
         if verbose:
             print(f"✓ Found {len(results)} relevant chunks")
@@ -830,7 +829,6 @@ def run_all_tests(
     questions: List[Dict],
     logger: InferenceLogger,
     max_tokens: int = 2048,
-    top_k: int = TOP_K_RESULTS,
     log_file: Optional[Path] = None,
     session_name: Optional[str] = None
 ) -> List[Dict]:
@@ -866,7 +864,6 @@ def run_all_tests(
             question=question,
             logger=logger,
             max_tokens=max_tokens,
-            top_k=top_k,
             verbose=True,
             log_file=log_file,
             session_name=session_name
@@ -1037,13 +1034,6 @@ Examples:
     )
     
     parser.add_argument(
-        '--top-k',
-        type=int,
-        default=TOP_K_RESULTS,
-        help=f'Number of chunks to retrieve from RAG (default: {TOP_K_RESULTS})'
-    )
-    
-    parser.add_argument(
         '--show-stats',
         action='store_true',
         help='Show statistics from logged tests'
@@ -1125,7 +1115,7 @@ Examples:
     log_file, session_name = create_session_log_file(
         model_name=args.model,
         db_path=args.db_path,
-        top_k=args.top_k,
+        top_k=TOP_K_RESULTS,
         similarity_threshold=SIMILARITY_THRESHOLD,
         test_questions_path=TEST_QUESTIONS_PATH
     )
@@ -1163,7 +1153,6 @@ Examples:
             question=question,
             logger=logger,
             max_tokens=args.max_tokens,
-            top_k=args.top_k,
             verbose=True,
             log_file=log_file,
             session_name=session_name
@@ -1204,7 +1193,6 @@ Examples:
             questions=quick_questions,
             logger=logger,
             max_tokens=args.max_tokens,
-            top_k=args.top_k,
             log_file=log_file,
             session_name=session_name
         )
@@ -1217,7 +1205,6 @@ Examples:
             questions=questions,
             logger=logger,
             max_tokens=args.max_tokens,
-            top_k=args.top_k,
             log_file=log_file,
             session_name=session_name
         )
