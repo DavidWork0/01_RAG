@@ -41,13 +41,14 @@ pipeline {
                     echo 'Evaluating answer quality against gold standard...'
                     
                     // Run answer evaluation on the last inference session
+                    // Use workspace paths since reuseNode true mounts the Jenkins workspace
                     sh '''
                         /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
-                            --gold-standard /app/01_RAG/data/test/sonar_gold_standard_dataset.json \
-                            --inference-log /app/01_RAG/tests/logs/inference_log.jsonl \
+                            --gold-standard data/test/sonar_gold_standard_dataset.json \
+                            --inference-log tests/logs/inference_log.jsonl \
                             --num-inference-eval 1 \
                             --max-questions 10 \
-                            --output-json /app/01_RAG/tests/logs/answer_evaluation_results.json
+                            --output-json tests/logs/answer_evaluation_results.json
                     '''
                     
                     echo '✅ Answer evaluation completed'
@@ -102,7 +103,7 @@ pipeline {
                         sh '''
                             /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
                                 --upload-evaluation \
-                                --evaluation-file /app/01_RAG/tests/logs/answer_evaluation_results.json \
+                                --evaluation-file tests/logs/answer_evaluation_results.json \
                                 --tags jenkins evaluation build-${BUILD_NUMBER}
                         '''
                     } catch (Exception e) {
