@@ -91,7 +91,7 @@ pipeline {
                                 // Stage 2: Run Inference Tests
                                 stage("${currentTest}. Inference - ${model}") {
                                     echo "Running inference with TOP_K=${topK}, Model=${model}..."
-                                    sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
+                                    sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment --top-k ${topK}"
                                     echo "✅ Inference completed"
                                 }
                                 
