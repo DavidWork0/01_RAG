@@ -701,21 +701,27 @@ class NeptuneUploader:
                         run[f"sessions/s{session_num}/length_ratio/std"] = stats['length_ratio']['std']
                     
                     # Upload per-question results for this session
-                    for result in session.get('per_question_results', []):
+                    for idx, result in enumerate(session.get('per_question_results', []), 1):
                         q_id = result['question_id']
                         
                         if result.get('semantic_similarity') is not None:
-                            run[f"sessions/s{session_num}/questions/q{q_id}/semantic_similarity"].log(result['semantic_similarity'])
+                            run[f"sessions/s{session_num}/questions/q{q_id}/semantic_similarity"].append(result['semantic_similarity'], step=idx)
                         if result.get('rouge_1_f') is not None:
-                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_1_f"].log(result['rouge_1_f'])
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_1_f"].append(result['rouge_1_f'], step=idx)
+                        if result.get('rouge_2_f') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_2_f"].append(result['rouge_2_f'], step=idx)
+                        if result.get('rouge_l_f') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_l_f"].append(result['rouge_l_f'], step=idx)
                         if result.get('bleu_score') is not None:
-                            run[f"sessions/s{session_num}/questions/q{q_id}/bleu_score"].log(result['bleu_score'])
+                            run[f"sessions/s{session_num}/questions/q{q_id}/bleu_score"].append(result['bleu_score'], step=idx)
+                        if result.get('tfidf_similarity') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/tfidf_similarity"].append(result['tfidf_similarity'], step=idx)
                         if result.get('response_time_seconds') is not None:
-                            run[f"sessions/s{session_num}/questions/q{q_id}/response_time"].log(result['response_time_seconds'])
+                            run[f"sessions/s{session_num}/questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
                 
                 # Create comparison charts across sessions
                 print("📊 Creating comparison charts...")
-                for metric_key in ['semantic_similarity', 'rouge_1_f', 'bleu_score', 'response_time_seconds']:
+                for metric_key in ['semantic_similarity', 'rouge_1_f', 'rouge_2_f', 'rouge_l_f', 'bleu_score', 'tfidf_similarity', 'response_time_seconds']:
                     values = []
                     for session in eval_data['sessions']:
                         stats = session.get('aggregate_stats', {})
@@ -724,7 +730,52 @@ class NeptuneUploader:
                     
                     if values:
                         for idx, val in enumerate(values, 1):
-                            run[f"comparison/{metric_key}/by_session"].log(val, step=idx)
+                            run[f"comparison/{metric_key}/by_session"].append(val, step=idx)
+                
+                # Create per-question charts aggregated across all sessions
+                print("📊 Creating per-question charts...")
+                for session in eval_data['sessions']:
+                    session_num = session['session_number']
+                    
+                    # Semantic similarity per question
+                    if session.get('per_question_results'):
+                        sem_scores = [(r['question_id'], r.get('semantic_similarity')) 
+                                      for r in session['per_question_results'] 
+                                      if r.get('semantic_similarity') is not None]
+                        for q_id, score in sem_scores:
+                            run[f"charts/semantic_similarity_by_question"].append(score, step=q_id)
+                    
+                    # ROUGE-1 F1 per question
+                    if session.get('per_question_results'):
+                        rouge1_scores = [(r['question_id'], r.get('rouge_1_f')) 
+                                         for r in session['per_question_results'] 
+                                         if r.get('rouge_1_f') is not None]
+                        for q_id, score in rouge1_scores:
+                            run[f"charts/rouge_1_f_by_question"].append(score, step=q_id)
+                    
+                    # ROUGE-L F1 per question
+                    if session.get('per_question_results'):
+                        rougel_scores = [(r['question_id'], r.get('rouge_l_f')) 
+                                         for r in session['per_question_results'] 
+                                         if r.get('rouge_l_f') is not None]
+                        for q_id, score in rougel_scores:
+                            run[f"charts/rouge_l_f_by_question"].append(score, step=q_id)
+                    
+                    # BLEU score per question
+                    if session.get('per_question_results'):
+                        bleu_scores = [(r['question_id'], r.get('bleu_score')) 
+                                       for r in session['per_question_results'] 
+                                       if r.get('bleu_score') is not None]
+                        for q_id, score in bleu_scores:
+                            run[f"charts/bleu_score_by_question"].append(score, step=q_id)
+                    
+                    # TF-IDF similarity per question
+                    if session.get('per_question_results'):
+                        tfidf_scores = [(r['question_id'], r.get('tfidf_similarity')) 
+                                        for r in session['per_question_results'] 
+                                        if r.get('tfidf_similarity') is not None]
+                        for q_id, score in tfidf_scores:
+                            run[f"charts/tfidf_similarity_by_question"].append(score, step=q_id)
             
             else:
                 # Single session evaluation
@@ -773,25 +824,71 @@ class NeptuneUploader:
                 
                 # Upload per-question results
                 print("📝 Uploading per-question results...")
-                for result in eval_data.get('per_question_results', []):
+                for idx, result in enumerate(eval_data.get('per_question_results', []), 1):
                     q_id = result['question_id']
                     
                     run[f"questions/q{q_id}/question"] = result.get('question', '')[:200]
                     
                     if result.get('semantic_similarity') is not None:
-                        run[f"questions/q{q_id}/semantic_similarity"].log(result['semantic_similarity'])
+                        run[f"questions/q{q_id}/semantic_similarity"].append(result['semantic_similarity'], step=idx)
                     if result.get('rouge_1_f') is not None:
-                        run[f"questions/q{q_id}/rouge_1_f"].log(result['rouge_1_f'])
+                        run[f"questions/q{q_id}/rouge_1_f"].append(result['rouge_1_f'], step=idx)
                     if result.get('rouge_2_f') is not None:
-                        run[f"questions/q{q_id}/rouge_2_f"].log(result['rouge_2_f'])
+                        run[f"questions/q{q_id}/rouge_2_f"].append(result['rouge_2_f'], step=idx)
                     if result.get('rouge_l_f') is not None:
-                        run[f"questions/q{q_id}/rouge_l_f"].log(result['rouge_l_f'])
+                        run[f"questions/q{q_id}/rouge_l_f"].append(result['rouge_l_f'], step=idx)
                     if result.get('bleu_score') is not None:
-                        run[f"questions/q{q_id}/bleu_score"].log(result['bleu_score'])
+                        run[f"questions/q{q_id}/bleu_score"].append(result['bleu_score'], step=idx)
                     if result.get('tfidf_similarity') is not None:
-                        run[f"questions/q{q_id}/tfidf_similarity"].log(result['tfidf_similarity'])
+                        run[f"questions/q{q_id}/tfidf_similarity"].append(result['tfidf_similarity'], step=idx)
                     if result.get('response_time_seconds') is not None:
-                        run[f"questions/q{q_id}/response_time"].log(result['response_time_seconds'])
+                        run[f"questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
+                
+                # Create per-question charts for visualization
+                print("📊 Creating per-question charts...")
+                results = eval_data.get('per_question_results', [])
+                
+                # Semantic similarity by question
+                sem_scores = [(r['question_id'], r.get('semantic_similarity')) 
+                              for r in results if r.get('semantic_similarity') is not None]
+                for q_id, score in sem_scores:
+                    run[f"charts/semantic_similarity_by_question"].append(score, step=q_id)
+                
+                # ROUGE-1 F1 by question
+                rouge1_scores = [(r['question_id'], r.get('rouge_1_f')) 
+                                 for r in results if r.get('rouge_1_f') is not None]
+                for q_id, score in rouge1_scores:
+                    run[f"charts/rouge_1_f_by_question"].append(score, step=q_id)
+                
+                # ROUGE-2 F1 by question
+                rouge2_scores = [(r['question_id'], r.get('rouge_2_f')) 
+                                 for r in results if r.get('rouge_2_f') is not None]
+                for q_id, score in rouge2_scores:
+                    run[f"charts/rouge_2_f_by_question"].append(score, step=q_id)
+                
+                # ROUGE-L F1 by question
+                rougel_scores = [(r['question_id'], r.get('rouge_l_f')) 
+                                 for r in results if r.get('rouge_l_f') is not None]
+                for q_id, score in rougel_scores:
+                    run[f"charts/rouge_l_f_by_question"].append(score, step=q_id)
+                
+                # BLEU score by question
+                bleu_scores = [(r['question_id'], r.get('bleu_score')) 
+                               for r in results if r.get('bleu_score') is not None]
+                for q_id, score in bleu_scores:
+                    run[f"charts/bleu_score_by_question"].append(score, step=q_id)
+                
+                # TF-IDF similarity by question
+                tfidf_scores = [(r['question_id'], r.get('tfidf_similarity')) 
+                                for r in results if r.get('tfidf_similarity') is not None]
+                for q_id, score in tfidf_scores:
+                    run[f"charts/tfidf_similarity_by_question"].append(score, step=q_id)
+                
+                # Answer length ratio by question
+                length_ratios = [(r['question_id'], r.get('length_ratio')) 
+                                 for r in results if r.get('length_ratio') is not None]
+                for q_id, ratio in length_ratios:
+                    run[f"charts/length_ratio_by_question"].append(ratio, step=q_id)
             
             # Upload the evaluation file itself
             print("📄 Uploading evaluation file...")
