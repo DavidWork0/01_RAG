@@ -48,13 +48,43 @@ pipeline {
                     sh '/app/01_RAG/.venv/bin/python tests/test_load_model.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_reranking.py'
                     sh '/app/01_RAG/.venv/bin/python tests/test_similarity_filter.py'
-                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode quick --include-environment'
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    echo 'Running tests inside linux_with_cuda_complete container...'
+                    // Use the python environment pre-installed in the image
+                    // The image has the venv at /app/01_RAG/.venv
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
+                }
+            }
+        }
+
+
+        stage('Evaluate Answers') {
+            steps {
+                script {
+                    echo 'Evaluating answer quality against gold standard...'
+                    
+                    // Run answer evaluation on the last inference session
+                    sh '''
+                        /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
+                            --gold-standard /app/01_RAG/data/test/sonar-reasoning-pro_gold_standard_dataset.json \
+                            --inference-log /app/01_RAG/tests/logs/inference_log.jsonl \
+                            --num-inference-eval 1 \
+                            --output-json /app/01_RAG/tests/logs/answer_evaluation_results.json
+                    '''
+                    
+                    echo '✅ Answer evaluation completed'
                 }
             }
         }
         
         stage('Upload to Neptune') {
-            // This stage uploads test results to Neptune.ai for visualization
+            // This stage uploads test results and evaluation metrics to Neptune.ai for visualization
             // See docs/neptune_integration.md for details
             when {
                 expression { 
@@ -63,10 +93,19 @@ pipeline {
             }
             steps {
                 script {
-                    echo 'Uploading test results to Neptune.ai...'
+                    echo 'Uploading test results and evaluation metrics to Neptune.ai...'
                     
                     try {
+                        // Upload inference test results
                         sh 'bash jenkins_neptune_upload.sh'
+                        
+                        // Upload answer evaluation metrics
+                        sh '''
+                            /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+                                --upload-evaluation \
+                                --evaluation-file /app/01_RAG/tests/logs/answer_evaluation_results.json \
+                                --tags jenkins evaluation build-${BUILD_NUMBER}
+                        '''
                     } catch (Exception e) {
                         echo "⚠️  Warning: Neptune upload failed: ${e.message}"
                         echo "   Tests completed successfully, but results were not uploaded."
@@ -81,9 +120,11 @@ pipeline {
         always {
             script {
                 echo 'Cleaning up...'
-                // Archive test logs as Jenkins artifacts
+                // Archive test logs and evaluation results as Jenkins artifacts
                 archiveArtifacts artifacts: 'tests/logs/**/*.log', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'tests/logs/**/*.csv', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/answer_evaluation_results.json', allowEmptyArchive: true
             }
         }
         success {

@@ -45,6 +45,9 @@ echo ""
 UPLOAD_MODE="${NEPTUNE_UPLOAD_MODE:-latest}"
 echo "📤 Upload mode: $UPLOAD_MODE"
 
+# Check for evaluation file
+EVALUATION_FILE="${NEPTUNE_EVALUATION_FILE:-$PROJECT_ROOT/tests/logs/answer_evaluation_results.json}"
+
 # Prepare tags
 TAGS="jenkins"
 if [ ! -z "$JOB_NAME" ]; then
@@ -126,12 +129,34 @@ case "$UPLOAD_MODE" in
             --tags $TAGS \
             --log-dir "$PROJECT_ROOT/tests/logs"
         ;;
+    evaluation)
+        if [ -f "$EVALUATION_FILE" ]; then
+            echo "📊 Uploading evaluation results from: $EVALUATION_FILE"
+            $PYTHON src/neptune_uploader.py \
+                --upload-evaluation \
+                --evaluation-file "$EVALUATION_FILE" \
+                --tags $TAGS
+        else
+            echo "⚠️  Warning: Evaluation file not found: $EVALUATION_FILE"
+            echo "   Skipping evaluation upload"
+        fi
+        ;;
     *)
         echo "❌ ERROR: Invalid NEPTUNE_UPLOAD_MODE: $UPLOAD_MODE"
-        echo "   Valid options: latest, all, inference"
+        echo "   Valid options: latest, all, inference, evaluation"
         exit 1
         ;;
 esac
+
+# Additionally upload evaluation results if they exist (for any mode)
+if [ -f "$EVALUATION_FILE" ] && [ "$UPLOAD_MODE" != "evaluation" ]; then
+    echo ""
+    echo "📊 Found evaluation results, uploading to Neptune..."
+    $PYTHON src/neptune_uploader.py \
+        --upload-evaluation \
+        --evaluation-file "$EVALUATION_FILE" \
+        --tags $TAGS evaluation || echo "⚠️  Warning: Evaluation upload failed"
+fi
 
 echo ""
 echo "=============================================================================="
