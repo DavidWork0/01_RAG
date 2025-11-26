@@ -52,7 +52,7 @@ pipeline {
             }
         }
         
-        stage('Run Tests') {
+        stage('Run Inference Tests') {
             steps {
                 script {
                     echo 'Running tests inside linux_with_cuda_complete container...'
