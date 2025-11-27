@@ -5,7 +5,7 @@
     "generated_date": "2025-11-25T20:44:16.002913",
     "gpt_model": "sonar-pro",
     "approach": "gold_standard_full_context",
-    "description": "GPT-4 answers with full PDF access - no retrieval/embeddings",
+    "description": "sonar pro answers with full PDF access - no retrieval/embeddings",
     "total_questions": 17,
     "pdf_pages": 1678,
     "pdf_characters": 5355233
