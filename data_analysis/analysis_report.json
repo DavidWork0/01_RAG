@@ -1,0 +1,38 @@
+{
+  "total_experiments": 136,
+  "unique_models": 10,
+  "unique_topk_values": [
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "latest_configurations": 50,
+  "overall_statistics": {
+    "semantic_similarity": {
+      "best_mean": 0.8673153758049011,
+      "worst_mean": 0.7725641556084156,
+      "average": 0.8323569333702326
+    },
+    "bleu_score": {
+      "best_mean": 0.1217495679292477,
+      "worst_mean": 0.053845099323119795,
+      "average": 0.08438099872951316
+    },
+    "response_time": {
+      "fastest_mean": 2.2147935152053835,
+      "slowest_mean": 47.90785744190216,
+      "average": 20.754262846946716
+    }
+  },
+  "best_configuration": {
+    "model": "InternVL3_5-8B-Q4_K_M",
+    "top_k": 15,
+    "semantic_sim_mean": 0.8502088844776153,
+    "bleu_mean": 0.1101813175972616,
+    "tfidf_mean": 0.6138916356199775,
+    "response_time_mean": 25.201169109344484,
+    "composite_score": 0.5573054397562179
+  }
+}
