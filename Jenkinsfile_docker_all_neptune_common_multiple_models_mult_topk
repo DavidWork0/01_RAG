@@ -23,6 +23,15 @@ pipeline {
     }
 
     stages {
+        stage('Install rouge-score') {
+            steps {
+                script {
+                    echo 'Installing rouge-score package...'
+                    sh '/app/01_RAG/.venv/bin/pip install rouge-score'
+                }
+            }
+        }
+
         stage('TOP_K Sweep Testing') {
             steps {
                 script {
