@@ -26,19 +26,29 @@ pipeline {
         stage('Setup Database Links') {
             steps {
                 script {
-                    echo '🔗 Setting up database symlinks...'
+                    echo '🔍 Debugging mount and database access...'
                     sh '''
-                        # Remove the empty tmpfs-mounted directory
+                        echo "=== Checking /mnt/databases ==="
+                        ls -la /mnt/databases/ || echo "❌ /mnt/databases not accessible"
+                        
+                        echo ""
+                        echo "=== Checking /var/jenkins_home/local_repo/data/output ==="
+                        ls /var/jenkins_home/local_repo/data/output/ | head -10
+                        
+                        echo ""
+                        echo "=== All mounts ==="
+                        mount | grep -E "(mnt|jenkins|database)" || echo "No relevant mounts"
+                        
+                        echo ""
+                        echo "=== Attempting direct copy instead ==="
                         rm -rf data/output
+                        mkdir -p data/output
+                        cp -r /var/jenkins_home/local_repo/data/output/* data/output/ || echo "❌ Copy failed"
                         
-                        # Create symlink to the mounted databases
-                        ln -s /mnt/databases data/output
-                        
-                        # Verify
-                        echo "✅ Symlink created. Checking databases..."
-                        ls -la data/output/ | head -20
-                        echo "..."
-                        echo "Total databases: $(ls -1 data/output/ | wc -l)"
+                        echo ""
+                        echo "=== Verification ==="
+                        echo "Databases copied: $(ls -1 data/output/ | wc -l)"
+                        ls -la data/output/ | head -15
                     '''
                 }
             }
