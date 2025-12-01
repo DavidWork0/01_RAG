@@ -192,12 +192,20 @@ class AnswerEvaluator:
         
         self.rouge_scorer = None
         if ROUGE_AVAILABLE and (not CONFIG_AVAILABLE or is_metric_enabled('rouge')):
-            use_stemmer = ROUGE_USE_STEMMER if CONFIG_AVAILABLE else True
-            self.rouge_scorer = rouge_scorer.RougeScorer(
-                ['rouge1', 'rouge2', 'rougeL'],
-                use_stemmer=use_stemmer
-            )
-            print("[OK] ROUGE scorer initialized")
+            try:
+                use_stemmer = ROUGE_USE_STEMMER if CONFIG_AVAILABLE else True
+                self.rouge_scorer = rouge_scorer.RougeScorer(
+                    ['rouge1', 'rouge2', 'rougeL'],
+                    use_stemmer=use_stemmer
+                )
+                print("[OK] ROUGE scorer initialized")
+            except Exception as e:
+                print(f"[ERROR] Failed to initialize ROUGE scorer: {e}")
+                self.rouge_scorer = None
+        elif not ROUGE_AVAILABLE:
+            print("[WARNING] ROUGE not available - install rouge-score package")
+        elif not is_metric_enabled('rouge'):
+            print("[INFO] ROUGE metric disabled in config")
         
         if NLTK_AVAILABLE:
             # Download required NLTK data
@@ -284,25 +292,54 @@ class AnswerEvaluator:
         Returns:
             Dictionary with ROUGE-1, ROUGE-2, and ROUGE-L scores
         """
-        if not self.rouge_scorer or (CONFIG_AVAILABLE and not is_metric_enabled('rouge')):
-            return {}
+        if not self.rouge_scorer:
+            if CONFIG_AVAILABLE and not is_metric_enabled('rouge'):
+                # Metric disabled in config - return empty dict (fields stay None)
+                return {}
+            # ROUGE scorer not initialized - return zeros
+            print("[WARNING] ROUGE scorer not available, returning zeros")
+            return {
+                'rouge_1_f': 0.0,
+                'rouge_1_p': 0.0,
+                'rouge_1_r': 0.0,
+                'rouge_2_f': 0.0,
+                'rouge_2_p': 0.0,
+                'rouge_2_r': 0.0,
+                'rouge_l_f': 0.0,
+                'rouge_l_p': 0.0,
+                'rouge_l_r': 0.0,
+            }
         
         try:
             scores = self.rouge_scorer.score(reference, generated)
             return {
-                'rouge_1_f': scores['rouge1'].fmeasure,
-                'rouge_1_p': scores['rouge1'].precision,
-                'rouge_1_r': scores['rouge1'].recall,
-                'rouge_2_f': scores['rouge2'].fmeasure,
-                'rouge_2_p': scores['rouge2'].precision,
-                'rouge_2_r': scores['rouge2'].recall,
-                'rouge_l_f': scores['rougeL'].fmeasure,
-                'rouge_l_p': scores['rougeL'].precision,
-                'rouge_l_r': scores['rougeL'].recall,
+                'rouge_1_f': float(scores['rouge1'].fmeasure),
+                'rouge_1_p': float(scores['rouge1'].precision),
+                'rouge_1_r': float(scores['rouge1'].recall),
+                'rouge_2_f': float(scores['rouge2'].fmeasure),
+                'rouge_2_p': float(scores['rouge2'].precision),
+                'rouge_2_r': float(scores['rouge2'].recall),
+                'rouge_l_f': float(scores['rougeL'].fmeasure),
+                'rouge_l_p': float(scores['rougeL'].precision),
+                'rouge_l_r': float(scores['rougeL'].recall),
             }
         except Exception as e:
-            print(f"[WARNING] Error calculating ROUGE scores: {e}")
-            return {}
+            import traceback
+            print(f"[ERROR] Exception during ROUGE calculation: {e}")
+            print(f"[ERROR] Reference length: {len(reference)}, Generated length: {len(generated)}")
+            print(f"[ERROR] Traceback: {traceback.format_exc()}")
+            # Return zeros instead of empty dict to maintain structure
+            return {
+                'rouge_1_f': 0.0,
+                'rouge_1_p': 0.0,
+                'rouge_1_r': 0.0,
+                'rouge_2_f': 0.0,
+                'rouge_2_p': 0.0,
+                'rouge_2_r': 0.0,
+                'rouge_l_f': 0.0,
+                'rouge_l_p': 0.0,
+                'rouge_l_r': 0.0,
+            }
     
     def calculate_bleu_score(
         self,
