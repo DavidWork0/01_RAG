@@ -23,6 +23,30 @@ pipeline {
     }
 
     stages {
+        stage('Verify Environment') {
+            steps {
+                script {
+                    echo '🔍 Verifying database paths and environment...'
+                    sh '''
+                        echo "=== Current working directory ==="
+                        pwd
+                        echo ""
+                        echo "=== Checking workspace data/output ==="
+                        ls -la data/output/ || echo "❌ data/output not found in workspace"
+                        echo ""
+                        echo "=== Checking /var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output ==="
+                        ls -la /var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output/ || echo "❌ Not found"
+                        echo ""
+                        echo "=== Checking /var/jenkins_home/local_repo/data/output ==="
+                        ls -la /var/jenkins_home/local_repo/data/output/ || echo "❌ Not found"
+                        echo ""
+                        echo "=== All mount points ==="
+                        mount | grep jenkins || echo "No jenkins mounts"
+                    '''
+                }
+            }
+        }
+        
         stage('Install rouge-score') {
             steps {
                 script {
