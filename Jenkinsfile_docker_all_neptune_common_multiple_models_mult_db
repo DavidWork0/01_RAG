@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'linux_with_cuda_complete:latest'
-            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/app/01_RAG/data/output:ro'
+            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output:ro'
             reuseNode true
         }
     }
