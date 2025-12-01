@@ -23,32 +23,15 @@ pipeline {
     }
 
     stages {
-        stage('Setup Database Links') {
+        stage('Setup Databases') {
             steps {
                 script {
-                    echo '🔍 Debugging mount and database access...'
+                    echo '📦 Copying databases into workspace...'
                     sh '''
-                        echo "=== Checking /mnt/databases ==="
-                        ls -la /mnt/databases/ || echo "❌ /mnt/databases not accessible"
-                        
-                        echo ""
-                        echo "=== Checking /var/jenkins_home/local_repo/data/output ==="
-                        ls /var/jenkins_home/local_repo/data/output/ | head -10
-                        
-                        echo ""
-                        echo "=== All mounts ==="
-                        mount | grep -E "(mnt|jenkins|database)" || echo "No relevant mounts"
-                        
-                        echo ""
-                        echo "=== Attempting direct copy instead ==="
                         rm -rf data/output
                         mkdir -p data/output
-                        cp -r /var/jenkins_home/local_repo/data/output/* data/output/ || echo "❌ Copy failed"
-                        
-                        echo ""
-                        echo "=== Verification ==="
-                        echo "Databases copied: $(ls -1 data/output/ | wc -l)"
-                        ls -la data/output/ | head -15
+                        cp -r /var/jenkins_home/local_repo/data/output/* data/output/
+                        echo "✅ Databases copied: $(ls -1 data/output/ | grep -c chroma_db)"
                     '''
                 }
             }
@@ -142,11 +125,15 @@ pipeline {
                     ]
                     def databases = [
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned',
-                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_250_cleaned'
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned'
                     ]
                     
                     // Define models to test
                     def models = [
+                        'InternVL3-2B-Instruct-Q5_K_M',
+                        'Qwen3-4B-Instruct-2507-Q8_0'
+                    ]
+                    def models1 = [
                         'InternVL3_5-2B-Q8_0',
                         'InternVL3_5-8B-Q4_K_M',
                         'InternVL3-2B-Instruct-Q5_K_M',
