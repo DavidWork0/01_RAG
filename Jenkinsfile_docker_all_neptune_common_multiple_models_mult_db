@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'linux_with_cuda_complete:latest'
-            args '--gpus all --entrypoint=""'
+            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/app/01_RAG/data/output:ro'
             reuseNode true
         }
     }
