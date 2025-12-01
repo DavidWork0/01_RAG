@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'linux_with_cuda_complete:latest'
-            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output:ro'
+            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/mnt/databases:ro'
             reuseNode true
         }
     }
@@ -23,25 +23,22 @@ pipeline {
     }
 
     stages {
-        stage('Verify Environment') {
+        stage('Setup Database Links') {
             steps {
                 script {
-                    echo '🔍 Verifying database paths and environment...'
+                    echo '🔗 Setting up database symlinks...'
                     sh '''
-                        echo "=== Current working directory ==="
-                        pwd
-                        echo ""
-                        echo "=== Checking workspace data/output ==="
-                        ls -la data/output/ || echo "❌ data/output not found in workspace"
-                        echo ""
-                        echo "=== Checking /var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output ==="
-                        ls -la /var/jenkins_home/workspace/RAG_inference_multimodel_multi_DB_test/data/output/ || echo "❌ Not found"
-                        echo ""
-                        echo "=== Checking /var/jenkins_home/local_repo/data/output ==="
-                        ls -la /var/jenkins_home/local_repo/data/output/ || echo "❌ Not found"
-                        echo ""
-                        echo "=== All mount points ==="
-                        mount | grep jenkins || echo "No jenkins mounts"
+                        # Remove the empty tmpfs-mounted directory
+                        rm -rf data/output
+                        
+                        # Create symlink to the mounted databases
+                        ln -s /mnt/databases data/output
+                        
+                        # Verify
+                        echo "✅ Symlink created. Checking databases..."
+                        ls -la data/output/ | head -20
+                        echo "..."
+                        echo "Total databases: $(ls -1 data/output/ | wc -l)"
                     '''
                 }
             }
