@@ -72,7 +72,7 @@ pipeline {
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_350_cleaned',
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_450_cleaned'
                     ]
-                    def databases = [
+                    def databases1 = [
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned',
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_250_cleaned',
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_750_150_cleaned',
@@ -107,7 +107,11 @@ pipeline {
                         'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_1000_cleaned',
                         'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_1500_cleaned',
                         'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_2000_cleaned',
-                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_3000_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_3000_cleaned'
+                    ]
+                    def databases = [
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_250_cleaned'
                     ]
                     
                     // Define models to test
