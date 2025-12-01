@@ -330,7 +330,7 @@ class NeptuneUploader:
         
         # Initialize Neptune run
         print("🚀 Initializing Neptune run...")
-        custom_run_id = f"{session_data['session_name']}_{session_data['metadata'].get('model_name', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        custom_run_id = f"{session_data['session_name']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         run = neptune.init_run(
             project=self.project,
             api_token=self.api_token,
