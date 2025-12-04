@@ -59,7 +59,7 @@ class TextCleaner:
         text = self.patterns['page_numbers'].sub('', text)
         
         # Step 2: Remove dot/dash lines
-        text = self.patterns['dot_lines'].sub('', text)
+        #text = self.patterns['dot_lines'].sub('', text)
         
         # Step 3: Remove trailing spaces from lines
         text = self.patterns['trailing_spaces'].sub('', text)
