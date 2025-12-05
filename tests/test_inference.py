@@ -1092,7 +1092,7 @@ Examples:
             embedding_model=EMBEDDING_MODEL,
             db_path=str(db_path),
             device='cuda',
-            verbose=False
+            verbose=True
         )
         print(f"✅ RAG system initialized")
     except Exception as e:
