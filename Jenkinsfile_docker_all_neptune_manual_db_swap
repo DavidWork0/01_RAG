@@ -41,7 +41,14 @@ pipeline {
                 }
             }
         }
-        
+        stage('Install rouge-score') {
+            steps {
+                script {
+                    echo 'Installing rouge-score package...'
+                    sh '/app/01_RAG/.venv/bin/pip install rouge-score'
+                }
+            }
+        }
         stage('Install Neptune') {
             steps {
                 script {
@@ -63,16 +70,18 @@ pipeline {
         stage('Evaluate Answers') {
             steps {
                 script {
-                    echo 'Evaluating answer quality against gold standard...'
+                    echo "Evaluating answers..."
+                    def timestamp = sh(script: 'date +%Y%m%d_%H%M%S', returnStdout: true).trim()
+                    def evalFile = "tests/logs/answer_evaluation_results_${timestamp}.json"
                     
-                    // Run answer evaluation on the last inference session
-                    sh '''
+                    sh """
                         /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
-                            --gold-standard /app/01_RAG/data/test/sonar_gold_standard_dataset.json \
-                            --inference-log /app/01_RAG/tests/logs/inference_log.jsonl \
+                            --gold-standard data/test/sonar_pro_gold_standard_dataset.json \
+                            --inference-log tests/logs/inference_log.jsonl \
                             --num-inference-eval 1 \
-                            --output-json /app/01_RAG/tests/logs/answer_evaluation_results.json
-                    '''
+                            --max-questions 10 \
+                            --output-json ${evalFile}
+                    """
                     
                     echo '✅ Answer evaluation completed'
                 }
@@ -96,12 +105,14 @@ pipeline {
                         sh 'bash jenkins_neptune_upload.sh'
                         
                         // Upload answer evaluation metrics
-                        sh '''
+                        sh """
                             /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
                                 --upload-evaluation \
-                                --evaluation-file /app/01_RAG/tests/logs/answer_evaluation_results.json \
-                                --tags jenkins evaluation build-${BUILD_NUMBER}
-                        '''
+                                --evaluation-file ${evalFile} \
+                                --tags jenkins evaluation build_${evalFile}
+                        """
+                        echo '✅ Neptune upload completed successfully'
+                        
                     } catch (Exception e) {
                         echo "⚠️  Warning: Neptune upload failed: ${e.message}"
                         echo "   Tests completed successfully, but results were not uploaded."
