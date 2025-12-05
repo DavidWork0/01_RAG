@@ -246,6 +246,7 @@ class HybridRAGQwen3_Module:
                 f"Error loading collection '{self.collection_name}': {str(e)}. "
                 f"Make sure the database was created with a compatible embedding model."
             )
+
     def _extract_keywords(self, query: str) -> set:
         """
         Extract meaningful keywords from query.
@@ -404,6 +405,13 @@ class HybridRAGQwen3_Module:
             List of filtered results above similarity threshold
         """
         filtered_results = []
+        
+        # Debug: Log top 5 distances and similarities to diagnose filtering
+        if scored_results:
+            self._print(f"   DEBUG: Top 5 distances/similarities before filtering:")
+            for i, (doc, meta, dist, kw_score, comb_score) in enumerate(scored_results[:5]):
+                similarity = max(0, min(100, (1 - dist) * 100))
+                self._print(f"     [{i+1}] dist={dist:.4f}, similarity={similarity:.2f}%, threshold={self.min_similarity}%")
         
         for doc, meta, dist, kw_score, comb_score in scored_results:
             # Calculate similarity percentage (lower distance = higher similarity)
