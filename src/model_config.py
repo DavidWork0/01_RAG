@@ -17,7 +17,7 @@ import os
 
 # Database path (relative to project root)
 #DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned"
-DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_450_cleaned"
+DEFAULT_DB_PATH = "/var/jenkins_home/local_repo/data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_200_cleaned"
 
 """
 def databases = [
