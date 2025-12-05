@@ -217,20 +217,11 @@ class HybridRAGQwen3_Module:
                 f"Please run chunk_qwen3_0_6B.py first to create the database."
                 #IDEA :  LOOK FOR ANOTHER COLLECTION if neccessary
             )
-        
-        # Debug: List database directory contents
-        print(f"\n🔍 DEBUG: Database path: {self.db_path}")
-        print(f"🔍 DEBUG: Database directory exists: {os.path.exists(self.db_path)}")
-        if os.path.exists(self.db_path):
-            print(f"🔍 DEBUG: Contents: {os.listdir(self.db_path)}")
-        
+          
         start_time = time.time()
         
         client = chromadb.PersistentClient(path=self.db_path)
-        
-        # Debug: List all collections in the database
-        print(f"🔍 DEBUG: All collections in database: {[col.name for col in client.list_collections()]}")
-        
+               
         try:
             # Use get_or_create_collection to avoid deserialization issues
             # This will reuse existing data but override the stored embedding function
@@ -421,17 +412,7 @@ class HybridRAGQwen3_Module:
             List of filtered results above similarity threshold
         """
         filtered_results = []
-        
-        # Debug: Log top 5 distances and similarities to diagnose filtering
-        # Always print this debug info regardless of verbose setting
-        if scored_results:
-            print(f"   DEBUG: Top 5 distances/similarities before filtering:")
-            for i, (doc, meta, dist, kw_score, comb_score) in enumerate(scored_results[:5]):
-                similarity = max(0, min(100, (1 - dist) * 100))
-                print(f"     [{i+1}] dist={dist:.4f}, similarity={similarity:.2f}%, threshold={self.min_similarity}%")
-        else:
-            print(f"   DEBUG: No scored_results before filtering!")
-        
+             
         for doc, meta, dist, kw_score, comb_score in scored_results:
             # Calculate similarity percentage (lower distance = higher similarity)
             similarity = max(0, min(100, (1 - dist) * 100))
