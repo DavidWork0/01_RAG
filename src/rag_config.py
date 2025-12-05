@@ -173,26 +173,8 @@ def get_db_path(chunk_strategy=None, embedding_model=None, embedding_dim=None, c
     
     return os.path.join(PROJECT_ROOT, "data", "output", db_type)
 
-
-def _resolve_env_db_path():
-    """Allow overriding DB path via env (absolute or project-root relative)."""
-    env_path = os.environ.get("RAG_DB_PATH") or os.environ.get("RAG_OVERRIDE_DB_PATH")
-    if not env_path:
-        return None
-    if os.path.isabs(env_path):
-        return env_path
-    return os.path.join(PROJECT_ROOT, env_path)
-
-
-def get_db_path_with_env(chunk_strategy=None, embedding_model=None, embedding_dim=None, chunk_size=None, overlap=None, cleaned=True):
-    override = _resolve_env_db_path()
-    if override:
-        return override
-    return get_db_path(chunk_strategy, embedding_model, embedding_dim, chunk_size, overlap, cleaned)
-
-
-# Default database path (env override takes precedence when set)
-DEFAULT_DB_PATH = get_db_path_with_env()
+# Default database path
+DEFAULT_DB_PATH = get_db_path()
 
 # =============================================================================
 # BATCH PROCESSING CONFIGURATION
