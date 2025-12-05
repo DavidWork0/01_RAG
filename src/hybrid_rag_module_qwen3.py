@@ -218,9 +218,18 @@ class HybridRAGQwen3_Module:
                 #IDEA :  LOOK FOR ANOTHER COLLECTION if neccessary
             )
         
+        # Debug: List database directory contents
+        print(f"\n🔍 DEBUG: Database path: {self.db_path}")
+        print(f"🔍 DEBUG: Database directory exists: {os.path.exists(self.db_path)}")
+        if os.path.exists(self.db_path):
+            print(f"🔍 DEBUG: Contents: {os.listdir(self.db_path)}")
+        
         start_time = time.time()
         
         client = chromadb.PersistentClient(path=self.db_path)
+        
+        # Debug: List all collections in the database
+        print(f"🔍 DEBUG: All collections in database: {[col.name for col in client.list_collections()]}")
         
         try:
             # Use get_or_create_collection to avoid deserialization issues
@@ -238,6 +247,13 @@ class HybridRAGQwen3_Module:
             self._print(f"✓ Database loaded in {elapsed:.2f}s")
             self._print(f"  Collection: {self.collection_name}")
             self._print(f"  Total chunks: {chunk_count}")
+            
+            if chunk_count == 0:
+                print(f"⚠️  WARNING: Collection '{self.collection_name}' has 0 chunks!")
+                print(f"   This usually means:")
+                print(f"   1. The database was not properly created")
+                print(f"   2. The wrong database directory is being loaded")
+                print(f"   3. The collection name doesn't match what was created")
             
             return collection
             
