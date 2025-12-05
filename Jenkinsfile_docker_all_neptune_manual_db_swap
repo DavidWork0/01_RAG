@@ -112,7 +112,7 @@ pipeline {
                             /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
                                 --upload-evaluation \
                                 --evaluation-file ${env.EVAL_FILE} \
-                                --tags jenkins evaluation build_${env.BUILD_NUMBER}
+                                --tags jenkins manual_db_eval evaluation build_${env.BUILD_NUMBER} fixed_size_Qwen3_0.6B_1024_500_150
                         """
                         echo '✅ Neptune upload completed successfully'
 
