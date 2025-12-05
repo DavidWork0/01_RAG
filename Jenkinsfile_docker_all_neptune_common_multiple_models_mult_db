@@ -178,11 +178,16 @@ pipeline {
                                     """
                                     echo "✅ Configuration updated"
                                 }
+
+                                // Derive DB path once and pass via environment to force RAG re-init
+                                def ragDbPath = "data/output/${database}"
                                 
                                 // Stage 2: Run Inference Tests
                                 stage("${currentTest}. Inference - ${model}") {
                                     echo "Running inference with Database=${database}, Model=${model}..."
-                                    sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
+                                    withEnv(["RAG_DB_PATH=${ragDbPath}", "RAG_OVERRIDE_DB_PATH=${ragDbPath}"]) {
+                                        sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
+                                    }
                                     echo "✅ Inference completed"
                                 }
                                 
@@ -194,14 +199,16 @@ pipeline {
                                     def timestamp = sh(script: 'date +%Y%m%d_%H%M%S', returnStdout: true).trim()
                                     def evalFile = "tests/logs/answer_evaluation_results_${database}_${model}_${timestamp}.json"
                                     
-                                    sh """
-                                        /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
-                                            --gold-standard data/test/sonar_pro_gold_standard_dataset.json \
-                                            --inference-log tests/logs/inference_log.jsonl \
-                                            --num-inference-eval 1 \
-                                            --max-questions 10 \
-                                            --output-json ${evalFile}
-                                    """
+                                    withEnv(["RAG_DB_PATH=${ragDbPath}", "RAG_OVERRIDE_DB_PATH=${ragDbPath}"]) {
+                                        sh """
+                                            /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
+                                                --gold-standard data/test/sonar_pro_gold_standard_dataset.json \
+                                                --inference-log tests/logs/inference_log.jsonl \
+                                                --num-inference-eval 1 \
+                                                --max-questions 10 \
+                                                --output-json ${evalFile}
+                                        """
+                                    }
                                     echo "✅ Evaluation completed: ${evalFile}"
                                     
                                     // Store eval file path for use in upload stage
