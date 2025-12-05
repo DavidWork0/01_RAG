@@ -18,6 +18,7 @@ import os
 # Database path (relative to project root)
 #DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned"
 DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned"
+
 """
 def databases = [
                         'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned',  OK
@@ -213,7 +214,7 @@ Key principles:
 
 
 # System message for InternVL models (with thinking)
-SYSTEM_MESSAGE_INTERNVL_OLD =  """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
+SYSTEM_MESSAGE_INTERNVL =  """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
 
 Always:
 - Analyze the retrieved context carefully before forming an answer.
