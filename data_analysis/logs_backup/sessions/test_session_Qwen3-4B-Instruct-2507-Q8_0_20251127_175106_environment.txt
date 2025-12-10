@@ -1,0 +1,636 @@
+====================================================================================================
+ENVIRONMENT INFORMATION
+====================================================================================================
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                     ENVIRONMENT VARIABLES                                        ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Note: Sensitive variables (containing 'password', 'token', 'secret', 'key', 'api', 'credential')
+      have been redacted for security.
+
+----------------------------------------------------------------------------------------------------
+  BUILD_DISPLAY_NAME                       = #8
+  BUILD_ID                                 = 8
+  BUILD_NUMBER                             = 8
+  BUILD_TAG                                = jenkins-RAG_inference_multimodel_multi_topK_test-8
+  BUILD_URL                                = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/8/
+  CI                                       = true
+  CLASSPATH                                = 
+  CUDA_HOME                                = /usr/local/cuda
+  CUDA_MODULE_LOADING                      = LAZY
+  CUDA_VERSION                             = 12.8.0
+  EXECUTOR_NUMBER                          = 0
+  GIT_BRANCH                               = origin/inference_testing_integration
+  GIT_COMMIT                               = c868829bba6cbf157b903a91d803ae2e84ff9d18
+  GIT_CONFIG_PARAMETERS                    = core.autocrlf=false
+  GIT_PREVIOUS_COMMIT                      = 0ef8bef743009daf51ed06093bc230de7f684e5a
+  GIT_PREVIOUS_SUCCESSFUL_COMMIT           = 0ef8bef743009daf51ed06093bc230de7f684e5a
+  GIT_URL                                  = /var/jenkins_home/local_repo
+  HF_HOME                                  = /app/01_RAG/models/huggingface
+  HOME                                     = /root
+  HOSTNAME                                 = 91bdef9c3026
+  HUDSON_HOME                              = /var/jenkins_home
+  HUDSON_SERVER_COOKIE                     = 75cbe09525e73a10
+  HUDSON_URL                               = http://localhost:8080/
+  HUGGINGFACE_HUB_CACHE                    = /app/01_RAG/models/huggingface
+  JENKINS_NODE_COOKIE                      = e83b2082-1930-47eb-bcb9-0138587edd2b
+  JENKINS_SERVER_COOKIE                    = durable-299f829b64172b0c6d2c0d02d279f6abb3ab29b8d12566e39def3b59479a01c8
+  JENKINS_URL                              = http://localhost:8080/
+  JOB_BASE_NAME                            = RAG_inference_multimodel_multi_topK_test
+  JOB_DISPLAY_URL                          = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/display/redirect
+  JOB_NAME                                 = RAG_inference_multimodel_multi_topK_test
+  JOB_URL                                  = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/
+  KMP_DUPLICATE_LIB_OK                     = True
+  KMP_INIT_AT_FORK                         = FALSE
+  LC_CTYPE                                 = C.UTF-8
+  LD_LIBRARY_PATH                          = /usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+  LIBRARY_PATH                             = /usr/local/cuda/lib64/stubs
+  NCCL_VERSION                             = 2.25.1-1
+  NEPTUNE_API_TOKEN                        = ***REDACTED***
+  NEPTUNE_PROJECT                          = davidwork0/rag-tests
+  NEPTUNE_UPLOAD_MODE                      = latest
+  NODE_LABELS                              = built-in
+  NODE_NAME                                = built-in
+  NVARCH                                   = x86_64
+  NVIDIA_DRIVER_CAPABILITIES               = compute,utility
+  NVIDIA_PRODUCT_NAME                      = CUDA
+  NVIDIA_REQUIRE_CUDA                      = cuda>=12.8 brand=unknown,driver>=470,driver<471 brand=grid,driver>=470,driver<471 brand=tesla,driver>=470,driver<471 brand=nvidia,driver>=470,driver<471 brand=quadro,driver>=470,driver<471 brand=qu...
+  NVIDIA_VISIBLE_DEVICES                   = all
+  NV_CUDA_CUDART_DEV_VERSION               = 12.8.57-1
+  NV_CUDA_CUDART_VERSION                   = 12.8.57-1
+  NV_CUDA_LIB_VERSION                      = 12.8.0-1
+  NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE       = cuda-nsight-compute-12-8=12.8.0-1
+  NV_CUDA_NSIGHT_COMPUTE_VERSION           = 12.8.0-1
+  NV_CUDNN_PACKAGE                         = libcudnn9-cuda-12=9.7.0.66-1
+  NV_CUDNN_PACKAGE_DEV                     = libcudnn9-dev-cuda-12=9.7.0.66-1
+  NV_CUDNN_PACKAGE_NAME                    = libcudnn9-cuda-12
+  NV_CUDNN_VERSION                         = 9.7.0.66-1
+  NV_LIBCUBLAS_DEV_PACKAGE                 = libcublas-dev-12-8=12.8.3.14-1
+  NV_LIBCUBLAS_DEV_PACKAGE_NAME            = libcublas-dev-12-8
+  NV_LIBCUBLAS_DEV_VERSION                 = 12.8.3.14-1
+  NV_LIBCUBLAS_PACKAGE                     = libcublas-12-8=12.8.3.14-1
+  NV_LIBCUBLAS_PACKAGE_NAME                = libcublas-12-8
+  NV_LIBCUBLAS_VERSION                     = 12.8.3.14-1
+  NV_LIBCUSPARSE_DEV_VERSION               = 12.5.7.53-1
+  NV_LIBCUSPARSE_VERSION                   = 12.5.7.53-1
+  NV_LIBNCCL_DEV_PACKAGE                   = libnccl-dev=2.25.1-1+cuda12.8
+  NV_LIBNCCL_DEV_PACKAGE_NAME              = libnccl-dev
+  NV_LIBNCCL_DEV_PACKAGE_VERSION           = 2.25.1-1
+  NV_LIBNCCL_PACKAGE                       = libnccl2=2.25.1-1+cuda12.8
+  NV_LIBNCCL_PACKAGE_NAME                  = libnccl2
+  NV_LIBNCCL_PACKAGE_VERSION               = 2.25.1-1
+  NV_LIBNPP_DEV_PACKAGE                    = libnpp-dev-12-8=12.3.3.65-1
+  NV_LIBNPP_DEV_VERSION                    = 12.3.3.65-1
+  NV_LIBNPP_PACKAGE                        = libnpp-12-8=12.3.3.65-1
+  NV_LIBNPP_VERSION                        = 12.3.3.65-1
+  NV_NVML_DEV_VERSION                      = 12.8.55-1
+  NV_NVPROF_DEV_PACKAGE                    = cuda-nvprof-12-8=12.8.57-1
+  NV_NVPROF_VERSION                        = 12.8.57-1
+  NV_NVTX_VERSION                          = 12.8.55-1
+  PATH                                     = /app/01_RAG/.venv/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  PIP_NO_CACHE_DIR                         = 1
+  PWD                                      = /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test
+  PYTHONDONTWRITEBYTECODE                  = 1
+  PYTHONUNBUFFERED                         = 1
+  RAG_LLM_MODELS_DIR                       = /app/01_RAG/models/llamacpp
+  RAG_MODEL_CACHE_DIR                      = /app/01_RAG/models/huggingface
+  RAG_PROJECT_ROOT_OVERRIDE                = /app/01_RAG
+  RUN_ARTIFACTS_DISPLAY_URL                = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/8/display/redirect?page=artifacts
+  RUN_CHANGES_DISPLAY_URL                  = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/8/display/redirect?page=changes
+  RUN_DISPLAY_URL                          = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/8/display/redirect
+  RUN_TESTS_DISPLAY_URL                    = http://localhost:8080/job/RAG_inference_multimodel_multi_topK_test/8/display/redirect?page=tests
+  STAGE_NAME                               = 3. Inference - Qwen3-4B-Instruct-2507-Q8_0
+  TRANSFORMERS_CACHE                       = /app/01_RAG/models/huggingface
+  VIRTUAL_ENV                              = /app/01_RAG/.venv
+  WORKDIR                                  = /app/01_RAG/tests
+  WORKSPACE                                = /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test
+  WORKSPACE_TMP                            = /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test@tmp
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                      PYTHON ENVIRONMENT                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Python Information:
+----------------------------------------------------------------------------------------------------
+  Python Version:         3.11.9
+  Python Implementation:  CPython
+  Python Compiler:        GCC 13.3.0
+  Python Build:           main (Nov 23 2025 14:15:55)
+  Platform:               linux
+  Max Size (bits):        63
+
+Executable and Paths:
+----------------------------------------------------------------------------------------------------
+  Python Executable:      /app/01_RAG/.venv/bin/python
+  Prefix:                 /app/01_RAG/.venv
+  Base Prefix:            /usr/local
+  Exec Prefix:            /app/01_RAG/.venv
+  Base Exec Prefix:       /usr/local
+
+Virtual Environment:
+----------------------------------------------------------------------------------------------------
+  Is Virtual Env:         True
+  Virtual Env Type:       venv
+  Virtual Env Path:       /app/01_RAG/.venv
+
+Encoding:
+----------------------------------------------------------------------------------------------------
+  Default Encoding:       utf-8
+  Filesystem Encoding:    utf-8
+
+Python Path (sys.path):
+----------------------------------------------------------------------------------------------------
+   1. /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test/src
+   2. /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test
+   3. /var/jenkins_home/workspace/RAG_inference_multimodel_multi_topK_test/tests
+   4. /usr/local/lib/python311.zip
+   5. /usr/local/lib/python3.11
+   6. /usr/local/lib/python3.11/lib-dynload
+   7. /app/01_RAG/.venv/lib/python3.11/site-packages
+   8. /tmp/tmpcnylsk67
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                      INSTALLED PACKAGES                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Total Packages: 233
+----------------------------------------------------------------------------------------------------
+Package Name                                       Version                       
+----------------------------------------------------------------------------------------------------
+  accelerate                                       1.12.0                        
+  acres                                            0.5.0                         
+  aiohappyeyeballs                                 2.6.1                         
+  aiohttp                                          3.12.15                       
+  aiosignal                                        1.4.0                         
+  altair                                           5.5.0                         
+  annotated-types                                  0.7.0                         
+  anyio                                            4.11.0                        
+  appdirs                                          1.4.4                         
+  arrow                                            1.4.0                         
+  attrs                                            25.3.0                        
+  backoff                                          2.2.1                         
+  bcrypt                                           5.0.0                         
+  blinker                                          1.9.0                         
+  boto3                                            1.41.2                        
+  botocore                                         1.41.2                        
+  bravado                                          11.1.0                        
+  bravado-core                                     6.1.1                         
+  build                                            1.3.0                         
+  cachetools                                       6.2.0                         
+  certifi                                          2025.8.3                      
+  charset-normalizer                               3.4.3                         
+  chromadb                                         1.1.1                         
+  ci-info                                          0.3.0                         
+  click                                            8.3.0                         
+  colorama                                         0.4.6                         
+  coloredlogs                                      15.0.1                        
+  configobj                                        5.0.9                         
+  configparser                                     7.2.0                         
+  dataclasses-json                                 0.6.7                         
+  datasets                                         4.1.1                         
+  dill                                             0.4.0                         
+  diskcache                                        5.6.3                         
+  distro                                           1.9.0                         
+  docstring_parser                                 0.17.0                        
+  durationpy                                       0.10                          
+  einops                                           0.8.1                         
+  etelemetry                                       0.3.1                         
+  filelock                                         3.19.1                        
+  Flask                                            3.1.2                         
+  flatbuffers                                      25.9.23                       
+  fqdn                                             1.5.1                         
+  frozenlist                                       1.7.0                         
+  fsspec                                           2025.9.0                      
+  future                                           1.0.0                         
+  gitdb                                            4.0.12                        
+  GitPython                                        3.1.45                        
+  google-auth                                      2.41.1                        
+  googleapis-common-protos                         1.70.0                        
+  greenlet                                         3.2.4                         
+  grpcio                                           1.75.1                        
+  h11                                              0.16.0                        
+  hf-xet                                           1.2.0                         
+  httpcore                                         1.0.9                         
+  httplib2                                         0.31.0                        
+  httptools                                        0.7.1                         
+  httpx                                            0.28.1                        
+  httpx-sse                                        0.4.1                         
+  huggingface-hub                                  0.35.3                        
+  humanfriendly                                    10.0                          
+  idna                                             3.10                          
+  importlib_metadata                               8.7.0                         
+  importlib_resources                              6.5.2                         
+  iniconfig                                        2.1.0                         
+  instructor                                       1.11.3                        
+  isoduration                                      20.11.0                       
+  itsdangerous                                     2.2.0                         
+  Jinja2                                           3.1.6                         
+  jiter                                            0.10.0                        
+  jmespath                                         1.0.1                         
+  joblib                                           1.5.2                         
+  jsonpatch                                        1.33                          
+  jsonpointer                                      3.0.0                         
+  jsonref                                          1.1.0                         
+  jsonschema                                       4.25.1                        
+  jsonschema-specifications                        2025.9.1                      
+  kubernetes                                       34.1.0                        
+  langchain                                        0.3.27                        
+  langchain-community                              0.3.30                        
+  langchain-core                                   0.3.78                        
+  langchain-huggingface                            0.3.1                         
+  langchain-openai                                 0.3.34                        
+  langchain-text-splitters                         0.3.11                        
+  langsmith                                        0.4.32                        
+  lark                                             1.3.1                         
+  llama_cpp_python                                 0.3.16                        
+  looseversion                                     1.3.0                         
+  lxml                                             6.0.2                         
+  markdown-it-py                                   4.0.0                         
+  MarkupSafe                                       3.0.3                         
+  marshmallow                                      3.26.1                        
+  mdurl                                            0.1.2                         
+  ml_dtypes                                        0.5.3                         
+  mmh3                                             5.2.0                         
+  monotonic                                        1.6                           
+  mpmath                                           1.3.0                         
+  msgpack                                          1.1.2                         
+  multidict                                        6.6.4                         
+  multiprocess                                     0.70.16                       
+  mypy_extensions                                  1.1.0                         
+  narwhals                                         2.6.0                         
+  neptune                                          1.14.0                        
+  nest-asyncio                                     1.6.0                         
+  networkx                                         3.5                           
+  nibabel                                          5.3.2                         
+  nipype                                           1.10.0                        
+  nltk                                             3.9.2                         
+  numpy                                            2.3.3                         
+  nvidia-cublas-cu12                               12.8.3.14                     
+  nvidia-cuda-cupti-cu12                           12.8.57                       
+  nvidia-cuda-nvrtc-cu12                           12.8.61                       
+  nvidia-cuda-runtime-cu12                         12.8.57                       
+  nvidia-cudnn-cu12                                9.7.1.26                      
+  nvidia-cufft-cu12                                11.3.3.41                     
+  nvidia-cufile-cu12                               1.13.0.11                     
+  nvidia-curand-cu12                               10.3.9.55                     
+  nvidia-cusolver-cu12                             11.7.2.55                     
+  nvidia-cusparse-cu12                             12.5.7.53                     
+  nvidia-cusparselt-cu12                           0.6.3                         
+  nvidia-nccl-cu12                                 2.26.2                        
+  nvidia-nvjitlink-cu12                            12.8.61                       
+  nvidia-nvtx-cu12                                 12.8.55                       
+  oauthlib                                         3.3.1                         
+  onnx                                             1.19.1                        
+  onnxruntime                                      1.23.1                        
+  onnxruntime-gpu                                  1.23.0                        
+  openai                                           1.109.1                       
+  opentelemetry-api                                1.37.0                        
+  opentelemetry-exporter-otlp-proto-common         1.37.0                        
+  opentelemetry-exporter-otlp-proto-grpc           1.37.0                        
+  opentelemetry-proto                              1.37.0                        
+  opentelemetry-sdk                                1.37.0                        
+  opentelemetry-semantic-conventions               0.58b0                        
+  optimum                                          2.0.0                         
+  optimum-onnx                                     0.0.1                         
+  orjson                                           3.11.3                        
+  overrides                                        7.7.0                         
+  packaging                                        25.0                          
+  pandas                                           2.3.3                         
+  pathlib                                          1.0.1                         
+  pillow                                           11.3.0                        
+  pip                                              25.3                          
+  pluggy                                           1.6.0                         
+  posthog                                          5.4.0                         
+  propcache                                        0.3.2                         
+  protobuf                                         6.32.1                        
+  prov                                             2.1.1                         
+  psutil                                           7.1.0                         
+  puremagic                                        1.30                          
+  pyarrow                                          21.0.0                        
+  pyasn1                                           0.6.1                         
+  pyasn1_modules                                   0.4.2                         
+  pybase64                                         1.4.2                         
+  pydantic                                         2.11.9                        
+  pydantic-settings                                2.11.0                        
+  pydantic_core                                    2.33.2                        
+  pydeck                                           0.9.1                         
+  pydot                                            4.0.1                         
+  Pygments                                         2.19.2                        
+  PyJWT                                            2.10.1                        
+  PyMuPDF                                          1.26.4                        
+  pyparsing                                        3.2.5                         
+  PyPika                                           0.48.9                        
+  pyproject_hooks                                  1.2.0                         
+  pyreadline3                                      3.5.4                         
+  pytest                                           8.4.2                         
+  python-dateutil                                  2.9.0.post0                   
+  python-dotenv                                    1.1.1                         
+  pytz                                             2025.2                        
+  pyxnat                                           1.6.3                         
+  PyYAML                                           6.0.3                         
+  ragas                                            0.3.6                         
+  rdflib                                           7.2.1                         
+  referencing                                      0.36.2                        
+  regex                                            2025.9.18                     
+  requests                                         2.32.5                        
+  requests-oauthlib                                2.0.0                         
+  requests-toolbelt                                1.0.0                         
+  rfc3339-validator                                0.1.4                         
+  rfc3986-validator                                0.1.1                         
+  rfc3987-syntax                                   1.1.0                         
+  rich                                             14.1.0                        
+  rpds-py                                          0.27.1                        
+  rsa                                              4.9.1                         
+  s3transfer                                       0.15.0                        
+  safetensors                                      0.6.2                         
+  scikit-learn                                     1.7.2                         
+  scikit-network                                   0.33.3                        
+  scipy                                            1.16.2                        
+  sentence-transformers                            5.1.1                         
+  setuptools                                       65.5.0                        
+  shellingham                                      1.5.4                         
+  simplejson                                       3.20.2                        
+  six                                              1.17.0                        
+  smmap                                            5.0.2                         
+  sniffio                                          1.3.1                         
+  SQLAlchemy                                       2.0.43                        
+  streamlit                                        1.50.0                        
+  swagger-spec-validator                           3.0.4                         
+  sympy                                            1.13.3                        
+  tenacity                                         9.1.2                         
+  threadpoolctl                                    3.6.0                         
+  tiktoken                                         0.11.0                        
+  timm                                             1.0.20                        
+  tokenizers                                       0.21.4                        
+  toml                                             0.10.2                        
+  torch                                            2.7.1+cu128                   
+  torchaudio                                       2.7.1+cu128                   
+  torchvision                                      0.22.1+cu128                  
+  tornado                                          6.5.2                         
+  tqdm                                             4.67.1                        
+  traits                                           7.0.2                         
+  transformers                                     4.55.4                        
+  triton                                           3.3.1                         
+  typer                                            0.19.2                        
+  typing-inspect                                   0.9.0                         
+  typing-inspection                                0.4.2                         
+  typing_extensions                                4.15.0                        
+  tzdata                                           2025.2                        
+  uri-template                                     1.3.0                         
+  urllib3                                          2.3.0                         
+  uvicorn                                          0.37.0                        
+  uvloop                                           0.22.1                        
+  watchdog                                         6.0.0                         
+  watchfiles                                       1.1.0                         
+  webcolors                                        25.10.0                       
+  websocket-client                                 1.9.0                         
+  websockets                                       15.0.1                        
+  Werkzeug                                         3.1.3                         
+  xxhash                                           3.6.0                         
+  yarl                                             1.20.1                        
+  zipp                                             3.23.0                        
+  zstandard                                        0.25.0                        
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                        PIP FREEZE OUTPUT                                         ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Requirements Format (pip freeze):
+----------------------------------------------------------------------------------------------------
+accelerate==1.12.0
+acres==0.5.0
+aiohappyeyeballs==2.6.1
+aiohttp==3.12.15
+aiosignal==1.4.0
+altair==5.5.0
+annotated-types==0.7.0
+anyio==4.11.0
+appdirs==1.4.4
+arrow==1.4.0
+attrs==25.3.0
+backoff==2.2.1
+bcrypt==5.0.0
+blinker==1.9.0
+boto3==1.41.2
+botocore==1.41.2
+bravado==11.1.0
+bravado-core==6.1.1
+build==1.3.0
+cachetools==6.2.0
+certifi==2025.8.3
+charset-normalizer==3.4.3
+chromadb==1.1.1
+ci-info==0.3.0
+click==8.3.0
+colorama==0.4.6
+coloredlogs==15.0.1
+configobj==5.0.9
+configparser==7.2.0
+dataclasses-json==0.6.7
+datasets==4.1.1
+dill==0.4.0
+diskcache==5.6.3
+distro==1.9.0
+docstring_parser==0.17.0
+durationpy==0.10
+einops==0.8.1
+etelemetry==0.3.1
+filelock==3.19.1
+Flask==3.1.2
+flatbuffers==25.9.23
+fqdn==1.5.1
+frozenlist==1.7.0
+fsspec==2025.9.0
+future==1.0.0
+gitdb==4.0.12
+GitPython==3.1.45
+google-auth==2.41.1
+googleapis-common-protos==1.70.0
+greenlet==3.2.4
+grpcio==1.75.1
+h11==0.16.0
+hf-xet==1.2.0
+httpcore==1.0.9
+httplib2==0.31.0
+httptools==0.7.1
+httpx==0.28.1
+httpx-sse==0.4.1
+huggingface-hub==0.35.3
+humanfriendly==10.0
+idna==3.10
+importlib_metadata==8.7.0
+importlib_resources==6.5.2
+iniconfig==2.1.0
+instructor==1.11.3
+isoduration==20.11.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+jiter==0.10.0
+jmespath==1.0.1
+joblib==1.5.2
+jsonpatch==1.33
+jsonpointer==3.0.0
+jsonref==1.1.0
+jsonschema==4.25.1
+jsonschema-specifications==2025.9.1
+kubernetes==34.1.0
+langchain==0.3.27
+langchain-community==0.3.30
+langchain-core==0.3.78
+langchain-huggingface==0.3.1
+langchain-openai==0.3.34
+langchain-text-splitters==0.3.11
+langsmith==0.4.32
+lark==1.3.1
+llama_cpp_python @ file:///tmp/llama-cpp-python
+looseversion==1.3.0
+lxml==6.0.2
+markdown-it-py==4.0.0
+MarkupSafe==3.0.3
+marshmallow==3.26.1
+mdurl==0.1.2
+ml_dtypes==0.5.3
+mmh3==5.2.0
+monotonic==1.6
+mpmath==1.3.0
+msgpack==1.1.2
+multidict==6.6.4
+multiprocess==0.70.16
+mypy_extensions==1.1.0
+narwhals==2.6.0
+neptune==1.14.0
+nest-asyncio==1.6.0
+networkx==3.5
+nibabel==5.3.2
+nipype==1.10.0
+nltk==3.9.2
+numpy==2.3.3
+nvidia-cublas-cu12==12.8.3.14
+nvidia-cuda-cupti-cu12==12.8.57
+nvidia-cuda-nvrtc-cu12==12.8.61
+nvidia-cuda-runtime-cu12==12.8.57
+nvidia-cudnn-cu12==9.7.1.26
+nvidia-cufft-cu12==11.3.3.41
+nvidia-cufile-cu12==1.13.0.11
+nvidia-curand-cu12==10.3.9.55
+nvidia-cusolver-cu12==11.7.2.55
+nvidia-cusparse-cu12==12.5.7.53
+nvidia-cusparselt-cu12==0.6.3
+nvidia-nccl-cu12==2.26.2
+nvidia-nvjitlink-cu12==12.8.61
+nvidia-nvtx-cu12==12.8.55
+oauthlib==3.3.1
+onnx==1.19.1
+onnxruntime==1.23.1
+onnxruntime-gpu==1.23.0
+openai==1.109.1
+opentelemetry-api==1.37.0
+opentelemetry-exporter-otlp-proto-common==1.37.0
+opentelemetry-exporter-otlp-proto-grpc==1.37.0
+opentelemetry-proto==1.37.0
+opentelemetry-sdk==1.37.0
+opentelemetry-semantic-conventions==0.58b0
+optimum==2.0.0
+optimum-onnx==0.0.1
+orjson==3.11.3
+overrides==7.7.0
+packaging==25.0
+pandas==2.3.3
+pathlib==1.0.1
+pillow==11.3.0
+pluggy==1.6.0
+posthog==5.4.0
+propcache==0.3.2
+protobuf==6.32.1
+prov==2.1.1
+psutil==7.1.0
+puremagic==1.30
+pyarrow==21.0.0
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
+pybase64==1.4.2
+pydantic==2.11.9
+pydantic-settings==2.11.0
+pydantic_core==2.33.2
+pydeck==0.9.1
+pydot==4.0.1
+Pygments==2.19.2
+PyJWT==2.10.1
+PyMuPDF==1.26.4
+pyparsing==3.2.5
+PyPika==0.48.9
+pyproject_hooks==1.2.0
+pyreadline3==3.5.4
+pytest==8.4.2
+python-dateutil==2.9.0.post0
+python-dotenv==1.1.1
+pytz==2025.2
+pyxnat==1.6.3
+PyYAML==6.0.3
+ragas==0.3.6
+rdflib==7.2.1
+referencing==0.36.2
+regex==2025.9.18
+requests==2.32.5
+requests-oauthlib==2.0.0
+requests-toolbelt==1.0.0
+rfc3339-validator==0.1.4
+rfc3986-validator==0.1.1
+rfc3987-syntax==1.1.0
+rich==14.1.0
+rpds-py==0.27.1
+rsa==4.9.1
+s3transfer==0.15.0
+safetensors==0.6.2
+scikit-learn==1.7.2
+scikit-network==0.33.3
+scipy==1.16.2
+sentence-transformers==5.1.1
+shellingham==1.5.4
+simplejson==3.20.2
+six==1.17.0
+smmap==5.0.2
+sniffio==1.3.1
+SQLAlchemy==2.0.43
+streamlit==1.50.0
+swagger-spec-validator==3.0.4
+sympy==1.13.3
+tenacity==9.1.2
+threadpoolctl==3.6.0
+tiktoken==0.11.0
+timm==1.0.20
+tokenizers==0.21.4
+toml==0.10.2
+torch==2.7.1+cu128
+torchaudio==2.7.1+cu128
+torchvision==0.22.1+cu128
+tornado==6.5.2
+tqdm==4.67.1
+traits==7.0.2
+transformers==4.55.4
+triton==3.3.1
+typer==0.19.2
+typing-inspect==0.9.0
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+tzdata==2025.2
+uri-template==1.3.0
+urllib3==2.3.0
+uvicorn==0.37.0
+uvloop==0.22.1
+watchdog==6.0.0
+watchfiles==1.1.0
+webcolors==25.10.0
+websocket-client==1.9.0
+websockets==15.0.1
+Werkzeug==3.1.3
+xxhash==3.6.0
+yarl==1.20.1
+zipp==3.23.0
+zstandard==0.25.0
+
+
+====================================================================================================
+END OF ENVIRONMENT INFORMATION
+====================================================================================================

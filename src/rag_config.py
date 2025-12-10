@@ -184,7 +184,7 @@ DEFAULT_DB_PATH = get_db_path()
 # Recommended values:
 # - 20-25 for Qwen3-0.6B with 6-8GB VRAM
 # - 100 for Qwen3-0.6B with 12GB+ VRAM
-BATCH_SIZE = 50
+BATCH_SIZE = 10
 
 # =============================================================================
 # SEARCH CONFIGURATION - HYBRID RAG

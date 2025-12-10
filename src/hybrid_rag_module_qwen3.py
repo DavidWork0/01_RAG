@@ -159,7 +159,7 @@ class HybridRAGQwen3_Module:
         self.tokenizer, self.model, self.embedding_fn = self._load_embedding_model()
         self.collection = self._load_vector_database()
         
-        self._print(f"✓ System initialized successfully")
+        self._print(f"[+] System initialized successfully")
     
     def _print(self, message: str):
         """Print message if verbose mode is enabled."""
@@ -198,7 +198,7 @@ class HybridRAGQwen3_Module:
         embedding_fn = Qwen3EmbeddingFunction(tokenizer, model, self.device)
         
         elapsed = time.time() - start_time
-        self._print(f"✓ Model loaded in {elapsed:.2f}s")
+        self._print(f"[+] Model loaded in {elapsed:.2f}s")
         
         return tokenizer, model, embedding_fn
     
@@ -235,12 +235,12 @@ class HybridRAGQwen3_Module:
             chunk_count = collection.count()
             elapsed = time.time() - start_time
             
-            self._print(f"✓ Database loaded in {elapsed:.2f}s")
+            self._print(f"[+] Database loaded in {elapsed:.2f}s")
             self._print(f"  Collection: {self.collection_name}")
             self._print(f"  Total chunks: {chunk_count}")
             
             if chunk_count == 0:
-                print(f"⚠️  WARNING: Collection '{self.collection_name}' has 0 chunks!")
+                print(f"[WARNING] Collection '{self.collection_name}' has 0 chunks!")
                 print(f"   This usually means:")
                 print(f"   1. The database was not properly created")
                 print(f"   2. The wrong database directory is being loaded")
@@ -525,7 +525,7 @@ class HybridRAGQwen3_Module:
         semantic_results = self._perform_semantic_search(query, initial_k)
         
         if not semantic_results['documents'][0]:
-            self._print("⚠️  No results found in database")
+            self._print("[WARNING] No results found in database")
             return []
         
         # Step 2: Extract keywords from query
@@ -542,7 +542,7 @@ class HybridRAGQwen3_Module:
         filtered_results = self._filter_by_similarity(ranked_results)
         
         if not filtered_results:
-            self._print(f"⚠️  No results above similarity threshold ({self.min_similarity}%)")
+            self._print(f"[WARNING] No results above similarity threshold ({self.min_similarity}%)")
             return []
         
         # Step 6: Select final top-k from filtered and ranked results
@@ -552,7 +552,7 @@ class HybridRAGQwen3_Module:
         formatted_results = self._format_results_for_output(final_results, return_distances)
         
         elapsed = time.time() - start_time
-        self._print(f"✓ Found {len(formatted_results)} results in {elapsed:.2f}s")
+        self._print(f"[+] Found {len(formatted_results)} results in {elapsed:.2f}s")
         
         return formatted_results
     
@@ -684,7 +684,7 @@ def interactive_mode(collection):
             print("\nExiting interactive mode.")
             break
         except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
+            print(f"\n[ERROR] {str(e)}")
             continue
 
 if __name__ == "__main__":
