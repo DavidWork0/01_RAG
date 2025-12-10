@@ -355,7 +355,86 @@ docker logs -f linux_with_cuda-complete-container
 ### Docker Configuration
 - `Dockerfile_multi` - Multi-stage build
 - `docker-compose.yml` - Standard deployment
-- `docker-compose-jenkins.yml` - CI/CD integration
+- `docker-compose-jenkins.yml` - CI/CD integration with Jenkins
+
+---
+
+## 🔄 CI/CD with Jenkins
+
+The project includes Jenkins integration for automated testing and hyperparameter tuning.
+
+### Jenkins Setup
+
+**Prerequisites:**
+- Docker and Docker Compose installed
+- Project Docker image built (`linux_with_cuda_complete:latest`)
+- GPU access configured (NVIDIA Container Toolkit)
+
+**Start Jenkins Server:**
+```powershell
+# Build and start Jenkins container
+docker-compose -f docker-compose-jenkins.yml up -d
+
+# View logs
+docker logs jenkins_server
+
+# Get initial admin password
+docker logs jenkins_server | Select-String "password"
+```
+
+**Initial Configuration:**
+1. Open Jenkins at http://localhost:8080
+2. Enter the initial admin password from logs
+3. Install suggested plugins
+4. Install **Docker Pipeline** plugin (Manage Jenkins → Plugins → Available)
+5. Add Neptune.ai API token as credential (ID: `neptune-api-token`) as written in Thesis (secret)
+
+**EXAMPLE: Create Pipeline Job:**
+1. Click "New Item" → Enter name → Select "Pipeline"
+2. Under Pipeline section:
+   - **Definition**: Pipeline script from SCM
+   - **SCM**: Git
+   - **Repository URL**: `/var/jenkins_home/local_repo`
+   - **Script Path**: `Jenkinsfile_docker_all_neptune_common_multiple_models_mult_topk`
+3. Click "Save"
+
+**Alternative (Direct Script):**
+- Change "Definition" to "Pipeline script"
+- Copy content from Jenkinsfile directly into text area
+
+### Available Jenkinsfiles
+
+- `Jenkinsfile_docker` - Basic inference testing with single model
+- `Jenkinsfile_docker_all_neptune` - Multi-model testing with Neptune.ai logging
+- `Jenkinsfile_docker_all_neptune_common_multiple_models_mult_topk` - Comprehensive testing with TOP_K sweeps across multiple models
+- `Jenkinsfile_docker_pipeline` - Full pipeline execution
+- `Jenkinsfile_hyperparameter_tuning` - Hyperparameter optimization runs
+
+### Neptune.ai Integration
+
+Configure Neptune.ai credentials in Jenkins:
+1. Go to "Manage Jenkins" → "Credentials"
+2. Add "Secret text" credential
+3. ID: `neptune-api-token`
+4. Secret: Your Neptune.ai API token
+5. Update `NEPTUNE_PROJECT` in Jenkinsfile with your project name
+
+**Jenkinsfile Environment Variables:**
+```groovy
+environment {
+    NEPTUNE_API_TOKEN = credentials('neptune-api-token')
+    NEPTUNE_PROJECT = 'your-workspace/project-name'
+    NEPTUNE_UPLOAD_MODE = 'latest'
+    RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+}
+```
+
+### Run Tests
+
+Click "Build Now" in Jenkins UI to start automated testing. Results are logged to:
+- Jenkins console output
+- Neptune.ai dashboard (if configured)
+- Local log files in `tests/logs/`
 
 ---
 
