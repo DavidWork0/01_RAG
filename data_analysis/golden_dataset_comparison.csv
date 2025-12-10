@@ -1,5 +1,0 @@
-,semantic_sim_mean,semantic_sim_mean,semantic_sim_mean,semantic_sim_mean,semantic_sim_mean,bleu_mean,bleu_mean,bleu_mean,bleu_mean,tfidf_mean,tfidf_mean,tfidf_mean,tfidf_mean,response_time_mean,response_time_mean,response_time_mean,response_time_mean,composite_score,composite_score,composite_score,composite_score
-,mean,std,min,max,count,mean,std,min,max,mean,std,min,max,mean,std,min,max,mean,std,min,max
-dataset_name,,,,,,,,,,,,,,,,,,,,,
-sonar_gold_standard_dataset,0.8324,0.0197,0.7726,0.8673,50,0.0844,0.0158,0.0538,0.1217,0.5575,0.0279,0.4918,0.6139,20.7543,11.195,2.2148,47.9079,0.5255,0.0165,0.4935,0.5573
-sonar_reasoning_pro_gold_standard_dataset,0.8103,0.028,0.6984,0.8411,30,0.1004,0.0187,0.0649,0.1382,0.5479,0.0313,0.4849,0.6157,18.906,12.5589,1.8597,59.1038,0.5186,0.0203,0.4696,0.56

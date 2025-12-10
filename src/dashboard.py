@@ -477,7 +477,7 @@ with input_container:
         value="",
         height=100,
         max_chars=1000,
-        on_change=None,  # "" to reset input after sending but it rolls back to the top of the
+        on_change=None,  # "" to reset input after sending but it rolls back to the top so this is not implemented
         placeholder="Ask me anything about documents...",
         key="message_input",
         disabled=False,
@@ -539,8 +539,8 @@ if send_button and user_input.strip():
         
         # Add warning if no context
         final_answer = parsed_response['answer']
-        #if no_relevant_context:
-            #final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
+        if no_relevant_context:
+            final_answer = f"[⚠️] No relevant information found in knowledge base - Answer based on general knowledge:\n\n{final_answer}"
         
         # Add assistant message
         assistant_message = {

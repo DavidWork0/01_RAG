@@ -438,6 +438,7 @@ if __name__ == "__main__":
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
+    # important to clear output dir before running because duplication in chroma DB could happen under the same foldername and then the some chunks would be duplicated
     if CLEAN_OUTPUT_DIR == True:
         #Clear output directory before running
         output_dir = os.path.join(PROJECT_ROOT, "data", "output")
@@ -447,7 +448,6 @@ if __name__ == "__main__":
             print(f"Cleared existing output directory: {output_dir}")
 
     # Example usage of the complete workflow
-    # Adjust input_dir and output_dir as needed
     input_dir = os.path.join(PROJECT_ROOT, "data", "pdfs")
     output_dir = os.path.join(PROJECT_ROOT, "data", "output")
         

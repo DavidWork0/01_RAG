@@ -629,7 +629,7 @@ def create_rag_system(
 
 
 # =============================================================================
-# MAIN FUNCTION AND INTERACTIVE MODE
+# MAIN FUNCTION 
 # =============================================================================
 
 def main():
@@ -638,54 +638,6 @@ def main():
         embedding_model=EMBEDDING_MODEL,
         db_path=DB_PATH
     )
-
-    # Start interactive mode
-    interactive_mode(rag_system.collection)
-
-# =============================================================================
-# INTERACTIVE MODE
-# =============================================================================
-
-def interactive_mode(collection):
-    rag_system = create_rag_system(
-        embedding_model=EMBEDDING_MODEL,
-        db_path=DB_PATH
-    )
-    
-    print("\n=== Hybrid RAG Interactive Search ===")
-    print("Type your query and press Enter. Type 'exit' to quit.\n")
-    
-    while True:
-        try:
-            query = input("Enter your search query: ").strip()
-            if query.lower() in {'exit', 'quit'}:
-                print("Exiting interactive mode.")
-                break
-            
-            results = rag_system.search(query, top_k=5, return_distances=True)
-            
-            if not results:
-                print("No results found.\n")
-                continue
-            
-            print(f"\nTop {len(results)} results:\n")
-            for res in results:
-                print(f"Rank: {res['rank']}")
-                print(f"Similarity Score: {res['similarity_score']:.2f}%")
-                print(f"Distance: {res.get('distance', 'N/A')}")
-                print(f"Keyword Score: {res['keyword_score']:.4f}")
-                print(f"Combined Score: {res['combined_score']:.4f}")
-                print(f"Source: {res['metadata'].get('source', 'Unknown')}")
-                print(f"Chunk Index: {res['metadata'].get('chunk_index', 'N/A')}")
-                print(f"Content:\n{res['content']}\n")
-                print("-" * 60)
-            
-        except KeyboardInterrupt:
-            print("\nExiting interactive mode.")
-            break
-        except Exception as e:
-            print(f"\n[ERROR] {str(e)}")
-            continue
 
 if __name__ == "__main__":
     main()

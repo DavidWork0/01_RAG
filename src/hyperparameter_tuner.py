@@ -224,7 +224,7 @@ class HyperparameterTuner:
         with open(self.session_log, 'w', encoding='utf-8') as f:
             json.dump(session_data, f, indent=2)
         
-        print(f"\n📊 Session results saved to: {self.session_log}")
+        print(f"\n Session results saved to: {self.session_log}")
     
     def run_grid_search(self, param_grid: Dict[str, List[Any]]):
         """
@@ -307,9 +307,9 @@ class HyperparameterTuner:
     
     def cleanup(self):
         """Restore original config file"""
-        print("\n🔄 Restoring original configuration...")
+        print("\n  Info: Restoring original configuration...")
         self.config_modifier.restore_config()
-        print("✓ Original configuration restored")
+        print("[OK] Original configuration restored")
 
 
 # =============================================================================
@@ -474,8 +474,8 @@ if __name__ == "__main__":
     print("="*70)
     
     # Default: Run quick test
-    print("\n🚀 Running quick test by default...")
-    print("💡 Edit this file to run different tests or import as a module\n")
+    print("\n  Info: Running quick test by default...")
+    print("  Info: Edit this file to run different tests or import as a module\n")
     
     chunk_size_optimization()
     #batch_size_optimization()

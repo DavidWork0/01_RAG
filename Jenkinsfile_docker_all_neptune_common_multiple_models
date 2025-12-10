@@ -91,7 +91,7 @@ pipeline {
                             stage("${modelNumber}. Inference - ${model}") {
                                 echo "Running inference tests for ${model}..."
                                 sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
-                                echo "✅ Inference completed for ${model}"
+                                echo "[OK] Inference completed for ${model}"
                             }
                             
                             // Stage 2: Evaluate Answers
@@ -105,7 +105,7 @@ pipeline {
                                         --max-questions 10 \
                                         --output-json tests/logs/answer_evaluation_results_${model}.json
                                 """
-                                echo "✅ Evaluation completed for ${model}"
+                                echo "[OK] Evaluation completed for ${model}"
                             }
                             
                             // Stage 3: Upload to Neptune
@@ -125,22 +125,22 @@ pipeline {
                                                 --tags jenkins evaluation build-${BUILD_NUMBER} model-${model}
                                         """
                                         
-                                        echo "✅ Neptune upload completed for ${model}"
+                                        echo "[OK] Neptune upload completed for ${model}"
                                     } catch (Exception e) {
-                                        echo "⚠️  Warning: Neptune upload failed for ${model}: ${e.message}"
+                                        echo "[!] Warning: Neptune upload failed for ${model}: ${e.message}"
                                     }
                                 } else {
-                                    echo "⚠️  Neptune credentials not configured, skipping upload for ${model}"
+                                    echo "[!] Neptune credentials not configured, skipping upload for ${model}"
                                 }
                             }
                             
                             modelResults[model] = 'SUCCESS'
-                            echo "✅ All stages completed successfully for ${model}"
+                            echo "[OK] All stages completed successfully for ${model}"
                             
                         } catch (Exception e) {
                             modelResults[model] = 'FAILED'
                             failedModels.add(model)
-                            echo "❌ Failed processing model ${model}: ${e.message}"
+                            echo "[x] Failed processing model ${model}: ${e.message}"
                             echo "Continuing with next model..."
                         }
                         
@@ -159,7 +159,7 @@ pipeline {
                     
                     models.each { model ->
                         def status = modelResults[model]
-                        def icon = status == 'SUCCESS' ? '✅' : '❌'
+                        def icon = status == 'SUCCESS' ? '[OK]' : '[x]'
                         echo "${icon} ${model}: ${status}"
                     }
                     
@@ -191,10 +191,10 @@ pipeline {
             }
         }
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '[OK] Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs for details.'
+            echo '[x] Pipeline failed. Check logs for details.'
         }
     }
 }

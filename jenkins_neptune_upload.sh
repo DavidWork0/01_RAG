@@ -26,24 +26,24 @@ echo ""
 
 # Check if Neptune credentials are set
 if [ -z "$NEPTUNE_API_TOKEN" ]; then
-    echo "❌ ERROR: NEPTUNE_API_TOKEN environment variable is not set"
+    echo "[x] ERROR: NEPTUNE_API_TOKEN environment variable is not set"
     echo "   Please configure it in Jenkins credentials or environment variables"
     exit 1
 fi
 
 if [ -z "$NEPTUNE_PROJECT" ]; then
-    echo "❌ ERROR: NEPTUNE_PROJECT environment variable is not set"
+    echo "[x] ERROR: NEPTUNE_PROJECT environment variable is not set"
     echo "   Example: username/project-name"
     exit 1
 fi
 
-echo "✅ Neptune credentials configured"
+echo "[OK] Neptune credentials configured"
 echo "   Project: $NEPTUNE_PROJECT"
 echo ""
 
 # Set default upload mode
 UPLOAD_MODE="${NEPTUNE_UPLOAD_MODE:-latest}"
-echo "📤 Upload mode: $UPLOAD_MODE"
+echo "[OK] Upload mode: $UPLOAD_MODE"
 
 # Check for evaluation file
 EVALUATION_FILE="${NEPTUNE_EVALUATION_FILE:-$PROJECT_ROOT/tests/logs/answer_evaluation_results.json}"
@@ -60,19 +60,19 @@ if [ ! -z "$NEPTUNE_TAGS" ]; then
     TAGS="$TAGS $NEPTUNE_TAGS"
 fi
 
-echo "🏷️  Tags: $TAGS"
+echo "[OK] Tags: $TAGS"
 echo ""
 
 # Detect project root (Jenkins workspace or Docker /app path)
 if [ -f "tests/test_inference.py" ]; then
     PROJECT_ROOT=$(pwd)
-    echo "📂 Project root: $PROJECT_ROOT (current directory)"
+    echo "[OK] Project root: $PROJECT_ROOT (current directory)"
 elif [ -d "/app/01_RAG" ]; then
     PROJECT_ROOT="/app/01_RAG"
     cd "$PROJECT_ROOT"
-    echo "📂 Project root: $PROJECT_ROOT (Docker path)"
+    echo "[OK] Project root: $PROJECT_ROOT (Docker path)"
 else
-    echo "❌ ERROR: Cannot find project root"
+    echo "[x] ERROR: Cannot find project root"
     exit 1
 fi
 
@@ -84,29 +84,29 @@ elif [ -f "/app/01_RAG/.venv/bin/python" ]; then
 else
     PYTHON="python"
 fi
-echo "🐍 Python: $PYTHON"
+echo "[OK] Python: $PYTHON"
 echo ""
 
 # Install neptune if not already installed
-echo "📦 Checking neptune installation..."
+echo "[OK] Checking neptune installation..."
 if ! $PYTHON -c "import neptune" 2>/dev/null; then
     echo "   Installing neptune..."
     $PYTHON -m pip install neptune --quiet
-    echo "   ✅ Neptune installed"
+    echo "   [OK] Neptune installed"
 else
-    echo "   ✅ Neptune already installed"
+    echo "   [OK] Neptune already installed"
 fi
 echo ""
 
 # Check if logs directory exists
 if [ ! -d "$PROJECT_ROOT/tests/logs/sessions" ]; then
-    echo "⚠️  Warning: Log directory not found: $PROJECT_ROOT/tests/logs/sessions"
-    echo "   Creating directory..."
+    echo "[!] Warning: Log directory not found: $PROJECT_ROOT/tests/logs/sessions"
+    echo "    Creating directory..."
     mkdir -p "$PROJECT_ROOT/tests/logs/sessions"
 fi
 
 # Run the uploader
-echo "🚀 Starting upload to Neptune.ai..."
+echo "[OK] Starting upload to Neptune.ai..."
 echo ""
 
 case "$UPLOAD_MODE" in
@@ -137,12 +137,12 @@ case "$UPLOAD_MODE" in
                 --evaluation-file "$EVALUATION_FILE" \
                 --tags $TAGS
         else
-            echo "⚠️  Warning: Evaluation file not found: $EVALUATION_FILE"
+            echo "[!] Warning: Evaluation file not found: $EVALUATION_FILE"
             echo "   Skipping evaluation upload"
         fi
         ;;
     *)
-        echo "❌ ERROR: Invalid NEPTUNE_UPLOAD_MODE: $UPLOAD_MODE"
+        echo "[x] ERROR: Invalid NEPTUNE_UPLOAD_MODE: $UPLOAD_MODE"
         echo "   Valid options: latest, all, inference, evaluation"
         exit 1
         ;;
@@ -151,14 +151,14 @@ esac
 # Additionally upload evaluation results if they exist (for any mode)
 if [ -f "$EVALUATION_FILE" ] && [ "$UPLOAD_MODE" != "evaluation" ]; then
     echo ""
-    echo "📊 Found evaluation results, uploading to Neptune..."
+    echo "[OK] Found evaluation results, uploading to Neptune..."
     $PYTHON src/neptune_uploader.py \
         --upload-evaluation \
         --evaluation-file "$EVALUATION_FILE" \
-        --tags $TAGS evaluation || echo "⚠️  Warning: Evaluation upload failed"
+        --tags $TAGS evaluation || echo "[!] Warning: Evaluation upload failed"
 fi
 
 echo ""
 echo "=============================================================================="
-echo "✅ Neptune upload completed successfully!"
+echo "[OK] Neptune upload completed successfully!"
 echo "=============================================================================="

@@ -406,9 +406,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 dir_to_ignore/
-required_programs
 models
 models/huggingface/InternVL3_5-4B
-models/.locks
 models/llamacpp
-docs/konzi_notes.txt

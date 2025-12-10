@@ -29,7 +29,7 @@ Currently the POC is done and working. **The performace is below the expected**.
 
     **streamlit_modern_multiuser.py:** 
       *INPUTS: Chroma_DB and hybrid_RAG system
-        -Doing it's done in a fancy way (of course this line and decription is not final :) )
+        -Doing it's done in a fancy way (of course this line and decription is not final :) 
         -
         -
         -

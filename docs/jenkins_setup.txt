@@ -2,13 +2,9 @@ To initialize a local Jenkins server that can run your tests (including the GPU-
 
 This setup runs Jenkins in a container and allows it to spawn your existing linux_with_cuda_complete container to run the tests.
 
-Step 1: Build your Project Image
-
-	First, ensure your main project image is built, as Jenkins will use it to run the tests.
+Step 1: Build Project Image
 
 Step 2: Start Jenkins
-
-	Run the following command to start the Jenkins server:
 
 Step 3: Configure Jenkins
 

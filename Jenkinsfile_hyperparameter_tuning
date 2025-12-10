@@ -129,10 +129,10 @@ pipeline {
             }
         }
         success {
-            echo '✅ Hyperparameter tuning pipeline completed successfully!'
+            echo '[OK] Hyperparameter tuning pipeline completed successfully!'
         }
         failure {
-            echo '❌ Hyperparameter tuning pipeline failed. Check logs for details.'
+            echo '[x] Hyperparameter tuning pipeline failed. Check logs for details.'
         }
     }
 }

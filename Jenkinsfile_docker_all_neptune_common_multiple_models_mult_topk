@@ -92,14 +92,14 @@ pipeline {
                                         echo "Current TOP_K_RESULTS:"
                                         grep "^TOP_K_RESULTS" src/model_config.py
                                     """
-                                    echo "✅ Configuration updated"
+                                    echo "[OK] Configuration updated"
                                 }
                                 
                                 // Stage 2: Run Inference Tests
                                 stage("${currentTest}. Inference - ${model}") {
                                     echo "Running inference with TOP_K=${topK}, Model=${model}..."
                                     sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
-                                    echo "✅ Inference completed"
+                                    echo "[OK] Inference completed"
                                 }
                                 
                                 // Stage 3: Evaluate Answers
@@ -118,7 +118,7 @@ pipeline {
                                             --max-questions 10 \
                                             --output-json ${evalFile}
                                     """
-                                    echo "✅ Evaluation completed: ${evalFile}"
+                                    echo "[OK] Evaluation completed: ${evalFile}"
                                     
                                     // Store eval file path for use in upload stage
                                     testResults["${testId}_evalfile"] = evalFile
@@ -144,23 +144,23 @@ pipeline {
                                                     --tags jenkins evaluation build-${BUILD_NUMBER} model-${model} topk-${topK}
                                             """
                                             
-                                            echo "✅ Neptune upload completed"
+                                            echo "[OK] Neptune upload completed"
                                         } catch (Exception uploadError) {
-                                            echo "⚠️  Warning: Neptune upload failed: ${uploadError.message}"
+                                            echo "[!] Warning: Neptune upload failed: ${uploadError.message}"
                                             echo "Continuing with pipeline..."
                                         }
                                     } else {
-                                        echo "ℹ️  Neptune credentials not configured, skipping upload"
+                                        echo "[!] Neptune credentials not configured, skipping upload"
                                     }
                                 }
                                 
                                 testResults[testId] = "SUCCESS"
-                                echo "✅ Test ${testId} completed successfully"
+                                echo "[OK] Test ${testId} completed successfully"
                                 
                             } catch (Exception e) {
                                 testResults[testId] = "FAILED"
                                 failedTests.add(testId)
-                                echo "❌ Failed test ${testId}: ${e.message}"
+                                echo "[x] Failed test ${testId}: ${e.message}"
                                 echo "Continuing with next test..."
                             }
                         }
@@ -179,12 +179,12 @@ pipeline {
                     if (failedTests.size() > 0) {
                         echo "Failed tests:"
                         failedTests.each { test ->
-                            echo "  ❌ ${test}"
+                            echo "  [x] ${test}"
                         }
                         echo ""
-                        echo "⚠️  Some tests failed but pipeline completed"
+                        echo "[!] Some tests failed but pipeline completed"
                     } else {
-                        echo "✅ All tests passed successfully!"
+                        echo "[OK] All tests passed successfully!"
                     }
                     echo "=========================================="
                     
@@ -192,7 +192,7 @@ pipeline {
                     echo "\nDetailed Results:"
                     testResults.each { test, status ->
                         if (!test.endsWith('_evalfile')) {
-                            def icon = status == "SUCCESS" ? "✅" : "❌"
+                            def icon = status == "SUCCESS" ? "[OK]" : "[x]"
                             echo "${icon} ${test}: ${status}"
                         }
                     }
@@ -215,10 +215,10 @@ pipeline {
             }
         }
         success {
-            echo '✅ TOP_K Sweep Pipeline completed successfully!'
+            echo '[OK] TOP_K Sweep Pipeline completed successfully!'
         }
         failure {
-            echo '❌ TOP_K Sweep Pipeline failed. Check logs for details.'
+            echo '[x] TOP_K Sweep Pipeline failed. Check logs for details.'
         }
     }
 }

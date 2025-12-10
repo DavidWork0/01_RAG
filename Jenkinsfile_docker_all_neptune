@@ -56,8 +56,6 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests inside linux_with_cuda_complete container...'
-                    // Use the python environment pre-installed in the image
-                    // The image has the venv at /app/01_RAG/.venv
                     sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-8B-Q5_K_M --mode all --include-environment'
                 }
             }
@@ -129,10 +127,10 @@ pipeline {
             }
         }
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '[OK] Pipeline completed successfully!'
         }
         failure {
-            echo ' Pipeline failed. Check logs for details.'
+            echo '[x] Pipeline failed. Check logs for details.'
         }
     }
 }

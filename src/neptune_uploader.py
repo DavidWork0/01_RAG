@@ -39,7 +39,7 @@ try:
     NEPTUNE_AVAILABLE = True
 except ImportError:
     NEPTUNE_AVAILABLE = False
-    print("⚠️  Warning: neptune package not installed.")
+    print("   Warning: neptune package not installed.")
     print("   Install with: pip install neptune")
 
 from src.inference_logger import InferenceLogger
@@ -300,7 +300,7 @@ class NeptuneUploader:
         print(f"{'='*80}\n")
         
         # Parse session log
-        print("📖 Parsing session log...")
+        print(" Parsing session log...")
         session_data = self.parse_session_log(session_log_path)
         
         # Load session tags if available
@@ -311,9 +311,9 @@ class NeptuneUploader:
                 import json
                 with open(tags_file, 'r', encoding='utf-8') as f:
                     session_tags = json.load(f)
-                print(f"📋 Loaded session tags: {session_tags}")
+                print(f"   Loaded session tags: {session_tags}")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to load session tags: {e}")
+                print(f"   Warning: Failed to load session tags: {e}")
         
         # Build enhanced tags list
         enhanced_tags = list(tags or [])
@@ -329,7 +329,7 @@ class NeptuneUploader:
                 enhanced_tags.append(f"sim_thresh-{session_tags['similarity_threshold']}")
         
         # Initialize Neptune run
-        print("🚀 Initializing Neptune run...")
+        print("  Info: Initializing Neptune run...")
         custom_run_id = f"{session_data['session_name']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         run = neptune.init_run(
             project=self.project,
@@ -340,22 +340,22 @@ class NeptuneUploader:
             description=description or f"RAG Test Session: {session_data['session_name']}"
         )
         
-        print(f"✅ Neptune run created: {run['sys/id'].fetch()}")
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
         
         try:
             # Upload metadata
-            print("📊 Uploading metadata...")
+            print("  Info: Uploading metadata...")
             for key, value in session_data["metadata"].items():
                 run[f"metadata/{key}"] = value
             
             # Upload session tags as metadata
             if session_tags:
-                print("🏷️  Uploading session tags...")
+                print("  Info: Uploading session tags...")
                 for key, value in session_tags.items():
                     run[f"config/{key}"] = value
             
             # Upload hardware info
-            print("🖥️  Uploading hardware information...")
+            print("  Info: Uploading hardware information...")
             for key, value in session_data["hardware_info"].items():
                 if isinstance(value, list):
                     run[f"hardware/{key}"] = str(value)
@@ -363,22 +363,22 @@ class NeptuneUploader:
                     run[f"hardware/{key}"] = value
             
             # Upload model configuration
-            print("🤖 Uploading model configuration...")
+            print("  Info: Uploading model configuration...")
             for key, value in session_data["model_config"].items():
                 run[f"model_config/{key}"] = value
             
             # Upload RAG configuration
-            print("🔍 Uploading RAG configuration...")
+            print("  Info: Uploading RAG configuration...")
             for key, value in session_data["rag_config"].items():
                 run[f"rag_config/{key}"] = value
             
             # Upload summary statistics
-            print("📈 Uploading summary statistics...")
+            print("  Info: Uploading summary statistics...")
             for key, value in session_data["summary"].items():
                 run[f"summary/{key}"] = value
             
             # Upload individual test results as metrics
-            print("📝 Uploading test results...")
+            print("  Info: Uploading test results...")
             for idx, result in enumerate(session_data["test_results"], 1):
                 q_id = result["question_id"]
                 run[f"tests/q{q_id}/response_time"].append(result["response_time"], step=idx)
@@ -389,17 +389,17 @@ class NeptuneUploader:
                 run[f"tests/q{q_id}/category"] = result["category"]
             
             # Upload the actual log file
-            print("📄 Uploading log file...")
+            print("  Info: Uploading log file...")
             run["logs/session_log"].upload(str(session_log_path))
             
             # Check for environment report
             env_report = session_log_path.parent / f"{session_log_path.stem}_environment.txt"
             if env_report.exists():
-                print("🌍 Uploading environment report...")
+                print("  Info: Uploading environment report...")
                 run["logs/environment_report"].upload(str(env_report))
             
             # Create summary charts (Neptune will auto-generate some visualizations)
-            print("📊 Creating summary visualizations...")
+            print("  Info: Creating summary visualizations...")
             
             # Response time per question
             if session_data["test_results"]:
@@ -425,8 +425,8 @@ class NeptuneUploader:
                 for idx, success in enumerate(success_values, 1):
                     run["charts/success_by_question"].append(success, step=idx)
             
-            print(f"\n✅ Session uploaded successfully!")
-            print(f"🔗 View in Neptune: {run.get_url()}")
+            print(f"\n  [OK] Session uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
             
             run_id = run["sys/id"].fetch()
             
@@ -450,7 +450,7 @@ class NeptuneUploader:
             Neptune run ID, or None if no sessions found
         """
         if not self.sessions_dir.exists():
-            print(f"❌ Sessions directory not found: {self.sessions_dir}")
+            print(f"  [X] Sessions directory not found: {self.sessions_dir}")
             return None
         
         # Find all session log files (excluding environment reports)
@@ -460,7 +460,7 @@ class NeptuneUploader:
         ]
         
         if not log_files:
-            print(f"❌ No session log files found in: {self.sessions_dir}")
+            print(f"  [X] No session log files found in: {self.sessions_dir}")
             return None
         
         # Get most recent
@@ -484,7 +484,7 @@ class NeptuneUploader:
             List of Neptune run IDs
         """
         if not self.sessions_dir.exists():
-            print(f"❌ Sessions directory not found: {self.sessions_dir}")
+            print(f"  [X] Sessions directory not found: {self.sessions_dir}")
             return []
         
         # Find all session log files (excluding environment reports)
@@ -494,7 +494,7 @@ class NeptuneUploader:
         ]
         
         if not log_files:
-            print(f"❌ No session log files found in: {self.sessions_dir}")
+            print(f"  [X] No session log files found in: {self.sessions_dir}")
             return []
         
         # Sort by modification time (most recent first)
@@ -515,7 +515,7 @@ class NeptuneUploader:
                 run_id = self.upload_session(log_file, tags=tags)
                 run_ids.append(run_id)
             except Exception as e:
-                print(f"❌ Failed to upload {log_file.name}: {e}")
+                print(f"  [X] Failed to upload {log_file.name}: {e}")
                 continue
         
         print(f"\n{'='*80}")
@@ -553,17 +553,17 @@ class NeptuneUploader:
         )
         
         if not logs:
-            print("❌ No inference logs found")
+            print("  [X] No inference logs found")
             return None
         
-        print(f"📊 Found {len(logs)} inference log(s)")
+        print(f"  [Info] Found {len(logs)} inference log(s)")
         
         # Initialize Neptune run
         run_name = f"Inference_Logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         if model_name:
             run_name += f"_{model_name}"
         
-        print("🚀 Initializing Neptune run...")
+        print("  [Info] Initializing Neptune run...")
         custom_run_id = f"{run_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         run = neptune.init_run(
             project=self.project,
@@ -574,17 +574,17 @@ class NeptuneUploader:
             description="Inference logs from InferenceLogger"
         )
         
-        print(f"✅ Neptune run created: {run['sys/id'].fetch()}")
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
         
         try:
             # Upload statistics
-            print("📊 Uploading statistics...")
+            print("  [Info] Uploading statistics...")
             stats = self.inference_logger.get_statistics(model_name=model_name)
             for key, value in stats.items():
                 run[f"statistics/{key}"] = value
             
             # Upload individual logs
-            print("📝 Uploading individual logs...")
+            print("  [Info] Uploading individual logs...")
             for log in logs:
                 q_id = log.get("question_id", "unknown")
                 timestamp = log.get("timestamp", "")
@@ -599,15 +599,15 @@ class NeptuneUploader:
                     run[f"logs/q{q_id}/question"] = log["question"][:200]
             
             # Upload CSV and JSONL files
-            print("📄 Uploading log files...")
+            print("  [Info] Uploading log files...")
             if self.inference_logger.csv_log.exists():
                 run["files/inference_summary.csv"].upload(str(self.inference_logger.csv_log))
             
             if self.inference_logger.jsonl_log.exists():
                 run["files/inference_log.jsonl"].upload(str(self.inference_logger.jsonl_log))
             
-            print(f"\n✅ Inference logs uploaded successfully!")
-            print(f"🔗 View in Neptune: {run.get_url()}")
+            print(f"\n  [OK] Inference logs uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
             
             run_id = run["sys/id"].fetch()
             
@@ -638,7 +638,7 @@ class NeptuneUploader:
         print(f"{'='*80}\n")
         
         # Load evaluation results
-        print(f"📖 Loading evaluation file: {evaluation_file}")
+        print(f"  [Info] Loading evaluation file: {evaluation_file}")
         with open(evaluation_file, 'r', encoding='utf-8') as f:
             eval_data = json.load(f)
         
@@ -646,12 +646,12 @@ class NeptuneUploader:
         is_multi_session = 'sessions' in eval_data
         
         if is_multi_session:
-            print(f"📊 Multi-session evaluation: {eval_data['num_sessions_evaluated']} sessions")
+            print(f"  [Info] Multi-session evaluation: {eval_data['num_sessions_evaluated']} sessions")
         else:
-            print(f"📊 Single-session evaluation")
+            print(f"  [Info] Single-session evaluation")
         
         # Initialize Neptune run
-        print("🚀 Initializing Neptune run...")
+        print("  [Info] Initializing Neptune run...")
         
         if is_multi_session:
             run_name = f"Answer_Eval_Multi_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -670,11 +670,11 @@ class NeptuneUploader:
             description=description or f"Answer quality evaluation results"
         )
         
-        print(f"✅ Neptune run created: {run['sys/id'].fetch()}")
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
         
         try:
             # Upload general metadata
-            print("📊 Uploading metadata...")
+            print("  [Info] Uploading metadata...")
             run["evaluation/timestamp"] = eval_data.get('evaluation_timestamp', '')
             run["evaluation/embedding_model"] = eval_data.get('embedding_model', '')
             run["evaluation/gold_standard_path"] = eval_data.get('gold_standard_path', '')
@@ -683,7 +683,7 @@ class NeptuneUploader:
             # Upload session tags if available
             session_tags = eval_data.get('session_tags', {})
             if session_tags:
-                print("🏷️  Uploading session configuration tags...")
+                print("  [Info] Uploading session configuration tags...")
                 for key, value in session_tags.items():
                     run[f"config/{key}"] = value
                 
@@ -707,7 +707,7 @@ class NeptuneUploader:
                 run["evaluation/num_sessions"] = eval_data['num_sessions_evaluated']
                 run["evaluation/max_questions_limit"] = eval_data.get('max_questions_limit', 'all')
                 
-                print("📈 Uploading multi-session metrics...")
+                print("  [Info] Uploading multi-session metrics...")
                 for session in eval_data['sessions']:
                     session_num = session['session_number']
                     session_name = session['session_name']
@@ -772,7 +772,7 @@ class NeptuneUploader:
                             run[f"sessions/s{session_num}/questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
                 
                 # Create comparison charts across sessions
-                print("📊 Creating comparison charts...")
+                print("  [Info] Creating comparison charts...")
                 for metric_key in ['semantic_similarity', 'rouge_1_f', 'rouge_2_f', 'rouge_l_f', 'bleu_score', 'tfidf_similarity', 'response_time_seconds']:
                     values = []
                     for session in eval_data['sessions']:
@@ -785,7 +785,7 @@ class NeptuneUploader:
                             run[f"comparison/{metric_key}/by_session"].append(val, step=idx)
                 
                 # Create per-question charts aggregated across all sessions
-                print("📊 Creating per-question charts...")
+                print("  [Info] Creating per-question charts...")
                 for session in eval_data['sessions']:
                     session_num = session['session_number']
                     
@@ -836,7 +836,7 @@ class NeptuneUploader:
                 run["evaluation/questions_evaluated"] = eval_data.get('total_questions_evaluated', 0)
                 run["evaluation/max_questions_limit"] = eval_data.get('max_questions_limit', 'all')
                 
-                print("📈 Uploading metrics...")
+                print("  [Info] Uploading metrics...")
                 stats = eval_data.get('aggregate_stats', {})
                 
                 # Aggregate metrics
@@ -875,7 +875,7 @@ class NeptuneUploader:
                     run["metrics/length_ratio/std"] = stats['length_ratio']['std']
                 
                 # Upload per-question results
-                print("📝 Uploading per-question results...")
+                print("  [Info] Uploading per-question results...")
                 for idx, result in enumerate(eval_data.get('per_question_results', []), 1):
                     q_id = result['question_id']
                     
@@ -897,7 +897,7 @@ class NeptuneUploader:
                         run[f"questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
                 
                 # Create per-question charts for visualization
-                print("📊 Creating per-question charts...")
+                print("  [Info] Creating per-question charts...")
                 results = eval_data.get('per_question_results', [])
                 
                 # Semantic similarity by question
@@ -943,11 +943,11 @@ class NeptuneUploader:
                     run[f"charts/length_ratio_by_question"].append(ratio, step=q_id)
             
             # Upload the evaluation file itself
-            print("📄 Uploading evaluation file...")
+            print("  [Info] Uploading evaluation file...")
             run["files/evaluation_results.json"].upload(str(evaluation_file))
             
-            print(f"\n✅ Evaluation results uploaded successfully!")
-            print(f"🔗 View in Neptune: {run.get_url()}")
+            print(f"\n  [OK] Evaluation results uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
             
             run_id = run["sys/id"].fetch()
             
@@ -1083,7 +1083,7 @@ Environment Variables:
         parser.error("--evaluation-file requires --upload-evaluation")
     
     if not NEPTUNE_AVAILABLE:
-        print("\n❌ Neptune package not installed.")
+        print("\n  [Error] Neptune package not installed.")
         print("   Install with: pip install neptune")
         sys.exit(1)
     
@@ -1095,7 +1095,7 @@ Environment Variables:
             log_dir=args.log_dir
         )
     except (ValueError, ImportError) as e:
-        print(f"\n❌ Initialization failed: {e}")
+        print(f"\n  [Error] Initialization failed: {e}")
         sys.exit(1)
     
     # Execute upload
@@ -1130,10 +1130,10 @@ Environment Variables:
                 description=args.description
             )
         
-        print("\n✅ All uploads completed successfully!")
+        print("\n  [OK] All uploads completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Upload failed: {e}")
+        print(f"\n  [Error] Upload failed: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

@@ -25,7 +25,7 @@ try:
     NEPTUNE_AVAILABLE = True
 except ImportError:
     NEPTUNE_AVAILABLE = False
-    print("⚠️  Warning: neptune package not installed.")
+    print("  Warning: neptune package not installed.")
     print("   Running without Neptune integration.")
 
 
@@ -66,11 +66,11 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             self.neptune_api_token = neptune_api_token or os.environ.get('NEPTUNE_API_TOKEN')
             
             if not self.neptune_project or not self.neptune_api_token:
-                print("⚠️  Neptune credentials not found. Running without Neptune integration.")
+                print("  Warning: Neptune credentials not found. Running without Neptune integration.")
                 self.enable_neptune = False
         
         if not self.enable_neptune:
-            print("ℹ️  Neptune integration disabled. Results will be saved locally only.")
+            print("  Info: Neptune integration disabled. Results will be saved locally only.")
     
     def start_neptune_run(self, tags: Optional[List[str]] = None, description: Optional[str] = None):
         """
@@ -84,7 +84,7 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             return
         
         try:
-            print("\n🚀 Starting Neptune run...")
+            print("\n  Info: Starting Neptune run...")
             
             custom_run_id = f"hyperparam_tuning_{self.session_timestamp}"
             
@@ -97,15 +97,15 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
                 description=description or "RAG hyperparameter tuning session"
             )
             
-            print(f"✅ Neptune run created: {self.neptune_run['sys/id'].fetch()}")
-            print(f"🔗 View run: {self.neptune_run.get_url()}")
+            print(f"  Info: Neptune run created: {self.neptune_run['sys/id'].fetch()}")
+            print(f"  Info: View run: {self.neptune_run.get_url()}")
             
             # Log session metadata
             self.neptune_run["session/timestamp"] = self.session_timestamp
             self.neptune_run["session/log_file"] = str(self.session_log)
             
         except Exception as e:
-            print(f"⚠️  Failed to start Neptune run: {e}")
+            print(f"  Warning: Failed to start Neptune run: {e}")
             print("   Continuing without Neptune integration.")
             self.enable_neptune = False
     
@@ -205,7 +205,7 @@ class NeptuneHyperparameterTuner(HyperparameterTuner):
             )
             
         except Exception as e:
-            print(f"⚠️  Failed to log experiment to Neptune: {e}")
+            print(f"  Warning: Failed to log experiment to Neptune: {e}")
     
     def _print_summary(self):
         """Print summary and log final stats to Neptune."""

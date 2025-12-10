@@ -34,12 +34,12 @@ pipeline {
         stage('Setup Databases') {
             steps {
                 script {
-                    echo '📦 Copying databases into workspace...'
+                    echo '[...] Copying databases into workspace...'
                     sh '''
                         rm -rf data/output
                         mkdir -p data/output
                         cp -r /var/jenkins_home/local_repo/data/output/* data/output/
-                        echo "✅ Databases copied: $(ls -1 data/output/ | grep -c chroma_db)"
+                        echo "[OK] Databases copied: $(ls -1 data/output/ | grep -c chroma_db)"
                     '''
                 }
             }
@@ -86,7 +86,7 @@ pipeline {
                             --output-json ${env.EVAL_FILE}
                     """
                     
-                    echo '✅ Answer evaluation completed'
+                    echo '[OK] Answer evaluation completed'
                 }
             }
         }
@@ -114,10 +114,10 @@ pipeline {
                                 --evaluation-file ${env.EVAL_FILE} \
                                 --tags jenkins manual_db_eval evaluation build_${env.BUILD_NUMBER} fixed_size_Qwen3_0.6B_1024_500_150
                         """
-                        echo '✅ Neptune upload completed successfully'
+                        echo '[OK] Neptune upload completed successfully'
 
                     } catch (Exception e) {
-                        echo "⚠️  Warning: Neptune upload failed: ${e.message}"
+                        echo "[!] Warning: Neptune upload failed: ${e.message}"
                         echo "   Tests completed successfully, but results were not uploaded."
                         echo "   Check Neptune configuration in environment section."
                     }
@@ -138,10 +138,10 @@ pipeline {
             }
         }
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '[OK] Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs for details.'
+            echo '[x] Pipeline failed. Check logs for details.'
         }
     }
 }

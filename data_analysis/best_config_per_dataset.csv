@@ -1,3 +1,0 @@
-dataset,best_model,best_top_k,semantic_sim,bleu_score,tfidf_sim,response_time,composite_score
-sonar_gold_standard_dataset,InternVL3_5-8B-Q4_K_M,15,0.8502088844776153,0.1101813175972616,0.6138916356199775,25.201169109344484,0.5573054397562179
-sonar_reasoning_pro_gold_standard_dataset,InternVL3_5-8B-Q4_K_M,15,0.834844878741673,0.13822712066753792,0.6151879442345234,26.116357735225133,0.5599624709672876
