@@ -167,7 +167,7 @@ flowchart TB
    jenkins([Jenkins Pipeline])
 
    %% ---------- Storage / Artifacts ----------
-   subgraph artifacts[Artifacts / Folders]
+   subgraph artifacts["Artifacts / Folders"]
       pdfs[(data/pdfs/*.pdf)]
       extracted_images[(data/output/extracted_images/*)]
       image_desc[(data/output/image_descriptions/*.txt)]
@@ -179,36 +179,36 @@ flowchart TB
    end
 
    %% ---------- Models ----------
-   subgraph models[Local Offline Models (not in git)]
+   subgraph models["Local Offline Models (not in git)"]
       hf_embed[(models/huggingface/...\nQwen/Qwen3-Embedding-0.6B)]
       hf_vlm[(models/huggingface/...\nOpenGVLab/InternVL3_5-4B)]
       gguf_llm[(models/llamacpp/*.gguf\nllama.cpp backend)]
    end
 
    %% ---------- Config ----------
-   subgraph config[Configuration]
+   subgraph config["Configuration"]
       rag_cfg[[src/rag_config.py\nchunking + retrieval params]]
       model_cfg[[src/model_config.py\nLLM model list + prompt templates]]
       env_vars[[Env vars\nHF_HOME / TRANSFORMERS_CACHE\nRAG_MODEL_CACHE_DIR\nCUDA_VISIBLE_DEVICES]]
    end
 
    %% ---------- 1) Ingestion / Extraction ----------
-   subgraph ingest[1) PDF Ingestion & Multi-Modal Extraction]
+   subgraph ingest["1) PDF Ingestion & Multi-Modal Extraction"]
       dp_pdf[[src/data_pipeline_pdf.py]]
       fitz[(PyMuPDF / fitz)]
-      placeholder_text[[Text with [IMAGE:...] placeholders]]
+      placeholder_text[[Text with IMAGE placeholders]]
       internvl[[InternVL3.5 inference\n(intevl3_5/*)]]
       merge_step[[Merge text + captions\n(placeholder replacement)]]
    end
 
    %% ---------- 2) Cleaning ----------
-   subgraph clean[2) Text Cleaning]
+   subgraph clean["2) Text Cleaning"]
       pre_chunk[[src/pre_chunking.py]]
       cleaner[[Remove PDF artifacts\n(page nums / dot lines / spacing)]]
    end
 
    %% ---------- 3) Chunking + Embeddings + DB ----------
-   subgraph index[3) Chunking, Embeddings, Vector DB Build]
+   subgraph index["3) Chunking, Embeddings, Vector DB Build"]
       chunker[[src/chunk_qwen3_0_6B.py]]
       strategy{CHUNK_STRATEGY}
       fixed[[fixed_size\nchunk_size + overlap]]
@@ -219,7 +219,7 @@ flowchart TB
    end
 
    %% ---------- 4) Serving / RAG Query ----------
-   subgraph serve[4) Interactive RAG Query (Streamlit)]
+   subgraph serve["4) Interactive RAG Query (Streamlit)"]
       ui[[src/dashboard.py\nStreamlit multi-user UI]]
       shared_lock[[Shared LLM lock\n(st.cache_resource)]]
       rag_core[[src/hybrid_rag_module_qwen3.py\nHybridRAGQwen3_Module]]
@@ -234,7 +234,7 @@ flowchart TB
    end
 
    %% ---------- 5) Testing / Evaluation / Experiment Tracking ----------
-   subgraph eval[5) Testing, Evaluation, Neptune Upload]
+   subgraph eval["5) Testing, Evaluation, Neptune Upload"]
       pytest[[pytest tests/*]]
       test_infer[[tests/test_inference.py\nrun questions + log sessions]]
       infer_logger[[src/inference_logger.py\nwrite JSONL/logs]]
@@ -244,7 +244,7 @@ flowchart TB
    end
 
    %% ---------- 6) Docker / CI ----------
-   subgraph cicd[6) Docker + CI/CD]
+   subgraph cicd["6) Docker + CI/CD"]
       compose[[docker-compose.yml\nlinux_with_cuda_complete]]
       image[[Dockerfile_multi\nCUDA + Python + deps]]
       jfile[[Jenkinsfile_docker_pipeline\n(run pipeline steps 1-3)]]
