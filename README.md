@@ -168,21 +168,21 @@ flowchart TB
 
    %% ---------- Storage / Artifacts ----------
    subgraph artifacts["Artifacts / Folders"]
-      pdfs[(data/pdfs/*.pdf)]
-      extracted_images[(data/output/extracted_images/*)]
-      image_desc[(data/output/image_descriptions/*.txt)]
-      merged_text[(data/output/final_merged/*.txt)]
-      merged_clean[(data/output/final_merged/cleaned/*.txt)]
-      chroma_db[(data/output/chroma_db_*/)]
-      test_logs[(tests/logs/**)]
-      session_logs[(tests/logs/sessions/*.log)]
+      pdfs[(data/pdfs (PDF files))]
+      extracted_images[(data/output/extracted_images)]
+      image_desc[(data/output/image_descriptions)]
+      merged_text[(data/output/final_merged)]
+      merged_clean[(data/output/final_merged/cleaned)]
+      chroma_db[(data/output/chroma_db_*)]
+      test_logs[(tests/logs)]
+      session_logs[(tests/logs/sessions)]
    end
 
    %% ---------- Models ----------
    subgraph models["Local Offline Models (not in git)"]
       hf_embed[(models/huggingface/...\nQwen/Qwen3-Embedding-0.6B)]
       hf_vlm[(models/huggingface/...\nOpenGVLab/InternVL3_5-4B)]
-      gguf_llm[(models/llamacpp/*.gguf\nllama.cpp backend)]
+      gguf_llm[(models/llamacpp (GGUF models)\nllama.cpp backend)]
    end
 
    %% ---------- Config ----------
@@ -197,7 +197,7 @@ flowchart TB
       dp_pdf[[src/data_pipeline_pdf.py]]
       fitz[(PyMuPDF / fitz)]
       placeholder_text[[Text with IMAGE placeholders]]
-      internvl[[InternVL3.5 inference\n(intevl3_5/*)]]
+      internvl[[InternVL3.5 inference\n(intevl3_5 module)]]
       merge_step[[Merge text + captions\n(placeholder replacement)]]
    end
 
@@ -235,7 +235,7 @@ flowchart TB
 
    %% ---------- 5) Testing / Evaluation / Experiment Tracking ----------
    subgraph eval["5) Testing, Evaluation, Neptune Upload"]
-      pytest[[pytest tests/*]]
+      pytest[[pytest tests]]
       test_infer[[tests/test_inference.py\nrun questions + log sessions]]
       infer_logger[[src/inference_logger.py\nwrite JSONL/logs]]
       ans_eval[[src/answer_evaluator.py\nROUGE/BLEU/semantic/TF-IDF]]
