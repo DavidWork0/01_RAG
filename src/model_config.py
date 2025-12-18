@@ -181,8 +181,8 @@ MODEL_CONFIG = {
 # Default model to use this is used by the Streamlit app on startup
 #DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
 #DEFAULT_MODEL = "InternVL3_5-2B-Q8_0"
-#DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
-DEFAULT_MODEL = "Qwen3-8B-Q5_K_M" #activated only for thinking parse testing
+DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
+#DEFAULT_MODEL = "Qwen3-8B-Q5_K_M" #activated only for thinking parse testing
 #DEFAULT_MODEL = "Qwen3-4B-Instruct-2507-Q8_0" #BEST MODEL
 
 

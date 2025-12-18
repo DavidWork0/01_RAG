@@ -539,8 +539,8 @@ if send_button and user_input.strip():
         
         # Add warning if no context
         final_answer = parsed_response['answer']
-        if no_relevant_context:
-            final_answer = f"[⚠️] No relevant information found in knowledge base - Answer based on general knowledge:\n\n{final_answer}"
+        #if no_relevant_context:
+        #    final_answer = f"[⚠️] No relevant information found in knowledge base - Answer based on general knowledge:\n\n{final_answer}"
         
         # Add assistant message
         assistant_message = {
