@@ -1,0 +1,79 @@
+PROPRIETARY LICENSE WITH NOTIFICATION REQUIREMENT
+
+Copyright (c) 2026 Áts Dávid Máté
+All rights reserved.
+
+TERMS AND CONDITIONS
+
+0. DEFINITIONS
+   "Software" means the original work authored by Áts Dávid Máté that is
+   contained in this repository, excluding Third-Party Components.
+
+   "Third-Party Components" means any software, libraries, frameworks, tools,
+   data, models, model weights, or other materials not authored by Áts Dávid Máté
+   that are used by, bundled with, or otherwise referenced by the Software,
+   including (without limitation) Python packages installed via pip/conda.
+
+   "Notification" means an email sent to atsdavidwork@gmail.com with subject
+   "RAG Code Use Notification" that includes:
+   - Your name or organization name
+   - Intended use case
+   - Date of first use (or planned start date)
+
+   "Óbuda University Affiliates" means Óbuda University (Óbudai Egyetem) and its
+   currently enrolled students, current employees (including faculty/staff), and
+   contractors acting on behalf of Óbuda University.
+
+1. NOTIFICATION REQUIREMENT (APPLIES TO THE SOFTWARE)
+   By using, copying, modifying, or distributing the Software, you MUST send the
+   Notification BEFORE any use.
+
+   Notification is satisfied when the email is sent; no acknowledgement or
+   approval is required.
+
+   LIMITED EXCEPTION (ÓBUDA UNIVERSITY): Óbuda University Affiliates are exempt
+   from the notification requirement for a period of 2 months from the date of
+   first use of the Software. After this period, Notification is required BEFORE
+   continuing use.
+
+2. PERMITTED USE (OF THE SOFTWARE)
+   Subject to the notification requirement in Section 1, permission is granted
+   to use, copy, modify, and distribute the Software for any purpose, provided
+   that:
+
+   a) This license notice and notification requirement must be included in all
+      copies or substantial portions of the Software.
+
+   b) Any modifications or derivative works must clearly indicate that they have
+      been modified from the original.
+
+3. THIRD-PARTY COMPONENTS
+   Third-Party Components are licensed under their respective license terms.
+   This license does NOT apply to, change, or restrict the license terms of any
+   Third-Party Components.
+
+   If you distribute the Software together with any Third-Party Components
+   (for example: in a Docker image, bundled distribution, or vendored source
+   code), you are responsible for complying with the applicable third-party
+   license obligations (including any required copyright notices, license text
+   inclusion, and NOTICE files).
+
+   This repository contains third-party license summary files in the "license/"
+   directory; these summaries may not be exhaustive.
+
+4. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+
+5. TERMINATION
+   Failure to comply with the notification requirement will result in automatic
+   termination of your rights under this license.
+
+6. CONTACT
+   For questions about this license or to send required notifications, contact:
+   atsdavidwork@gmail.com

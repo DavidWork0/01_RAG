@@ -3,7 +3,7 @@
 A Retrieval-Augmented Generation (RAG) system that processes PDF documents with text and images, creates vector embeddings, and provides an interactive chat interface for querying the content. The system uses local offline models for complete privacy and control.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-Check%20license%20folder-green.svg)](license/)
+[![License](https://img.shields.io/badge/license-See%20LICENSE.txt-green.svg)](LICENSE.txt)
 
 ---
 
@@ -521,9 +521,16 @@ $env:TORCH_HOME = "C:\custom\path\models"
 
 ---
 
-## 📝 License - AI Generated, not validated
+## 📝 License & Third-Party Notices
 
-See the `license/` folder for detailed license information for all dependencies.
+### Project license (this repository's original code)
+See [LICENSE.txt](LICENSE.txt).
+
+### Third-party components disclaimer
+This repository uses third-party components (Python packages, tools, and optional external models). Those third-party components are **not** covered by [LICENSE.txt](LICENSE.txt) and remain licensed under their **own** terms.
+
+### Dependency license summaries (AI generated, not legally validated)
+The `license/` folder contains generated reports intended to help with compliance, but they may be incomplete or outdated compared to your actual environment (transitive dependencies, platform-specific wheels, Docker image contents, etc.).
 
 - `license_modules_map_generated.md` - Module license mapping
 - `package_licenses_generated.csv` - Package license summary
