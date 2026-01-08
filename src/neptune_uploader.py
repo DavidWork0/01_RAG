@@ -39,7 +39,7 @@ try:
     NEPTUNE_AVAILABLE = True
 except ImportError:
     NEPTUNE_AVAILABLE = False
-    print("⚠️  Warning: neptune package not installed.")
+    print("   Warning: neptune package not installed.")
     print("   Install with: pip install neptune")
 
 from src.inference_logger import InferenceLogger
@@ -300,31 +300,62 @@ class NeptuneUploader:
         print(f"{'='*80}\n")
         
         # Parse session log
-        print("📖 Parsing session log...")
+        print(" Parsing session log...")
         session_data = self.parse_session_log(session_log_path)
         
+        # Load session tags if available
+        tags_file = session_log_path.parent / f"{session_log_path.stem}_tags.json"
+        session_tags = {}
+        if tags_file.exists():
+            try:
+                import json
+                with open(tags_file, 'r', encoding='utf-8') as f:
+                    session_tags = json.load(f)
+                print(f"   Loaded session tags: {session_tags}")
+            except Exception as e:
+                print(f"   Warning: Failed to load session tags: {e}")
+        
+        # Build enhanced tags list
+        enhanced_tags = list(tags or [])
+        if session_tags:
+            # Add model name tag
+            if 'model' in session_tags:
+                enhanced_tags.append(f"model-{session_tags['model']}")
+            # Add top_k tag
+            if 'top_k' in session_tags:
+                enhanced_tags.append(f"top_k-{session_tags['top_k']}")
+            # Add similarity threshold tag
+            if 'similarity_threshold' in session_tags:
+                enhanced_tags.append(f"sim_thresh-{session_tags['similarity_threshold']}")
+        
         # Initialize Neptune run
-        print("🚀 Initializing Neptune run...")
-        custom_run_id = f"{session_data['session_name']}_{session_data['metadata'].get('model_name', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        print("  Info: Initializing Neptune run...")
+        custom_run_id = f"{session_data['session_name']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         run = neptune.init_run(
             project=self.project,
             api_token=self.api_token,
             custom_run_id=custom_run_id,
-            tags=tags or [],
+            tags=enhanced_tags,
             name=session_data["session_name"],
             description=description or f"RAG Test Session: {session_data['session_name']}"
         )
         
-        print(f"✅ Neptune run created: {run['sys/id'].fetch()}")
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
         
         try:
             # Upload metadata
-            print("📊 Uploading metadata...")
+            print("  Info: Uploading metadata...")
             for key, value in session_data["metadata"].items():
                 run[f"metadata/{key}"] = value
             
+            # Upload session tags as metadata
+            if session_tags:
+                print("  Info: Uploading session tags...")
+                for key, value in session_tags.items():
+                    run[f"config/{key}"] = value
+            
             # Upload hardware info
-            print("🖥️  Uploading hardware information...")
+            print("  Info: Uploading hardware information...")
             for key, value in session_data["hardware_info"].items():
                 if isinstance(value, list):
                     run[f"hardware/{key}"] = str(value)
@@ -332,43 +363,43 @@ class NeptuneUploader:
                     run[f"hardware/{key}"] = value
             
             # Upload model configuration
-            print("🤖 Uploading model configuration...")
+            print("  Info: Uploading model configuration...")
             for key, value in session_data["model_config"].items():
                 run[f"model_config/{key}"] = value
             
             # Upload RAG configuration
-            print("🔍 Uploading RAG configuration...")
+            print("  Info: Uploading RAG configuration...")
             for key, value in session_data["rag_config"].items():
                 run[f"rag_config/{key}"] = value
             
             # Upload summary statistics
-            print("📈 Uploading summary statistics...")
+            print("  Info: Uploading summary statistics...")
             for key, value in session_data["summary"].items():
                 run[f"summary/{key}"] = value
             
             # Upload individual test results as metrics
-            print("📝 Uploading test results...")
-            for result in session_data["test_results"]:
+            print("  Info: Uploading test results...")
+            for idx, result in enumerate(session_data["test_results"], 1):
                 q_id = result["question_id"]
-                run[f"tests/q{q_id}/response_time"].append(result["response_time"])
-                run[f"tests/q{q_id}/chunks_retrieved"].append(result["chunks_retrieved"])
-                run[f"tests/q{q_id}/answer_length"].append(result["answer_length"])
-                run[f"tests/q{q_id}/success"].append(1 if result["success"] else 0)
+                run[f"tests/q{q_id}/response_time"].append(result["response_time"], step=idx)
+                run[f"tests/q{q_id}/chunks_retrieved"].append(result["chunks_retrieved"], step=idx)
+                run[f"tests/q{q_id}/answer_length"].append(result["answer_length"], step=idx)
+                run[f"tests/q{q_id}/success"].append(1 if result["success"] else 0, step=idx)
                 run[f"tests/q{q_id}/question"] = result["question"]
                 run[f"tests/q{q_id}/category"] = result["category"]
             
             # Upload the actual log file
-            print("📄 Uploading log file...")
+            print("  Info: Uploading log file...")
             run["logs/session_log"].upload(str(session_log_path))
             
             # Check for environment report
             env_report = session_log_path.parent / f"{session_log_path.stem}_environment.txt"
             if env_report.exists():
-                print("🌍 Uploading environment report...")
+                print("  Info: Uploading environment report...")
                 run["logs/environment_report"].upload(str(env_report))
             
             # Create summary charts (Neptune will auto-generate some visualizations)
-            print("📊 Creating summary visualizations...")
+            print("  Info: Creating summary visualizations...")
             
             # Response time per question
             if session_data["test_results"]:
@@ -394,8 +425,8 @@ class NeptuneUploader:
                 for idx, success in enumerate(success_values, 1):
                     run["charts/success_by_question"].append(success, step=idx)
             
-            print(f"\n✅ Session uploaded successfully!")
-            print(f"🔗 View in Neptune: {run.get_url()}")
+            print(f"\n  [OK] Session uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
             
             run_id = run["sys/id"].fetch()
             
@@ -419,7 +450,7 @@ class NeptuneUploader:
             Neptune run ID, or None if no sessions found
         """
         if not self.sessions_dir.exists():
-            print(f"❌ Sessions directory not found: {self.sessions_dir}")
+            print(f"  [X] Sessions directory not found: {self.sessions_dir}")
             return None
         
         # Find all session log files (excluding environment reports)
@@ -429,7 +460,7 @@ class NeptuneUploader:
         ]
         
         if not log_files:
-            print(f"❌ No session log files found in: {self.sessions_dir}")
+            print(f"  [X] No session log files found in: {self.sessions_dir}")
             return None
         
         # Get most recent
@@ -453,7 +484,7 @@ class NeptuneUploader:
             List of Neptune run IDs
         """
         if not self.sessions_dir.exists():
-            print(f"❌ Sessions directory not found: {self.sessions_dir}")
+            print(f"  [X] Sessions directory not found: {self.sessions_dir}")
             return []
         
         # Find all session log files (excluding environment reports)
@@ -463,7 +494,7 @@ class NeptuneUploader:
         ]
         
         if not log_files:
-            print(f"❌ No session log files found in: {self.sessions_dir}")
+            print(f"  [X] No session log files found in: {self.sessions_dir}")
             return []
         
         # Sort by modification time (most recent first)
@@ -484,7 +515,7 @@ class NeptuneUploader:
                 run_id = self.upload_session(log_file, tags=tags)
                 run_ids.append(run_id)
             except Exception as e:
-                print(f"❌ Failed to upload {log_file.name}: {e}")
+                print(f"  [X] Failed to upload {log_file.name}: {e}")
                 continue
         
         print(f"\n{'='*80}")
@@ -522,17 +553,17 @@ class NeptuneUploader:
         )
         
         if not logs:
-            print("❌ No inference logs found")
+            print("  [X] No inference logs found")
             return None
         
-        print(f"📊 Found {len(logs)} inference log(s)")
+        print(f"  [Info] Found {len(logs)} inference log(s)")
         
         # Initialize Neptune run
         run_name = f"Inference_Logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         if model_name:
             run_name += f"_{model_name}"
         
-        print("🚀 Initializing Neptune run...")
+        print("  [Info] Initializing Neptune run...")
         custom_run_id = f"{run_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         run = neptune.init_run(
             project=self.project,
@@ -543,17 +574,17 @@ class NeptuneUploader:
             description="Inference logs from InferenceLogger"
         )
         
-        print(f"✅ Neptune run created: {run['sys/id'].fetch()}")
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
         
         try:
             # Upload statistics
-            print("📊 Uploading statistics...")
+            print("  [Info] Uploading statistics...")
             stats = self.inference_logger.get_statistics(model_name=model_name)
             for key, value in stats.items():
                 run[f"statistics/{key}"] = value
             
             # Upload individual logs
-            print("📝 Uploading individual logs...")
+            print("  [Info] Uploading individual logs...")
             for log in logs:
                 q_id = log.get("question_id", "unknown")
                 timestamp = log.get("timestamp", "")
@@ -568,15 +599,355 @@ class NeptuneUploader:
                     run[f"logs/q{q_id}/question"] = log["question"][:200]
             
             # Upload CSV and JSONL files
-            print("📄 Uploading log files...")
+            print("  [Info] Uploading log files...")
             if self.inference_logger.csv_log.exists():
                 run["files/inference_summary.csv"].upload(str(self.inference_logger.csv_log))
             
             if self.inference_logger.jsonl_log.exists():
                 run["files/inference_log.jsonl"].upload(str(self.inference_logger.jsonl_log))
             
-            print(f"\n✅ Inference logs uploaded successfully!")
-            print(f"🔗 View in Neptune: {run.get_url()}")
+            print(f"\n  [OK] Inference logs uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
+            
+            run_id = run["sys/id"].fetch()
+            
+        finally:
+            run.stop()
+        
+        return run_id
+    
+    def upload_evaluation(
+        self,
+        evaluation_file: Path,
+        tags: Optional[List[str]] = None,
+        description: Optional[str] = None
+    ) -> str:
+        """
+        Upload answer evaluation results to Neptune.ai.
+        
+        Args:
+            evaluation_file: Path to the evaluation results JSON file
+            tags: Optional list of tags for the run
+            description: Optional description for the run
+        
+        Returns:
+            Neptune run ID
+        """
+        print(f"\n{'='*80}")
+        print(f"Uploading Answer Evaluation Results")
+        print(f"{'='*80}\n")
+        
+        # Load evaluation results
+        print(f"  [Info] Loading evaluation file: {evaluation_file}")
+        with open(evaluation_file, 'r', encoding='utf-8') as f:
+            eval_data = json.load(f)
+        
+        # Determine if single or multi-session evaluation
+        is_multi_session = 'sessions' in eval_data
+        
+        if is_multi_session:
+            print(f"  [Info] Multi-session evaluation: {eval_data['num_sessions_evaluated']} sessions")
+        else:
+            print(f"  [Info] Single-session evaluation")
+        
+        # Initialize Neptune run
+        print("  [Info] Initializing Neptune run...")
+        
+        if is_multi_session:
+            run_name = f"Answer_Eval_Multi_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            session_names = [s['session_name'] for s in eval_data['sessions']]
+        else:
+            run_name = f"Answer_Eval_{eval_data.get('session_name', 'unknown')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            session_names = [eval_data.get('session_name', 'unknown')]
+        
+        custom_run_id = f"{run_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        run = neptune.init_run(
+            project=self.project,
+            api_token=self.api_token,
+            custom_run_id=custom_run_id,
+            tags=(tags or []) + ["answer_evaluation"],
+            name=run_name,
+            description=description or f"Answer quality evaluation results"
+        )
+        
+        print(f"  [OK] Neptune run created: {run['sys/id'].fetch()}")
+        
+        try:
+            # Upload general metadata
+            print("  [Info] Uploading metadata...")
+            run["evaluation/timestamp"] = eval_data.get('evaluation_timestamp', '')
+            run["evaluation/embedding_model"] = eval_data.get('embedding_model', '')
+            run["evaluation/gold_standard_path"] = eval_data.get('gold_standard_path', '')
+            run["evaluation/inference_log_path"] = eval_data.get('inference_log_path', '')
+            
+            # Upload session tags if available
+            session_tags = eval_data.get('session_tags', {})
+            if session_tags:
+                print("  [Info] Uploading session configuration tags...")
+                for key, value in session_tags.items():
+                    run[f"config/{key}"] = value
+                
+                # Add session tags to Neptune tags for filtering
+                enhanced_tags = list(tags or [])
+                if 'model' in session_tags:
+                    enhanced_tags.append(f"model-{session_tags['model']}")
+                if 'top_k' in session_tags:
+                    enhanced_tags.append(f"top_k-{session_tags['top_k']}")
+                if 'similarity_threshold' in session_tags:
+                    enhanced_tags.append(f"sim_thresh-{session_tags['similarity_threshold']}")
+                
+                # Update run tags (note: this appends to existing tags)
+                for tag in enhanced_tags:
+                    if tag not in (tags or []):
+                        run["sys/tags"].add(tag)
+            
+            if is_multi_session:
+                # Multi-session evaluation
+                run["evaluation/type"] = "multi-session"
+                run["evaluation/num_sessions"] = eval_data['num_sessions_evaluated']
+                run["evaluation/max_questions_limit"] = eval_data.get('max_questions_limit', 'all')
+                
+                print("  [Info] Uploading multi-session metrics...")
+                for session in eval_data['sessions']:
+                    session_num = session['session_number']
+                    session_name = session['session_name']
+                    stats = session.get('aggregate_stats', {})
+                    
+                    # Session metadata
+                    run[f"sessions/s{session_num}/name"] = session_name
+                    run[f"sessions/s{session_num}/questions_evaluated"] = session['total_questions_evaluated']
+                    
+                    # Aggregate metrics for this session
+                    if 'semantic_similarity' in stats:
+                        run[f"sessions/s{session_num}/semantic_similarity/mean"] = stats['semantic_similarity']['mean']
+                        run[f"sessions/s{session_num}/semantic_similarity/std"] = stats['semantic_similarity']['std']
+                        run[f"sessions/s{session_num}/semantic_similarity/min"] = stats['semantic_similarity']['min']
+                        run[f"sessions/s{session_num}/semantic_similarity/max"] = stats['semantic_similarity']['max']
+                    
+                    if 'rouge_1_f' in stats:
+                        run[f"sessions/s{session_num}/rouge_1_f/mean"] = stats['rouge_1_f']['mean']
+                        run[f"sessions/s{session_num}/rouge_1_f/std"] = stats['rouge_1_f']['std']
+                    
+                    if 'rouge_2_f' in stats:
+                        run[f"sessions/s{session_num}/rouge_2_f/mean"] = stats['rouge_2_f']['mean']
+                        run[f"sessions/s{session_num}/rouge_2_f/std"] = stats['rouge_2_f']['std']
+                    
+                    if 'rouge_l_f' in stats:
+                        run[f"sessions/s{session_num}/rouge_l_f/mean"] = stats['rouge_l_f']['mean']
+                        run[f"sessions/s{session_num}/rouge_l_f/std"] = stats['rouge_l_f']['std']
+                    
+                    if 'bleu_score' in stats:
+                        run[f"sessions/s{session_num}/bleu_score/mean"] = stats['bleu_score']['mean']
+                        run[f"sessions/s{session_num}/bleu_score/std"] = stats['bleu_score']['std']
+                    
+                    if 'tfidf_similarity' in stats:
+                        run[f"sessions/s{session_num}/tfidf_similarity/mean"] = stats['tfidf_similarity']['mean']
+                        run[f"sessions/s{session_num}/tfidf_similarity/std"] = stats['tfidf_similarity']['std']
+                    
+                    if 'response_time_seconds' in stats:
+                        run[f"sessions/s{session_num}/response_time/mean"] = stats['response_time_seconds']['mean']
+                        run[f"sessions/s{session_num}/response_time/std"] = stats['response_time_seconds']['std']
+                    
+                    if 'length_ratio' in stats:
+                        run[f"sessions/s{session_num}/length_ratio/mean"] = stats['length_ratio']['mean']
+                        run[f"sessions/s{session_num}/length_ratio/std"] = stats['length_ratio']['std']
+                    
+                    # Upload per-question results for this session
+                    for idx, result in enumerate(session.get('per_question_results', []), 1):
+                        q_id = result['question_id']
+                        
+                        if result.get('semantic_similarity') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/semantic_similarity"].append(result['semantic_similarity'], step=idx)
+                        if result.get('rouge_1_f') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_1_f"].append(result['rouge_1_f'], step=idx)
+                        if result.get('rouge_2_f') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_2_f"].append(result['rouge_2_f'], step=idx)
+                        if result.get('rouge_l_f') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/rouge_l_f"].append(result['rouge_l_f'], step=idx)
+                        if result.get('bleu_score') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/bleu_score"].append(result['bleu_score'], step=idx)
+                        if result.get('tfidf_similarity') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/tfidf_similarity"].append(result['tfidf_similarity'], step=idx)
+                        if result.get('response_time_seconds') is not None:
+                            run[f"sessions/s{session_num}/questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
+                
+                # Create comparison charts across sessions
+                print("  [Info] Creating comparison charts...")
+                for metric_key in ['semantic_similarity', 'rouge_1_f', 'rouge_2_f', 'rouge_l_f', 'bleu_score', 'tfidf_similarity', 'response_time_seconds']:
+                    values = []
+                    for session in eval_data['sessions']:
+                        stats = session.get('aggregate_stats', {})
+                        if metric_key in stats:
+                            values.append(stats[metric_key]['mean'])
+                    
+                    if values:
+                        for idx, val in enumerate(values, 1):
+                            run[f"comparison/{metric_key}/by_session"].append(val, step=idx)
+                
+                # Create per-question charts aggregated across all sessions
+                print("  [Info] Creating per-question charts...")
+                for session in eval_data['sessions']:
+                    session_num = session['session_number']
+                    
+                    # Semantic similarity per question
+                    if session.get('per_question_results'):
+                        sem_scores = [(r['question_id'], r.get('semantic_similarity')) 
+                                      for r in session['per_question_results'] 
+                                      if r.get('semantic_similarity') is not None]
+                        for q_id, score in sem_scores:
+                            run[f"charts/semantic_similarity_by_question"].append(score, step=q_id)
+                    
+                    # ROUGE-1 F1 per question
+                    if session.get('per_question_results'):
+                        rouge1_scores = [(r['question_id'], r.get('rouge_1_f')) 
+                                         for r in session['per_question_results'] 
+                                         if r.get('rouge_1_f') is not None]
+                        for q_id, score in rouge1_scores:
+                            run[f"charts/rouge_1_f_by_question"].append(score, step=q_id)
+                    
+                    # ROUGE-L F1 per question
+                    if session.get('per_question_results'):
+                        rougel_scores = [(r['question_id'], r.get('rouge_l_f')) 
+                                         for r in session['per_question_results'] 
+                                         if r.get('rouge_l_f') is not None]
+                        for q_id, score in rougel_scores:
+                            run[f"charts/rouge_l_f_by_question"].append(score, step=q_id)
+                    
+                    # BLEU score per question
+                    if session.get('per_question_results'):
+                        bleu_scores = [(r['question_id'], r.get('bleu_score')) 
+                                       for r in session['per_question_results'] 
+                                       if r.get('bleu_score') is not None]
+                        for q_id, score in bleu_scores:
+                            run[f"charts/bleu_score_by_question"].append(score, step=q_id)
+                    
+                    # TF-IDF similarity per question
+                    if session.get('per_question_results'):
+                        tfidf_scores = [(r['question_id'], r.get('tfidf_similarity')) 
+                                        for r in session['per_question_results'] 
+                                        if r.get('tfidf_similarity') is not None]
+                        for q_id, score in tfidf_scores:
+                            run[f"charts/tfidf_similarity_by_question"].append(score, step=q_id)
+            
+            else:
+                # Single session evaluation
+                run["evaluation/type"] = "single-session"
+                run["evaluation/session_name"] = eval_data.get('session_name', 'unknown')
+                run["evaluation/questions_evaluated"] = eval_data.get('total_questions_evaluated', 0)
+                run["evaluation/max_questions_limit"] = eval_data.get('max_questions_limit', 'all')
+                
+                print("  [Info] Uploading metrics...")
+                stats = eval_data.get('aggregate_stats', {})
+                
+                # Aggregate metrics
+                if 'semantic_similarity' in stats:
+                    run["metrics/semantic_similarity/mean"] = stats['semantic_similarity']['mean']
+                    run["metrics/semantic_similarity/std"] = stats['semantic_similarity']['std']
+                    run["metrics/semantic_similarity/min"] = stats['semantic_similarity']['min']
+                    run["metrics/semantic_similarity/max"] = stats['semantic_similarity']['max']
+                
+                if 'rouge_1_f' in stats:
+                    run["metrics/rouge_1_f/mean"] = stats['rouge_1_f']['mean']
+                    run["metrics/rouge_1_f/std"] = stats['rouge_1_f']['std']
+                
+                if 'rouge_2_f' in stats:
+                    run["metrics/rouge_2_f/mean"] = stats['rouge_2_f']['mean']
+                    run["metrics/rouge_2_f/std"] = stats['rouge_2_f']['std']
+                
+                if 'rouge_l_f' in stats:
+                    run["metrics/rouge_l_f/mean"] = stats['rouge_l_f']['mean']
+                    run["metrics/rouge_l_f/std"] = stats['rouge_l_f']['std']
+                
+                if 'bleu_score' in stats:
+                    run["metrics/bleu_score/mean"] = stats['bleu_score']['mean']
+                    run["metrics/bleu_score/std"] = stats['bleu_score']['std']
+                
+                if 'tfidf_similarity' in stats:
+                    run["metrics/tfidf_similarity/mean"] = stats['tfidf_similarity']['mean']
+                    run["metrics/tfidf_similarity/std"] = stats['tfidf_similarity']['std']
+                
+                if 'response_time_seconds' in stats:
+                    run["metrics/response_time/mean"] = stats['response_time_seconds']['mean']
+                    run["metrics/response_time/std"] = stats['response_time_seconds']['std']
+                
+                if 'length_ratio' in stats:
+                    run["metrics/length_ratio/mean"] = stats['length_ratio']['mean']
+                    run["metrics/length_ratio/std"] = stats['length_ratio']['std']
+                
+                # Upload per-question results
+                print("  [Info] Uploading per-question results...")
+                for idx, result in enumerate(eval_data.get('per_question_results', []), 1):
+                    q_id = result['question_id']
+                    
+                    run[f"questions/q{q_id}/question"] = result.get('question', '')[:200]
+                    
+                    if result.get('semantic_similarity') is not None:
+                        run[f"questions/q{q_id}/semantic_similarity"].append(result['semantic_similarity'], step=idx)
+                    if result.get('rouge_1_f') is not None:
+                        run[f"questions/q{q_id}/rouge_1_f"].append(result['rouge_1_f'], step=idx)
+                    if result.get('rouge_2_f') is not None:
+                        run[f"questions/q{q_id}/rouge_2_f"].append(result['rouge_2_f'], step=idx)
+                    if result.get('rouge_l_f') is not None:
+                        run[f"questions/q{q_id}/rouge_l_f"].append(result['rouge_l_f'], step=idx)
+                    if result.get('bleu_score') is not None:
+                        run[f"questions/q{q_id}/bleu_score"].append(result['bleu_score'], step=idx)
+                    if result.get('tfidf_similarity') is not None:
+                        run[f"questions/q{q_id}/tfidf_similarity"].append(result['tfidf_similarity'], step=idx)
+                    if result.get('response_time_seconds') is not None:
+                        run[f"questions/q{q_id}/response_time"].append(result['response_time_seconds'], step=idx)
+                
+                # Create per-question charts for visualization
+                print("  [Info] Creating per-question charts...")
+                results = eval_data.get('per_question_results', [])
+                
+                # Semantic similarity by question
+                sem_scores = [(r['question_id'], r.get('semantic_similarity')) 
+                              for r in results if r.get('semantic_similarity') is not None]
+                for q_id, score in sem_scores:
+                    run[f"charts/semantic_similarity_by_question"].append(score, step=q_id)
+                
+                # ROUGE-1 F1 by question
+                rouge1_scores = [(r['question_id'], r.get('rouge_1_f')) 
+                                 for r in results if r.get('rouge_1_f') is not None]
+                for q_id, score in rouge1_scores:
+                    run[f"charts/rouge_1_f_by_question"].append(score, step=q_id)
+                
+                # ROUGE-2 F1 by question
+                rouge2_scores = [(r['question_id'], r.get('rouge_2_f')) 
+                                 for r in results if r.get('rouge_2_f') is not None]
+                for q_id, score in rouge2_scores:
+                    run[f"charts/rouge_2_f_by_question"].append(score, step=q_id)
+                
+                # ROUGE-L F1 by question
+                rougel_scores = [(r['question_id'], r.get('rouge_l_f')) 
+                                 for r in results if r.get('rouge_l_f') is not None]
+                for q_id, score in rougel_scores:
+                    run[f"charts/rouge_l_f_by_question"].append(score, step=q_id)
+                
+                # BLEU score by question
+                bleu_scores = [(r['question_id'], r.get('bleu_score')) 
+                               for r in results if r.get('bleu_score') is not None]
+                for q_id, score in bleu_scores:
+                    run[f"charts/bleu_score_by_question"].append(score, step=q_id)
+                
+                # TF-IDF similarity by question
+                tfidf_scores = [(r['question_id'], r.get('tfidf_similarity')) 
+                                for r in results if r.get('tfidf_similarity') is not None]
+                for q_id, score in tfidf_scores:
+                    run[f"charts/tfidf_similarity_by_question"].append(score, step=q_id)
+                
+                # Answer length ratio by question
+                length_ratios = [(r['question_id'], r.get('length_ratio')) 
+                                 for r in results if r.get('length_ratio') is not None]
+                for q_id, ratio in length_ratios:
+                    run[f"charts/length_ratio_by_question"].append(ratio, step=q_id)
+            
+            # Upload the evaluation file itself
+            print("  [Info] Uploading evaluation file...")
+            run["files/evaluation_results.json"].upload(str(evaluation_file))
+            
+            print(f"\n  [OK] Evaluation results uploaded successfully!")
+            print(f"  [Link] View in Neptune: {run.get_url()}")
             
             run_id = run["sys/id"].fetch()
             
@@ -604,6 +975,9 @@ Examples:
   
   # Upload inference logs
   python neptune_uploader.py --upload-inference-logs --model Qwen3-8B-Q5_K_M
+  
+  # Upload answer evaluation results
+  python neptune_uploader.py --upload-evaluation --evaluation-file tests/logs/answer_evaluation_results.json
   
   # With custom tags
   python neptune_uploader.py --upload-latest --tags jenkins ci quick-test
@@ -650,6 +1024,18 @@ Environment Variables:
         help='Upload inference logs from InferenceLogger'
     )
     
+    parser.add_argument(
+        '--upload-evaluation',
+        action='store_true',
+        help='Upload answer evaluation results'
+    )
+    
+    parser.add_argument(
+        '--evaluation-file',
+        type=Path,
+        help='Path to evaluation results JSON file'
+    )
+    
     # Filters
     parser.add_argument(
         '--model',
@@ -683,14 +1069,21 @@ Environment Variables:
     args = parser.parse_args()
     
     # Validate that at least one upload mode is specified
-    if not any([args.session_log, args.upload_latest, args.upload_all, args.upload_inference_logs]):
+    if not any([args.session_log, args.upload_latest, args.upload_all, args.upload_inference_logs, args.upload_evaluation]):
         parser.error(
             "Please specify an upload mode: "
-            "--session-log, --upload-latest, --upload-all, or --upload-inference-logs"
+            "--session-log, --upload-latest, --upload-all, --upload-inference-logs, or --upload-evaluation"
         )
     
+    # Validate evaluation-specific arguments
+    if args.upload_evaluation and not args.evaluation_file:
+        parser.error("--upload-evaluation requires --evaluation-file")
+    
+    if args.evaluation_file and not args.upload_evaluation:
+        parser.error("--evaluation-file requires --upload-evaluation")
+    
     if not NEPTUNE_AVAILABLE:
-        print("\n❌ Neptune package not installed.")
+        print("\n  [Error] Neptune package not installed.")
         print("   Install with: pip install neptune")
         sys.exit(1)
     
@@ -702,7 +1095,7 @@ Environment Variables:
             log_dir=args.log_dir
         )
     except (ValueError, ImportError) as e:
-        print(f"\n❌ Initialization failed: {e}")
+        print(f"\n  [Error] Initialization failed: {e}")
         sys.exit(1)
     
     # Execute upload
@@ -730,10 +1123,17 @@ Environment Variables:
                 limit=args.limit
             )
         
-        print("\n✅ All uploads completed successfully!")
+        elif args.upload_evaluation:
+            uploader.upload_evaluation(
+                evaluation_file=args.evaluation_file,
+                tags=args.tags,
+                description=args.description
+            )
+        
+        print("\n  [OK] All uploads completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Upload failed: {e}")
+        print(f"\n  [Error] Upload failed: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

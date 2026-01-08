@@ -89,9 +89,9 @@ def test_similarity_filtering():
     # Final result
     print(f"\n{'='*70}")
     if all(checks_passed) and len(checks_passed) > 0:
-        print("✅ ALL TESTS PASSED - Similarity filtering is working correctly!")
+        print("  [OK] ALL TESTS PASSED - Similarity filtering is working correctly!")
     else:
-        print("❌ SOME TESTS FAILED - Please check the implementation")
+        print("  [Error] SOME TESTS FAILED - Please check the implementation")
     print(f"{'='*70}\n")
 
 if __name__ == "__main__":

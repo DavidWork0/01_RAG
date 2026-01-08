@@ -16,7 +16,48 @@ import os
 # =============================================================================
 
 # Database path (relative to project root)
-DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_cleaned"
+#DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned"
+DEFAULT_DB_PATH = "data/output/chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned"
+
+"""
+def databases = [
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_150_cleaned',  OK
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_500_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_750_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_750_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_200_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1000_450_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1250_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1250_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1250_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1250_450_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_200_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_1500_450_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_2000_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_2000_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_2000_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_2000_450_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_3000_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_3000_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_3000_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_3000_450_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_150_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_250_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_350_cleaned',
+                        'chroma_db_fixed_size_Qwen_Qwen3-Embedding-0.6B_1024_4000_450_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_500_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_1000_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_1500_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_2000_cleaned',
+                        'chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_3000_cleaned'
+                    ]
+"""
 
 # Embedding model for RAG
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
@@ -42,7 +83,7 @@ MODEL_CONFIG = {
         "verbose": False
     },
     "InternVL3_5-8B-Q4_K_M": {
-        "path": "models/llamacpp/InternVL3_5-8B-Q4_K_M.gguf",
+        "path": "models/llamacpp/internvl3_5-8b-q4_k_m.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
         "top_p": 0.9,
@@ -61,7 +102,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-4B-Instruct-2507-UD-Q6_K_XL.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -69,7 +114,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-8B-Q6_K.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -93,7 +142,11 @@ MODEL_CONFIG = {
         "path": "models/llamacpp/Qwen3-4B-Instruct-2507-Q8_0.gguf",
         "n_ctx": 32768,
         "temperature": 0.7,
-        "top_p": 0.9,
+        "top_p": 0.8,  # Adjusted from 0.9 to match official recommendations
+        "top_k": 20,  # Added - recommended by Qwen team
+        "min_p": 0.0,  # Added - recommended for consistency
+        "repeat_penalty": 1.05,  # Added - helps reduce repetition
+        "seed": 42,  # Fixed seed for deterministic responses across environments
         "n_gpu_layers": -1,
         "verbose": False
     },
@@ -109,7 +162,8 @@ MODEL_CONFIG = {
         "n_gpu_layers": -1,
         "verbose": False
     },
-        "Qwen3-8B-Q5_K_M": {
+
+    "Qwen3-8B-Q5_K_M": {
         "path": "models/llamacpp/Qwen3-8B-Q5_K_M.gguf",
         "n_ctx": 32768,  # Reduced from 16384, 32768 for better VRAM efficiency
         "temperature": 0.7,
@@ -127,8 +181,9 @@ MODEL_CONFIG = {
 # Default model to use this is used by the Streamlit app on startup
 #DEFAULT_MODEL = "InternVL3_5-2B-Q6_K"
 #DEFAULT_MODEL = "InternVL3_5-2B-Q8_0"
-#DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
-DEFAULT_MODEL = "Qwen3-8B-Q5_K_M"
+DEFAULT_MODEL = "Qwen3-8B-Q4_K_M"
+#DEFAULT_MODEL = "Qwen3-8B-Q5_K_M" #activated only for thinking parse testing
+#DEFAULT_MODEL = "Qwen3-4B-Instruct-2507-Q8_0" #BEST MODEL
 
 
 # =============================================================================
@@ -145,6 +200,18 @@ MAX_TOKENS_OPTIONS = [512, 1024, 2048, 4096, 6144, 8192]
 # PROMPT TEMPLATES
 # =============================================================================
 
+# System message for other models (without thinking)
+SYSTEM_MESSAGE_STANDARD = """You are an AI assistant for a Retrieval-Augmented Generation (RAG) system focused on technical documentation.
+
+Key principles:
+- Prioritize retrieved context over general knowledge
+- Extract and synthesize ALL relevant information from the context
+- Structure responses clearly with proper formatting (bullet points, sections, etc.)
+- If context is insufficient, state this clearly before providing general knowledge
+- Cite specific sections when referencing context (e.g., "According to the manual...")
+- Be precise, accurate, and comprehensive in your answers"""
+
+
 # System message for InternVL models (with thinking)
 SYSTEM_MESSAGE_INTERNVL =  """You are a helpful AI assistant specialized in hybrid Retrieval-Augmented Generation (RAG) tasks. Your role is to answer the user's question using both retrieved context from the knowledge base and reasoning based on prior conversation history.
 
@@ -159,17 +226,6 @@ Step-by-step reasoning and evidence analysis...
 </think>
 
 Your clear and concise answer here."""
-
-# System message for other models (without thinking)
-SYSTEM_MESSAGE_STANDARD = """You are an AI assistant for a Retrieval-Augmented Generation (RAG) system focused on technical documentation.
-
-Key principles:
-- Prioritize retrieved context over general knowledge
-- Extract and synthesize ALL relevant information from the context
-- Structure responses clearly with proper formatting (bullet points, sections, etc.)
-- If context is insufficient, state this clearly before providing general knowledge
-- Cite specific sections when referencing context (e.g., "According to the manual...")
-- Be precise, accurate, and comprehensive in your answers"""
 
 SYSTEM_MESSAGE_STANDARD_OLD = """You are an AI assistant designed for a Retrieval-Augmented Generation (RAG) system. Your primary goal is to answer the user's question using the retrieved context from the knowledge base.
 -If the context contains the answer, use it directly and clearly attribute or reference it when appropriate.

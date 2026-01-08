@@ -159,7 +159,7 @@ class HybridRAGQwen3_Module:
         self.tokenizer, self.model, self.embedding_fn = self._load_embedding_model()
         self.collection = self._load_vector_database()
         
-        self._print(f"✓ System initialized successfully")
+        self._print(f"[+] System initialized successfully")
     
     def _print(self, message: str):
         """Print message if verbose mode is enabled."""
@@ -198,7 +198,7 @@ class HybridRAGQwen3_Module:
         embedding_fn = Qwen3EmbeddingFunction(tokenizer, model, self.device)
         
         elapsed = time.time() - start_time
-        self._print(f"✓ Model loaded in {elapsed:.2f}s")
+        self._print(f"[+] Model loaded in {elapsed:.2f}s")
         
         return tokenizer, model, embedding_fn
     
@@ -217,11 +217,11 @@ class HybridRAGQwen3_Module:
                 f"Please run chunk_qwen3_0_6B.py first to create the database."
                 #IDEA :  LOOK FOR ANOTHER COLLECTION if neccessary
             )
-        
+          
         start_time = time.time()
         
         client = chromadb.PersistentClient(path=self.db_path)
-        
+               
         try:
             # Use get_or_create_collection to avoid deserialization issues
             # This will reuse existing data but override the stored embedding function
@@ -235,9 +235,16 @@ class HybridRAGQwen3_Module:
             chunk_count = collection.count()
             elapsed = time.time() - start_time
             
-            self._print(f"✓ Database loaded in {elapsed:.2f}s")
+            self._print(f"[+] Database loaded in {elapsed:.2f}s")
             self._print(f"  Collection: {self.collection_name}")
             self._print(f"  Total chunks: {chunk_count}")
+            
+            if chunk_count == 0:
+                print(f"[WARNING] Collection '{self.collection_name}' has 0 chunks!")
+                print(f"   This usually means:")
+                print(f"   1. The database was not properly created")
+                print(f"   2. The wrong database directory is being loaded")
+                print(f"   3. The collection name doesn't match what was created")
             
             return collection
             
@@ -246,6 +253,7 @@ class HybridRAGQwen3_Module:
                 f"Error loading collection '{self.collection_name}': {str(e)}. "
                 f"Make sure the database was created with a compatible embedding model."
             )
+
     def _extract_keywords(self, query: str) -> set:
         """
         Extract meaningful keywords from query.
@@ -404,7 +412,7 @@ class HybridRAGQwen3_Module:
             List of filtered results above similarity threshold
         """
         filtered_results = []
-        
+             
         for doc, meta, dist, kw_score, comb_score in scored_results:
             # Calculate similarity percentage (lower distance = higher similarity)
             similarity = max(0, min(100, (1 - dist) * 100))
@@ -517,7 +525,7 @@ class HybridRAGQwen3_Module:
         semantic_results = self._perform_semantic_search(query, initial_k)
         
         if not semantic_results['documents'][0]:
-            self._print("⚠️  No results found in database")
+            self._print("[WARNING] No results found in database")
             return []
         
         # Step 2: Extract keywords from query
@@ -534,7 +542,7 @@ class HybridRAGQwen3_Module:
         filtered_results = self._filter_by_similarity(ranked_results)
         
         if not filtered_results:
-            self._print(f"⚠️  No results above similarity threshold ({self.min_similarity}%)")
+            self._print(f"[WARNING] No results above similarity threshold ({self.min_similarity}%)")
             return []
         
         # Step 6: Select final top-k from filtered and ranked results
@@ -544,7 +552,7 @@ class HybridRAGQwen3_Module:
         formatted_results = self._format_results_for_output(final_results, return_distances)
         
         elapsed = time.time() - start_time
-        self._print(f"✓ Found {len(formatted_results)} results in {elapsed:.2f}s")
+        self._print(f"[+] Found {len(formatted_results)} results in {elapsed:.2f}s")
         
         return formatted_results
     
@@ -621,7 +629,7 @@ def create_rag_system(
 
 
 # =============================================================================
-# MAIN FUNCTION AND INTERACTIVE MODE
+# MAIN FUNCTION 
 # =============================================================================
 
 def main():
@@ -630,54 +638,6 @@ def main():
         embedding_model=EMBEDDING_MODEL,
         db_path=DB_PATH
     )
-
-    # Start interactive mode
-    interactive_mode(rag_system.collection)
-
-# =============================================================================
-# INTERACTIVE MODE
-# =============================================================================
-
-def interactive_mode(collection):
-    rag_system = create_rag_system(
-        embedding_model=EMBEDDING_MODEL,
-        db_path=DB_PATH
-    )
-    
-    print("\n=== Hybrid RAG Interactive Search ===")
-    print("Type your query and press Enter. Type 'exit' to quit.\n")
-    
-    while True:
-        try:
-            query = input("Enter your search query: ").strip()
-            if query.lower() in {'exit', 'quit'}:
-                print("Exiting interactive mode.")
-                break
-            
-            results = rag_system.search(query, top_k=5, return_distances=True)
-            
-            if not results:
-                print("No results found.\n")
-                continue
-            
-            print(f"\nTop {len(results)} results:\n")
-            for res in results:
-                print(f"Rank: {res['rank']}")
-                print(f"Similarity Score: {res['similarity_score']:.2f}%")
-                print(f"Distance: {res.get('distance', 'N/A')}")
-                print(f"Keyword Score: {res['keyword_score']:.4f}")
-                print(f"Combined Score: {res['combined_score']:.4f}")
-                print(f"Source: {res['metadata'].get('source', 'Unknown')}")
-                print(f"Chunk Index: {res['metadata'].get('chunk_index', 'N/A')}")
-                print(f"Content:\n{res['content']}\n")
-                print("-" * 60)
-            
-        except KeyboardInterrupt:
-            print("\nExiting interactive mode.")
-            break
-        except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
-            continue
 
 if __name__ == "__main__":
     main()

@@ -101,8 +101,7 @@ def inference_internvl3_5_2b_picture_path(model, device, tokenizer, picture_path
         return pixel_values
 
 
-    # Load and process image with HIGHER RESOLUTION
-    # Increased max_num from 12 to 36 for more detail (can go up to 128)
+    # System prompt for detailed description
     question = "Describe the image in detail."
 
 

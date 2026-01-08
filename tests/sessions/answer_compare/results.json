@@ -1,0 +1,231 @@
+{
+  "evaluation_timestamp": "2025-11-26T13:31:27.656716",
+  "session_name": "test_session_InternVL3_5-2B-Q6_K_20251108_182903",
+  "gold_standard_path": "data\\test\\sonar_gold_standard_dataset.json",
+  "inference_log_path": "tests\\logs\\inference_log.jsonl",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "inference_index_used": -1,
+  "max_questions_limit": 5,
+  "total_questions_evaluated": 5,
+  "per_question_results": [
+    {
+      "question_id": 1,
+      "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+      "model_name": "Qwen3-8B-Q5_K_M",
+      "reference_length": 1665,
+      "generated_length": 3608,
+      "length_ratio": 2.166966966966967,
+      "response_time_seconds": 42.353373765945435,
+      "semantic_similarity": 0.8256120681762695,
+      "rouge_1_f": 0.4435590969455511,
+      "rouge_1_p": 0.3471933471933472,
+      "rouge_1_r": 0.6139705882352942,
+      "rouge_2_f": 0.15712383488681755,
+      "rouge_2_p": 0.12291666666666666,
+      "rouge_2_r": 0.2177121771217712,
+      "rouge_l_f": 0.21779548472775567,
+      "rouge_l_p": 0.1704781704781705,
+      "rouge_l_r": 0.3014705882352941,
+      "bleu_score": 0.044036293388483264,
+      "tfidf_similarity": 0.6681964484491404
+    },
+    {
+      "question_id": 2,
+      "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+      "model_name": "Qwen3-8B-Q5_K_M",
+      "reference_length": 1059,
+      "generated_length": 1762,
+      "length_ratio": 1.6638338054768649,
+      "response_time_seconds": 46.11050462722778,
+      "semantic_similarity": 0.951945960521698,
+      "rouge_1_f": 0.5485436893203883,
+      "rouge_1_p": 0.46311475409836067,
+      "rouge_1_r": 0.6726190476190477,
+      "rouge_2_f": 0.29268292682926833,
+      "rouge_2_p": 0.24691358024691357,
+      "rouge_2_r": 0.3592814371257485,
+      "rouge_l_f": 0.3786407766990292,
+      "rouge_l_p": 0.319672131147541,
+      "rouge_l_r": 0.4642857142857143,
+      "bleu_score": 0.17176577950497443,
+      "tfidf_similarity": 0.7064364918404822
+    },
+    {
+      "question_id": 3,
+      "question": "Where are DB2 install logs stored when I finished with the install?",
+      "model_name": "Qwen3-8B-Q5_K_M",
+      "reference_length": 824,
+      "generated_length": 1917,
+      "length_ratio": 2.3264563106796117,
+      "response_time_seconds": 29.512765407562256,
+      "semantic_similarity": 0.8377065658569336,
+      "rouge_1_f": 0.3263157894736842,
+      "rouge_1_p": 0.2540983606557377,
+      "rouge_1_r": 0.45588235294117646,
+      "rouge_2_f": 0.08465608465608465,
+      "rouge_2_p": 0.06584362139917696,
+      "rouge_2_r": 0.11851851851851852,
+      "rouge_l_f": 0.1631578947368421,
+      "rouge_l_p": 0.12704918032786885,
+      "rouge_l_r": 0.22794117647058823,
+      "bleu_score": 0.02734746908105466,
+      "tfidf_similarity": 0.28176861939997666
+    },
+    {
+      "question_id": 4,
+      "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+      "model_name": "Qwen3-8B-Q5_K_M",
+      "reference_length": 779,
+      "generated_length": 1537,
+      "length_ratio": 1.9730423620025674,
+      "response_time_seconds": 18.706047296524048,
+      "semantic_similarity": 0.83030766248703,
+      "rouge_1_f": 0.4166666666666667,
+      "rouge_1_p": 0.3153153153153153,
+      "rouge_1_r": 0.6140350877192983,
+      "rouge_2_f": 0.12574850299401197,
+      "rouge_2_p": 0.09502262443438914,
+      "rouge_2_r": 0.18584070796460178,
+      "rouge_l_f": 0.22023809523809523,
+      "rouge_l_p": 0.16666666666666666,
+      "rouge_l_r": 0.32456140350877194,
+      "bleu_score": 0.0700560096412657,
+      "tfidf_similarity": 0.5341944812708374
+    },
+    {
+      "question_id": 5,
+      "question": "I've completed the install of ISVD10 on RHEL, but when I try to use the \"idsldapsearch\" command from my bash shell, I'm presented with an error saying that there is no such command. I'm logged in as the user \"root\". What is the issue and how can I solve it?",
+      "model_name": "Qwen3-8B-Q5_K_M",
+      "reference_length": 970,
+      "generated_length": 3653,
+      "length_ratio": 3.765979381443299,
+      "response_time_seconds": 43.00610566139221,
+      "semantic_similarity": 0.9024351239204407,
+      "rouge_1_f": 0.3293051359516616,
+      "rouge_1_p": 0.2210953346855984,
+      "rouge_1_r": 0.6449704142011834,
+      "rouge_2_f": 0.10303030303030304,
+      "rouge_2_p": 0.06910569105691057,
+      "rouge_2_r": 0.20238095238095238,
+      "rouge_l_f": 0.16314199395770393,
+      "rouge_l_p": 0.10953346855983773,
+      "rouge_l_r": 0.31952662721893493,
+      "bleu_score": 0.0425623513596832,
+      "tfidf_similarity": 0.5535648891134947
+    }
+  ],
+  "aggregate_stats": {
+    "semantic_similarity": {
+      "mean": 0.8696014761924744,
+      "median": 0.8377065658569336,
+      "std": 0.04970919359840077,
+      "min": 0.8256120681762695,
+      "max": 0.951945960521698,
+      "count": 5
+    },
+    "rouge_1_f": {
+      "mean": 0.4128780756715904,
+      "median": 0.4166666666666667,
+      "std": 0.08226579223478636,
+      "min": 0.3263157894736842,
+      "max": 0.5485436893203883,
+      "count": 5
+    },
+    "rouge_1_p": {
+      "mean": 0.3201634223896718,
+      "median": 0.3153153153153153,
+      "std": 0.0841050326646805,
+      "min": 0.2210953346855984,
+      "max": 0.46311475409836067,
+      "count": 5
+    },
+    "rouge_1_r": {
+      "mean": 0.6002954981431999,
+      "median": 0.6140350877192983,
+      "std": 0.07544201064587357,
+      "min": 0.45588235294117646,
+      "max": 0.6726190476190477,
+      "count": 5
+    },
+    "rouge_2_f": {
+      "mean": 0.1526483304792971,
+      "median": 0.12574850299401197,
+      "std": 0.07407862468128372,
+      "min": 0.08465608465608465,
+      "max": 0.29268292682926833,
+      "count": 5
+    },
+    "rouge_2_p": {
+      "mean": 0.11996043676081139,
+      "median": 0.09502262443438914,
+      "std": 0.06672715981574613,
+      "min": 0.06584362139917696,
+      "max": 0.24691358024691357,
+      "count": 5
+    },
+    "rouge_2_r": {
+      "mean": 0.21674675862231849,
+      "median": 0.20238095238095238,
+      "std": 0.07890172890256188,
+      "min": 0.11851851851851852,
+      "max": 0.3592814371257485,
+      "count": 5
+    },
+    "rouge_l_f": {
+      "mean": 0.22859484907188526,
+      "median": 0.21779548472775567,
+      "std": 0.07907757360669392,
+      "min": 0.16314199395770393,
+      "max": 0.3786407766990292,
+      "count": 5
+    },
+    "rouge_l_p": {
+      "mean": 0.17867992343601694,
+      "median": 0.16666666666666666,
+      "std": 0.07421233803216348,
+      "min": 0.10953346855983773,
+      "max": 0.319672131147541,
+      "count": 5
+    },
+    "rouge_l_r": {
+      "mean": 0.3275571019438607,
+      "median": 0.31952662721893493,
+      "std": 0.0766446540493391,
+      "min": 0.22794117647058823,
+      "max": 0.4642857142857143,
+      "count": 5
+    },
+    "bleu_score": {
+      "mean": 0.07115358059509225,
+      "median": 0.044036293388483264,
+      "std": 0.052145566047552126,
+      "min": 0.02734746908105466,
+      "max": 0.17176577950497443,
+      "count": 5
+    },
+    "tfidf_similarity": {
+      "mean": 0.5488321860147862,
+      "median": 0.5535648891134947,
+      "std": 0.14875923759761023,
+      "min": 0.28176861939997666,
+      "max": 0.7064364918404822,
+      "count": 5
+    },
+    "length_ratio": {
+      "mean": 2.379255765313862,
+      "median": 2.166966966966967,
+      "std": 0.7276942508349368,
+      "min": 1.6638338054768649,
+      "max": 3.765979381443299,
+      "count": 5
+    },
+    "response_time_seconds": {
+      "mean": 35.93775935173035,
+      "median": 42.353373765945435,
+      "std": 10.322972651726722,
+      "min": 18.706047296524048,
+      "max": 46.11050462722778,
+      "count": 5
+    }
+  }
+}

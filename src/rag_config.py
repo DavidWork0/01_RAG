@@ -109,11 +109,36 @@ CHUNK_SIZE_MAX_BY_SENTENCE = 1000  # Max characters per chunk for sentence-based
 # DATABASE CONFIGURATION
 # =============================================================================
 
-# Collection name in ChromaDB
-COLLECTION_NAME = "documents"
+# Auto-generate collection name based on chunking settings
+def get_collection_name(chunk_strategy=None, chunk_size=None, overlap=None):
+    """
+    Generate collection name based on chunking configuration.
+    
+    Args:
+        chunk_strategy: Chunking strategy (defaults to CHUNK_STRATEGY)
+        chunk_size: Chunk size (defaults to FIXED_SIZE_CHUNK_SIZE or CHUNK_SIZE_MAX_BY_SENTENCE)
+        overlap: Overlap size (defaults to FIXED_SIZE_OVERLAP, only for fixed_size)
+    
+    Returns:
+        Collection name string
+    """
+    chunk_strategy = chunk_strategy or CHUNK_STRATEGY
+    
+    if chunk_strategy == "fixed_size":
+        chunk_size = chunk_size or FIXED_SIZE_CHUNK_SIZE
+        overlap = overlap or FIXED_SIZE_OVERLAP
+        return f"docs_{chunk_strategy}_{chunk_size}_{overlap}"
+    elif chunk_strategy == "by_sentence":
+        chunk_size = chunk_size or CHUNK_SIZE_MAX_BY_SENTENCE
+        return f"docs_{chunk_strategy}_{chunk_size}"
+    else:
+        return "documents"
+
+# Collection name in ChromaDB (dynamically generated)
+COLLECTION_NAME = get_collection_name()
 
 # Auto-generate database path based on settings
-def get_db_path(chunk_strategy=None, embedding_model=None, embedding_dim=None, cleaned=True):
+def get_db_path(chunk_strategy=None, embedding_model=None, embedding_dim=None, chunk_size=None, overlap=None, cleaned=True):
     """
     Generate database path based on configuration.
     
@@ -121,6 +146,8 @@ def get_db_path(chunk_strategy=None, embedding_model=None, embedding_dim=None, c
         chunk_strategy: Chunking strategy (defaults to CHUNK_STRATEGY)
         embedding_model: Model name (defaults to EMBEDDING_MODEL)
         embedding_dim: Embedding dimension (defaults to EMBEDDING_DIMENSION)
+        chunk_size: Chunk size (defaults based on strategy)
+        overlap: Overlap size (defaults to FIXED_SIZE_OVERLAP, only for fixed_size)
         cleaned: Whether using cleaned data (defaults to True)
     
     Returns:
@@ -130,7 +157,17 @@ def get_db_path(chunk_strategy=None, embedding_model=None, embedding_dim=None, c
     embedding_model = embedding_model or EMBEDDING_MODEL
     embedding_dim = embedding_dim or EMBEDDING_DIMENSION
     
-    db_type = f"chroma_db_{chunk_strategy}_{embedding_model.replace('/', '_')}_{embedding_dim}"
+    # Build the db_type with chunking parameters
+    if chunk_strategy == "fixed_size":
+        chunk_size = chunk_size or FIXED_SIZE_CHUNK_SIZE
+        overlap = overlap or FIXED_SIZE_OVERLAP
+        db_type = f"chroma_db_{chunk_strategy}_{embedding_model.replace('/', '_')}_{embedding_dim}_{chunk_size}_{overlap}"
+    elif chunk_strategy == "by_sentence":
+        chunk_size = chunk_size or CHUNK_SIZE_MAX_BY_SENTENCE
+        db_type = f"chroma_db_{chunk_strategy}_{embedding_model.replace('/', '_')}_{embedding_dim}_{chunk_size}"
+    else:
+        db_type = f"chroma_db_{chunk_strategy}_{embedding_model.replace('/', '_')}_{embedding_dim}"
+    
     if cleaned:
         db_type += "_cleaned"
     
@@ -147,14 +184,14 @@ DEFAULT_DB_PATH = get_db_path()
 # Recommended values:
 # - 20-25 for Qwen3-0.6B with 6-8GB VRAM
 # - 100 for Qwen3-0.6B with 12GB+ VRAM
-BATCH_SIZE = 50
+BATCH_SIZE = 10
 
 # =============================================================================
 # SEARCH CONFIGURATION - HYBRID RAG
 # =============================================================================
 
 # Default number of results to retrieve
-DEFAULT_TOP_K = 25
+DEFAULT_TOP_K = 20
 
 # Minimum similarity score threshold (0-100)
 # Results with similarity scores below this threshold will be filtered out

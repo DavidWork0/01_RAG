@@ -1,0 +1,108 @@
+2025-12-01 18:03:02,830 - INFO - ============================================================
+2025-12-01 18:03:02,830 - INFO - CHUNKING AND EMBEDDINGS DATABASE CREATION
+2025-12-01 18:03:02,830 - INFO - Log file: e:\00_SW\01_RAG\tests\logs\embeddings\chunking_by_sentence_1500_20251201_180302.log
+2025-12-01 18:03:02,830 - INFO - ============================================================
+2025-12-01 18:03:02,830 - INFO - [1/4] Loading embedding model...
+2025-12-01 18:03:02,830 - INFO - Device: cuda, Torch dtype: torch.float16
+2025-12-01 18:03:02,832 - INFO - Model cache directory: e:\00_SW\01_RAG\models\huggingface
+2025-12-01 18:03:04,803 - INFO - Embedding model loaded in 1.97s
+2025-12-01 18:03:04,804 - INFO -   Model: Qwen/Qwen3-Embedding-0.6B
+2025-12-01 18:03:04,804 - INFO -   Embedding dimension: 1024
+2025-12-01 18:03:04,804 - INFO - [2/4] Setting up vector database...
+2025-12-01 18:03:04,804 - INFO - Creating new collection...
+2025-12-01 18:03:04,804 - INFO - Creating Embeddings Database from folder: e:\00_SW\01_RAG\data\output\final_merged\cleaned to db path: e:\00_SW\01_RAG\data\output\chroma_db_by_sentence_Qwen_Qwen3-Embedding-0.6B_1024_1500_cleaned
+2025-12-01 18:03:04,819 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-12-01 18:03:04,876 - INFO - Collection name: docs_by_sentence_1500
+2025-12-01 18:03:04,887 - INFO - Loaded 2 documents
+2025-12-01 18:03:04,887 - INFO - Starting document chunking...
+2025-12-01 18:03:05,220 - INFO -   Galaxy_Image_Classification_Based_on_Citizen_Science_Data_A_Comparative_Study_autoencoder_final.txt: 105815 chars -> 74 chunks
+2025-12-01 18:03:05,630 - INFO -   svd_10_0_3_documentation_final.txt: 5427259 chars -> 3764 chunks
+2025-12-01 18:03:05,631 - INFO - Created 3838 total chunks from 2 documents
+2025-12-01 18:03:05,631 - INFO - Chunk size statistics: min=111, max=52485, avg=1436.4
+2025-12-01 18:03:05,632 - INFO - Adding chunks to database in batches of 50...
+2025-12-01 18:03:07,147 - INFO -   Progress: 50/3838 chunks added
+2025-12-01 18:03:08,812 - INFO -   Progress: 100/3838 chunks added
+2025-12-01 18:03:10,441 - INFO -   Progress: 150/3838 chunks added
+2025-12-01 18:03:12,064 - INFO -   Progress: 200/3838 chunks added
+2025-12-01 18:03:13,692 - INFO -   Progress: 250/3838 chunks added
+2025-12-01 18:03:15,106 - INFO -   Progress: 300/3838 chunks added
+2025-12-01 18:03:16,176 - INFO -   Progress: 350/3838 chunks added
+2025-12-01 18:03:17,715 - INFO -   Progress: 400/3838 chunks added
+2025-12-01 18:03:19,123 - INFO -   Progress: 450/3838 chunks added
+2025-12-01 18:03:20,604 - INFO -   Progress: 500/3838 chunks added
+2025-12-01 18:03:22,249 - INFO -   Progress: 550/3838 chunks added
+2025-12-01 18:03:23,888 - INFO -   Progress: 600/3838 chunks added
+2025-12-01 18:03:25,525 - INFO -   Progress: 650/3838 chunks added
+2025-12-01 18:03:27,164 - INFO -   Progress: 700/3838 chunks added
+2025-12-01 18:03:28,559 - INFO -   Progress: 750/3838 chunks added
+2025-12-01 18:03:30,204 - INFO -   Progress: 800/3838 chunks added
+2025-12-01 18:03:31,780 - INFO -   Progress: 850/3838 chunks added
+2025-12-01 18:03:33,417 - INFO -   Progress: 900/3838 chunks added
+2025-12-01 18:03:35,053 - INFO -   Progress: 950/3838 chunks added
+2025-12-01 18:03:36,711 - INFO -   Progress: 1000/3838 chunks added
+2025-12-01 18:03:38,348 - INFO -   Progress: 1050/3838 chunks added
+2025-12-01 18:03:39,838 - INFO -   Progress: 1100/3838 chunks added
+2025-12-01 18:03:41,478 - INFO -   Progress: 1150/3838 chunks added
+2025-12-01 18:03:43,114 - INFO -   Progress: 1200/3838 chunks added
+2025-12-01 18:03:44,409 - INFO -   Progress: 1250/3838 chunks added
+2025-12-01 18:03:45,668 - INFO -   Progress: 1300/3838 chunks added
+2025-12-01 18:03:47,296 - INFO -   Progress: 1350/3838 chunks added
+2025-12-01 18:03:48,932 - INFO -   Progress: 1400/3838 chunks added
+2025-12-01 18:03:50,563 - INFO -   Progress: 1450/3838 chunks added
+2025-12-01 18:03:51,825 - INFO -   Progress: 1500/3838 chunks added
+2025-12-01 18:03:53,292 - INFO -   Progress: 1550/3838 chunks added
+2025-12-01 18:03:54,499 - INFO -   Progress: 1600/3838 chunks added
+2025-12-01 18:03:56,135 - INFO -   Progress: 1650/3838 chunks added
+2025-12-01 18:03:57,773 - INFO -   Progress: 1700/3838 chunks added
+2025-12-01 18:03:59,414 - INFO -   Progress: 1750/3838 chunks added
+2025-12-01 18:04:01,060 - INFO -   Progress: 1800/3838 chunks added
+2025-12-01 18:04:02,698 - INFO -   Progress: 1850/3838 chunks added
+2025-12-01 18:04:03,903 - INFO -   Progress: 1900/3838 chunks added
+2025-12-01 18:04:05,235 - INFO -   Progress: 1950/3838 chunks added
+2025-12-01 18:04:06,600 - INFO -   Progress: 2000/3838 chunks added
+2025-12-01 18:04:08,229 - INFO -   Progress: 2050/3838 chunks added
+2025-12-01 18:04:09,684 - INFO -   Progress: 2100/3838 chunks added
+2025-12-01 18:04:11,330 - INFO -   Progress: 2150/3838 chunks added
+2025-12-01 18:04:12,973 - INFO -   Progress: 2200/3838 chunks added
+2025-12-01 18:04:14,606 - INFO -   Progress: 2250/3838 chunks added
+2025-12-01 18:04:16,013 - INFO -   Progress: 2300/3838 chunks added
+2025-12-01 18:04:17,666 - INFO -   Progress: 2350/3838 chunks added
+2025-12-01 18:04:19,187 - INFO -   Progress: 2400/3838 chunks added
+2025-12-01 18:04:20,652 - INFO -   Progress: 2450/3838 chunks added
+2025-12-01 18:04:22,138 - INFO -   Progress: 2500/3838 chunks added
+2025-12-01 18:04:23,295 - INFO -   Progress: 2550/3838 chunks added
+2025-12-01 18:04:24,424 - INFO -   Progress: 2600/3838 chunks added
+2025-12-01 18:04:25,605 - INFO -   Progress: 2650/3838 chunks added
+2025-12-01 18:04:26,883 - INFO -   Progress: 2700/3838 chunks added
+2025-12-01 18:04:28,212 - INFO -   Progress: 2750/3838 chunks added
+2025-12-01 18:04:29,424 - INFO -   Progress: 2800/3838 chunks added
+2025-12-01 18:04:30,845 - INFO -   Progress: 2850/3838 chunks added
+2025-12-01 18:04:32,179 - INFO -   Progress: 2900/3838 chunks added
+2025-12-01 18:04:33,259 - INFO -   Progress: 2950/3838 chunks added
+2025-12-01 18:04:34,414 - INFO -   Progress: 3000/3838 chunks added
+2025-12-01 18:04:36,050 - INFO -   Progress: 3050/3838 chunks added
+2025-12-01 18:04:37,606 - INFO -   Progress: 3100/3838 chunks added
+2025-12-01 18:04:39,285 - INFO -   Progress: 3150/3838 chunks added
+2025-12-01 18:04:40,852 - INFO -   Progress: 3200/3838 chunks added
+2025-12-01 18:04:42,482 - INFO -   Progress: 3250/3838 chunks added
+2025-12-01 18:04:44,154 - INFO -   Progress: 3300/3838 chunks added
+2025-12-01 18:04:45,592 - INFO -   Progress: 3350/3838 chunks added
+2025-12-01 18:04:47,200 - INFO -   Progress: 3400/3838 chunks added
+2025-12-01 18:04:48,840 - INFO -   Progress: 3450/3838 chunks added
+2025-12-01 18:04:50,499 - INFO -   Progress: 3500/3838 chunks added
+2025-12-01 18:04:52,153 - INFO -   Progress: 3550/3838 chunks added
+2025-12-01 18:04:53,801 - INFO -   Progress: 3600/3838 chunks added
+2025-12-01 18:04:55,359 - INFO -   Progress: 3650/3838 chunks added
+2025-12-01 18:04:57,002 - INFO -   Progress: 3700/3838 chunks added
+2025-12-01 18:04:58,651 - INFO -   Progress: 3750/3838 chunks added
+2025-12-01 18:05:00,299 - INFO -   Progress: 3800/3838 chunks added
+2025-12-01 18:05:01,553 - INFO -   Progress: 3838/3838 chunks added
+2025-12-01 18:05:01,553 - INFO - Successfully added 3838 chunks to the database
+2025-12-01 18:05:01,554 - INFO - Database ready in 116.75s
+2025-12-01 18:05:01,554 - INFO - By sentence chunking strategy applied
+2025-12-01 18:05:01,554 - INFO - Total time taken: 118.73s | CHUNKING_STRATEGY: by_sentence, BATCH_SIZE: 50
+2025-12-01 18:05:01,566 - INFO - Collection ready with 3838 chunks
+2025-12-01 18:05:01,566 - INFO - ============================================================
+2025-12-01 18:05:01,566 - INFO - CHUNKING PROCESS COMPLETED SUCCESSFULLY
+2025-12-01 18:05:01,567 - INFO - Log saved to: e:\00_SW\01_RAG\tests\logs\embeddings\chunking_by_sentence_1500_20251201_180302.log
+2025-12-01 18:05:01,567 - INFO - ============================================================

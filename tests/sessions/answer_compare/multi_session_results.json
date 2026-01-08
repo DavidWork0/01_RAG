@@ -1,0 +1,628 @@
+{
+  "evaluation_timestamp": "2025-11-26T14:12:00.986619",
+  "gold_standard_path": "data\\test\\sonar-reasoning-pro_gold_standard_dataset.json",
+  "inference_log_path": "tests\\logs\\inference_log.jsonl",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "num_sessions_evaluated": 3,
+  "max_questions_limit": 5,
+  "sessions": [
+    {
+      "session_number": 1,
+      "inference_index": -1,
+      "session_name": "test_session_Qwen3-8B-Q5_K_M_20251125_113431",
+      "total_questions_evaluated": 4,
+      "per_question_results": [
+        {
+          "question_id": 1,
+          "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 897,
+          "generated_length": 3608,
+          "length_ratio": 4.022296544035674,
+          "response_time_seconds": 42.353373765945435,
+          "semantic_similarity": 0.8124222159385681,
+          "rouge_1_f": 0.28013029315960913,
+          "rouge_1_p": 0.1787941787941788,
+          "rouge_1_r": 0.6466165413533834,
+          "rouge_2_f": 0.08823529411764706,
+          "rouge_2_p": 0.05625,
+          "rouge_2_r": 0.20454545454545456,
+          "rouge_l_f": 0.15309446254071662,
+          "rouge_l_p": 0.09771309771309772,
+          "rouge_l_r": 0.3533834586466165,
+          "bleu_score": 0.031130850771726,
+          "tfidf_similarity": 0.5296429040828802
+        },
+        {
+          "question_id": 2,
+          "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1068,
+          "generated_length": 1762,
+          "length_ratio": 1.649812734082397,
+          "response_time_seconds": 46.11050462722778,
+          "semantic_similarity": 0.9575371742248535,
+          "rouge_1_f": 0.562962962962963,
+          "rouge_1_p": 0.4672131147540984,
+          "rouge_1_r": 0.7080745341614907,
+          "rouge_2_f": 0.2729528535980149,
+          "rouge_2_p": 0.22633744855967078,
+          "rouge_2_r": 0.34375,
+          "rouge_l_f": 0.36049382716049383,
+          "rouge_l_p": 0.29918032786885246,
+          "rouge_l_r": 0.453416149068323,
+          "bleu_score": 0.1847263147710172,
+          "tfidf_similarity": 0.7163041332657328
+        },
+        {
+          "question_id": 3,
+          "question": "Where are DB2 install logs stored when I finished with the install?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1090,
+          "generated_length": 1917,
+          "length_ratio": 1.7587155963302752,
+          "response_time_seconds": 29.512765407562256,
+          "semantic_similarity": 0.6622779965400696,
+          "rouge_1_f": 0.41277641277641275,
+          "rouge_1_p": 0.3442622950819672,
+          "rouge_1_r": 0.5153374233128835,
+          "rouge_2_f": 0.15802469135802472,
+          "rouge_2_p": 0.13168724279835392,
+          "rouge_2_r": 0.19753086419753085,
+          "rouge_l_f": 0.20638820638820637,
+          "rouge_l_p": 0.1721311475409836,
+          "rouge_l_r": 0.25766871165644173,
+          "bleu_score": 0.06173684300892575,
+          "tfidf_similarity": 0.36210891571338716
+        },
+        {
+          "question_id": 4,
+          "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 429,
+          "generated_length": 1537,
+          "length_ratio": 3.582750582750583,
+          "response_time_seconds": 18.706047296524048,
+          "semantic_similarity": 0.800372302532196,
+          "rouge_1_f": 0.343859649122807,
+          "rouge_1_p": 0.22072072072072071,
+          "rouge_1_r": 0.7777777777777778,
+          "rouge_2_f": 0.1837455830388693,
+          "rouge_2_p": 0.11764705882352941,
+          "rouge_2_r": 0.41935483870967744,
+          "rouge_l_f": 0.2596491228070175,
+          "rouge_l_p": 0.16666666666666666,
+          "rouge_l_r": 0.5873015873015873,
+          "bleu_score": 0.08618079256517791,
+          "tfidf_similarity": 0.6471909858481052
+        }
+      ],
+      "aggregate_stats": {
+        "semantic_similarity": {
+          "mean": 0.8081524223089218,
+          "median": 0.8063972592353821,
+          "std": 0.10449152310086786,
+          "min": 0.6622779965400696,
+          "max": 0.9575371742248535,
+          "count": 4
+        },
+        "rouge_1_f": {
+          "mean": 0.39993232950544794,
+          "median": 0.37831803094960986,
+          "std": 0.10516728497795023,
+          "min": 0.28013029315960913,
+          "max": 0.562962962962963,
+          "count": 4
+        },
+        "rouge_1_p": {
+          "mean": 0.30274757733774127,
+          "median": 0.282491507901344,
+          "std": 0.11276661186273444,
+          "min": 0.1787941787941788,
+          "max": 0.4672131147540984,
+          "count": 4
+        },
+        "rouge_1_r": {
+          "mean": 0.6619515691513839,
+          "median": 0.6773455377574371,
+          "std": 0.0965322605966614,
+          "min": 0.5153374233128835,
+          "max": 0.7777777777777778,
+          "count": 4
+        },
+        "rouge_2_f": {
+          "mean": 0.175739605528139,
+          "median": 0.170885137198447,
+          "std": 0.06611606078646175,
+          "min": 0.08823529411764706,
+          "max": 0.2729528535980149,
+          "count": 4
+        },
+        "rouge_2_p": {
+          "mean": 0.13298043754538852,
+          "median": 0.12466715081094167,
+          "std": 0.06090951569153483,
+          "min": 0.05625,
+          "max": 0.22633744855967078,
+          "count": 4
+        },
+        "rouge_2_r": {
+          "mean": 0.29129528936316573,
+          "median": 0.2741477272727273,
+          "std": 0.09416481045800469,
+          "min": 0.19753086419753085,
+          "max": 0.41935483870967744,
+          "count": 4
+        },
+        "rouge_l_f": {
+          "mean": 0.24490640472410857,
+          "median": 0.23301866459761195,
+          "std": 0.07663368106206617,
+          "min": 0.15309446254071662,
+          "max": 0.36049382716049383,
+          "count": 4
+        },
+        "rouge_l_p": {
+          "mean": 0.1839228099474001,
+          "median": 0.16939890710382513,
+          "std": 0.07272074618732821,
+          "min": 0.09771309771309772,
+          "max": 0.29918032786885246,
+          "count": 4
+        },
+        "rouge_l_r": {
+          "mean": 0.41294247666824213,
+          "median": 0.40339980385746976,
+          "std": 0.12216427090913316,
+          "min": 0.25766871165644173,
+          "max": 0.5873015873015873,
+          "count": 4
+        },
+        "bleu_score": {
+          "mean": 0.09094370027921171,
+          "median": 0.07395881778705182,
+          "std": 0.05755102420596656,
+          "min": 0.031130850771726,
+          "max": 0.1847263147710172,
+          "count": 4
+        },
+        "tfidf_similarity": {
+          "mean": 0.5638117347275263,
+          "median": 0.5884169449654927,
+          "std": 0.1342177031125522,
+          "min": 0.36210891571338716,
+          "max": 0.7163041332657328,
+          "count": 4
+        },
+        "length_ratio": {
+          "mean": 2.753393864299732,
+          "median": 2.670733089540429,
+          "std": 1.061275499672812,
+          "min": 1.649812734082397,
+          "max": 4.022296544035674,
+          "count": 4
+        },
+        "response_time_seconds": {
+          "mean": 34.17067277431488,
+          "median": 35.933069586753845,
+          "std": 10.843972085908499,
+          "min": 18.706047296524048,
+          "max": 46.11050462722778,
+          "count": 4
+        }
+      }
+    },
+    {
+      "session_number": 2,
+      "inference_index": -2,
+      "session_name": "test_session_Qwen3-8B-Q5_K_M_20251121_121533",
+      "total_questions_evaluated": 4,
+      "per_question_results": [
+        {
+          "question_id": 1,
+          "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 897,
+          "generated_length": 3608,
+          "length_ratio": 4.022296544035674,
+          "response_time_seconds": 41.79087567329407,
+          "semantic_similarity": 0.8124222159385681,
+          "rouge_1_f": 0.28013029315960913,
+          "rouge_1_p": 0.1787941787941788,
+          "rouge_1_r": 0.6466165413533834,
+          "rouge_2_f": 0.08823529411764706,
+          "rouge_2_p": 0.05625,
+          "rouge_2_r": 0.20454545454545456,
+          "rouge_l_f": 0.15309446254071662,
+          "rouge_l_p": 0.09771309771309772,
+          "rouge_l_r": 0.3533834586466165,
+          "bleu_score": 0.031130850771726,
+          "tfidf_similarity": 0.5296429040828802
+        },
+        {
+          "question_id": 2,
+          "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1068,
+          "generated_length": 1878,
+          "length_ratio": 1.7584269662921348,
+          "response_time_seconds": 31.29916739463806,
+          "semantic_similarity": 0.9399983882904053,
+          "rouge_1_f": 0.5644768856447689,
+          "rouge_1_p": 0.464,
+          "rouge_1_r": 0.7204968944099379,
+          "rouge_2_f": 0.28850855745721277,
+          "rouge_2_p": 0.23694779116465864,
+          "rouge_2_r": 0.36875,
+          "rouge_l_f": 0.38442822384428227,
+          "rouge_l_p": 0.316,
+          "rouge_l_r": 0.4906832298136646,
+          "bleu_score": 0.1933329418538391,
+          "tfidf_similarity": 0.7312181472238624
+        },
+        {
+          "question_id": 3,
+          "question": "Where are DB2 install logs stored when I finished with the install?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1090,
+          "generated_length": 1917,
+          "length_ratio": 1.7587155963302752,
+          "response_time_seconds": 29.4598491191864,
+          "semantic_similarity": 0.6622779965400696,
+          "rouge_1_f": 0.41277641277641275,
+          "rouge_1_p": 0.3442622950819672,
+          "rouge_1_r": 0.5153374233128835,
+          "rouge_2_f": 0.15802469135802472,
+          "rouge_2_p": 0.13168724279835392,
+          "rouge_2_r": 0.19753086419753085,
+          "rouge_l_f": 0.20638820638820637,
+          "rouge_l_p": 0.1721311475409836,
+          "rouge_l_r": 0.25766871165644173,
+          "bleu_score": 0.06173684300892575,
+          "tfidf_similarity": 0.36210891571338716
+        },
+        {
+          "question_id": 4,
+          "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 429,
+          "generated_length": 1537,
+          "length_ratio": 3.582750582750583,
+          "response_time_seconds": 18.69374370574951,
+          "semantic_similarity": 0.800372302532196,
+          "rouge_1_f": 0.343859649122807,
+          "rouge_1_p": 0.22072072072072071,
+          "rouge_1_r": 0.7777777777777778,
+          "rouge_2_f": 0.1837455830388693,
+          "rouge_2_p": 0.11764705882352941,
+          "rouge_2_r": 0.41935483870967744,
+          "rouge_l_f": 0.2596491228070175,
+          "rouge_l_p": 0.16666666666666666,
+          "rouge_l_r": 0.5873015873015873,
+          "bleu_score": 0.08618079256517791,
+          "tfidf_similarity": 0.6471909858481052
+        }
+      ],
+      "aggregate_stats": {
+        "semantic_similarity": {
+          "mean": 0.8037677258253098,
+          "median": 0.8063972592353821,
+          "std": 0.09831653725003393,
+          "min": 0.6622779965400696,
+          "max": 0.9399983882904053,
+          "count": 4
+        },
+        "rouge_1_f": {
+          "mean": 0.4003108101758995,
+          "median": 0.37831803094960986,
+          "std": 0.1057544110635456,
+          "min": 0.28013029315960913,
+          "max": 0.5644768856447689,
+          "count": 4
+        },
+        "rouge_1_p": {
+          "mean": 0.3019442986492167,
+          "median": 0.282491507901344,
+          "std": 0.11159758598889272,
+          "min": 0.1787941787941788,
+          "max": 0.464,
+          "count": 4
+        },
+        "rouge_1_r": {
+          "mean": 0.6650571592134956,
+          "median": 0.6835567178816606,
+          "std": 0.09815237871974598,
+          "min": 0.5153374233128835,
+          "max": 0.7777777777777778,
+          "count": 4
+        },
+        "rouge_2_f": {
+          "mean": 0.17962853149293845,
+          "median": 0.170885137198447,
+          "std": 0.07192228429687869,
+          "min": 0.08823529411764706,
+          "max": 0.28850855745721277,
+          "count": 4
+        },
+        "rouge_2_p": {
+          "mean": 0.1356330231966355,
+          "median": 0.12466715081094167,
+          "std": 0.06501040431660544,
+          "min": 0.05625,
+          "max": 0.23694779116465864,
+          "count": 4
+        },
+        "rouge_2_r": {
+          "mean": 0.2975452893631657,
+          "median": 0.2866477272727273,
+          "std": 0.09818290539372106,
+          "min": 0.19753086419753085,
+          "max": 0.41935483870967744,
+          "count": 4
+        },
+        "rouge_l_f": {
+          "mean": 0.25089000389505567,
+          "median": 0.23301866459761195,
+          "std": 0.08581019205410678,
+          "min": 0.15309446254071662,
+          "max": 0.38442822384428227,
+          "count": 4
+        },
+        "rouge_l_p": {
+          "mean": 0.18812772798018698,
+          "median": 0.16939890710382513,
+          "std": 0.07943958562375261,
+          "min": 0.09771309771309772,
+          "max": 0.316,
+          "count": 4
+        },
+        "rouge_l_r": {
+          "mean": 0.4222592468545775,
+          "median": 0.42203334423014055,
+          "std": 0.12624849906265104,
+          "min": 0.25766871165644173,
+          "max": 0.5873015873015873,
+          "count": 4
+        },
+        "bleu_score": {
+          "mean": 0.09309535704991719,
+          "median": 0.07395881778705182,
+          "std": 0.0610703304610678,
+          "min": 0.031130850771726,
+          "max": 0.1933329418538391,
+          "count": 4
+        },
+        "tfidf_similarity": {
+          "mean": 0.5675402382170588,
+          "median": 0.5884169449654927,
+          "std": 0.13853964747961975,
+          "min": 0.36210891571338716,
+          "max": 0.7312181472238624,
+          "count": 4
+        },
+        "length_ratio": {
+          "mean": 2.780547422352167,
+          "median": 2.670733089540429,
+          "std": 1.0337240080314678,
+          "min": 1.7584269662921348,
+          "max": 4.022296544035674,
+          "count": 4
+        },
+        "response_time_seconds": {
+          "mean": 30.31090897321701,
+          "median": 30.37950825691223,
+          "std": 8.192208521961332,
+          "min": 18.69374370574951,
+          "max": 41.79087567329407,
+          "count": 4
+        }
+      }
+    },
+    {
+      "session_number": 3,
+      "inference_index": -3,
+      "session_name": "test_session_Qwen3-8B-Q5_K_M_20251121_080738",
+      "total_questions_evaluated": 4,
+      "per_question_results": [
+        {
+          "question_id": 1,
+          "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 897,
+          "generated_length": 3608,
+          "length_ratio": 4.022296544035674,
+          "response_time_seconds": 42.165722370147705,
+          "semantic_similarity": 0.8124222159385681,
+          "rouge_1_f": 0.28013029315960913,
+          "rouge_1_p": 0.1787941787941788,
+          "rouge_1_r": 0.6466165413533834,
+          "rouge_2_f": 0.08823529411764706,
+          "rouge_2_p": 0.05625,
+          "rouge_2_r": 0.20454545454545456,
+          "rouge_l_f": 0.15309446254071662,
+          "rouge_l_p": 0.09771309771309772,
+          "rouge_l_r": 0.3533834586466165,
+          "bleu_score": 0.031130850771726,
+          "tfidf_similarity": 0.5296429040828802
+        },
+        {
+          "question_id": 2,
+          "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1068,
+          "generated_length": 1878,
+          "length_ratio": 1.7584269662921348,
+          "response_time_seconds": 31.155508756637573,
+          "semantic_similarity": 0.9399983882904053,
+          "rouge_1_f": 0.5644768856447689,
+          "rouge_1_p": 0.464,
+          "rouge_1_r": 0.7204968944099379,
+          "rouge_2_f": 0.28850855745721277,
+          "rouge_2_p": 0.23694779116465864,
+          "rouge_2_r": 0.36875,
+          "rouge_l_f": 0.38442822384428227,
+          "rouge_l_p": 0.316,
+          "rouge_l_r": 0.4906832298136646,
+          "bleu_score": 0.1933329418538391,
+          "tfidf_similarity": 0.7312181472238624
+        },
+        {
+          "question_id": 3,
+          "question": "Where are DB2 install logs stored when I finished with the install?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1090,
+          "generated_length": 1917,
+          "length_ratio": 1.7587155963302752,
+          "response_time_seconds": 29.366905689239502,
+          "semantic_similarity": 0.6622779965400696,
+          "rouge_1_f": 0.41277641277641275,
+          "rouge_1_p": 0.3442622950819672,
+          "rouge_1_r": 0.5153374233128835,
+          "rouge_2_f": 0.15802469135802472,
+          "rouge_2_p": 0.13168724279835392,
+          "rouge_2_r": 0.19753086419753085,
+          "rouge_l_f": 0.20638820638820637,
+          "rouge_l_p": 0.1721311475409836,
+          "rouge_l_r": 0.25766871165644173,
+          "bleu_score": 0.06173684300892575,
+          "tfidf_similarity": 0.36210891571338716
+        },
+        {
+          "question_id": 4,
+          "question": "I'd like to establish replication between two fresh installs of ISVD10. I'd like these servers to replicate modifications to each other, like they are both \"masters\". What is the name of this topology setup?",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 429,
+          "generated_length": 1537,
+          "length_ratio": 3.582750582750583,
+          "response_time_seconds": 18.615544080734253,
+          "semantic_similarity": 0.800372302532196,
+          "rouge_1_f": 0.343859649122807,
+          "rouge_1_p": 0.22072072072072071,
+          "rouge_1_r": 0.7777777777777778,
+          "rouge_2_f": 0.1837455830388693,
+          "rouge_2_p": 0.11764705882352941,
+          "rouge_2_r": 0.41935483870967744,
+          "rouge_l_f": 0.2596491228070175,
+          "rouge_l_p": 0.16666666666666666,
+          "rouge_l_r": 0.5873015873015873,
+          "bleu_score": 0.08618079256517791,
+          "tfidf_similarity": 0.6471909858481052
+        }
+      ],
+      "aggregate_stats": {
+        "semantic_similarity": {
+          "mean": 0.8037677258253098,
+          "median": 0.8063972592353821,
+          "std": 0.09831653725003393,
+          "min": 0.6622779965400696,
+          "max": 0.9399983882904053,
+          "count": 4
+        },
+        "rouge_1_f": {
+          "mean": 0.4003108101758995,
+          "median": 0.37831803094960986,
+          "std": 0.1057544110635456,
+          "min": 0.28013029315960913,
+          "max": 0.5644768856447689,
+          "count": 4
+        },
+        "rouge_1_p": {
+          "mean": 0.3019442986492167,
+          "median": 0.282491507901344,
+          "std": 0.11159758598889272,
+          "min": 0.1787941787941788,
+          "max": 0.464,
+          "count": 4
+        },
+        "rouge_1_r": {
+          "mean": 0.6650571592134956,
+          "median": 0.6835567178816606,
+          "std": 0.09815237871974598,
+          "min": 0.5153374233128835,
+          "max": 0.7777777777777778,
+          "count": 4
+        },
+        "rouge_2_f": {
+          "mean": 0.17962853149293845,
+          "median": 0.170885137198447,
+          "std": 0.07192228429687869,
+          "min": 0.08823529411764706,
+          "max": 0.28850855745721277,
+          "count": 4
+        },
+        "rouge_2_p": {
+          "mean": 0.1356330231966355,
+          "median": 0.12466715081094167,
+          "std": 0.06501040431660544,
+          "min": 0.05625,
+          "max": 0.23694779116465864,
+          "count": 4
+        },
+        "rouge_2_r": {
+          "mean": 0.2975452893631657,
+          "median": 0.2866477272727273,
+          "std": 0.09818290539372106,
+          "min": 0.19753086419753085,
+          "max": 0.41935483870967744,
+          "count": 4
+        },
+        "rouge_l_f": {
+          "mean": 0.25089000389505567,
+          "median": 0.23301866459761195,
+          "std": 0.08581019205410678,
+          "min": 0.15309446254071662,
+          "max": 0.38442822384428227,
+          "count": 4
+        },
+        "rouge_l_p": {
+          "mean": 0.18812772798018698,
+          "median": 0.16939890710382513,
+          "std": 0.07943958562375261,
+          "min": 0.09771309771309772,
+          "max": 0.316,
+          "count": 4
+        },
+        "rouge_l_r": {
+          "mean": 0.4222592468545775,
+          "median": 0.42203334423014055,
+          "std": 0.12624849906265104,
+          "min": 0.25766871165644173,
+          "max": 0.5873015873015873,
+          "count": 4
+        },
+        "bleu_score": {
+          "mean": 0.09309535704991719,
+          "median": 0.07395881778705182,
+          "std": 0.0610703304610678,
+          "min": 0.031130850771726,
+          "max": 0.1933329418538391,
+          "count": 4
+        },
+        "tfidf_similarity": {
+          "mean": 0.5675402382170588,
+          "median": 0.5884169449654927,
+          "std": 0.13853964747961975,
+          "min": 0.36210891571338716,
+          "max": 0.7312181472238624,
+          "count": 4
+        },
+        "length_ratio": {
+          "mean": 2.780547422352167,
+          "median": 2.670733089540429,
+          "std": 1.0337240080314678,
+          "min": 1.7584269662921348,
+          "max": 4.022296544035674,
+          "count": 4
+        },
+        "response_time_seconds": {
+          "mean": 30.32592022418976,
+          "median": 30.261207222938538,
+          "std": 8.350475290186436,
+          "min": 18.615544080734253,
+          "max": 42.165722370147705,
+          "count": 4
+        }
+      }
+    }
+  ]
+}

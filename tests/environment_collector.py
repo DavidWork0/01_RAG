@@ -384,7 +384,7 @@ def main():
         filter_sensitive=not args.no_filter
     )
     
-    print(f"✅ Environment report written to: {output_path}")
+    print(f"  [OK] Environment report written to: {output_path}")
     print(f"   File size: {output_path.stat().st_size:,} bytes")
 
 

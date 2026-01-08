@@ -1,0 +1,138 @@
+pipeline {
+    agent {
+        docker {
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint=""'
+            reuseNode true
+        }
+    }
+
+    environment {
+        // Ensure all huggingface caches resolve to the baked-in models
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+        HF_HOME = '/app/01_RAG/models/huggingface'
+        HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+        TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+        RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+        RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+        RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+        WORKDIR = '/app/01_RAG/src'
+        
+        // Neptune.ai configuration (required for hyperparameter tuning results)
+        NEPTUNE_API_TOKEN = credentials('neptune-api-token')
+        NEPTUNE_PROJECT = 'davidwork0/rag-tests'
+        
+        // Hyperparameter tuning mode
+        // Options: 'quick' (3 experiments), 'chunk_size' (20 experiments), 'batch_size' (5 experiments)
+        TUNING_MODE = 'chunk_size'
+    }
+
+    stages {
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    echo '========================================='
+                    echo 'HYPERPARAMETER TUNING PIPELINE'
+                    echo '========================================='
+                    echo "Tuning Mode: ${env.TUNING_MODE}"
+                    echo "Neptune Project: ${env.NEPTUNE_PROJECT}"
+                    echo '========================================='
+                }
+            }
+        }
+        
+        stage('Install Neptune') {
+            steps {
+                script {
+                    echo 'Installing Neptune.ai package...'
+                    sh '/app/01_RAG/.venv/bin/pip install neptune'
+                }
+            }
+        }
+        
+        stage('Verify Files') {
+            steps {
+                script {
+                    echo 'Verifying hyperparameter tuning files...'
+                    sh """
+                        echo "Workspace: \${WORKSPACE}"
+                        
+                        if [ -f "\${WORKSPACE}/src/hyperparameter_tuner_neptune.py" ]; then
+                            echo "✓ hyperparameter_tuner_neptune.py found"
+                        else
+                            echo "✗ hyperparameter_tuner_neptune.py NOT found"
+                            echo "Contents of \${WORKSPACE}/src/:"
+                            ls -la "\${WORKSPACE}/src/" | grep hyperparameter || echo "(no matching files)"
+                            exit 1
+                        fi
+                        
+                        if [ -f "\${WORKSPACE}/src/hyperparameter_tuner.py" ]; then
+                            echo "✓ hyperparameter_tuner.py found"
+                        else
+                            echo "✗ hyperparameter_tuner.py NOT found"
+                        fi
+                        
+                        if [ -f "\${WORKSPACE}/src/rag_config.py" ]; then
+                            echo "✓ rag_config.py found"
+                        else
+                            echo "✗ rag_config.py NOT found"
+                        fi
+                        
+                        if [ -f "\${WORKSPACE}/src/chunk_qwen3_0_6B.py" ]; then
+                            echo "✓ chunk_qwen3_0_6B.py found"
+                        else
+                            echo "✗ chunk_qwen3_0_6B.py NOT found"
+                        fi
+                    """
+                }
+            }
+        }
+        
+        stage('Run Hyperparameter Tuning') {
+            steps {
+                script {
+                    echo "Running hyperparameter tuning in mode: ${env.TUNING_MODE}"
+                    echo 'This will test multiple configurations and upload results to Neptune.ai'
+                    echo ''
+                    
+                    // Run from workspace where code is checked out
+                    sh """
+                        cd ${WORKSPACE}/src
+                        /app/01_RAG/.venv/bin/python hyperparameter_tuner_neptune.py \
+                            --mode ${env.TUNING_MODE}
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                echo 'Archiving results...'
+                
+                // Archive tuning results as Jenkins artifacts
+                archiveArtifacts artifacts: 'tests/logs/hyperparameter_tuning/**/*.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/embeddings/**/*.log', allowEmptyArchive: true
+                
+                echo '========================================='
+                echo 'HYPERPARAMETER TUNING COMPLETE'
+                echo '========================================='
+                echo ''
+                echo 'Results have been uploaded to Neptune.ai'
+                echo "View your results at: https://app.neptune.ai/${env.NEPTUNE_PROJECT}"
+                echo ''
+                echo 'Local results saved to: tests/logs/hyperparameter_tuning/'
+                echo '========================================='
+            }
+        }
+        success {
+            echo '[OK] Hyperparameter tuning pipeline completed successfully!'
+        }
+        failure {
+            echo '[x] Hyperparameter tuning pipeline failed. Check logs for details.'
+        }
+    }
+}

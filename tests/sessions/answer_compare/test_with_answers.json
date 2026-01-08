@@ -1,0 +1,346 @@
+{
+  "evaluation_timestamp": "2025-11-26T14:19:49.277604",
+  "gold_standard_path": "data\\test\\sonar-reasoning-pro_gold_standard_dataset.json",
+  "inference_log_path": "tests\\logs\\inference_log.jsonl",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "num_sessions_evaluated": 2,
+  "max_questions_limit": 2,
+  "sessions": [
+    {
+      "session_number": 1,
+      "inference_index": -1,
+      "session_name": "test_session_Qwen3-8B-Q5_K_M_20251125_113431",
+      "total_questions_evaluated": 2,
+      "per_question_results": [
+        {
+          "question_id": 1,
+          "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+          "reference_answer": " No, you cannot make an instance owner with the name \"instanceowner\" on RHEL (Red Hat Enterprise Linux). The instance name \"instanceowner\" violates a critical naming constraint. According to the IBM Security Verify Directory documentation, the instance name must meet the following requirements: - **Maximum length: 8 characters** - The instance name must be an existing user ID on the system - The instance name must not be greater than eight characters in length The name \"instanceowner\" contains 13 characters, which exceeds the 8-character maximum. Therefore, it cannot be used as an instance owner name on RHEL or any other Linux system. **Valid naming examples** would be names like: - \"nrinst1\" (7 characters) - \"testinst\" (8 characters) - \"myinst\" (6 characters) These constraints apply to both AIX and Linux systems (including RHEL), as documented in the instance creation procedures. ---",
+          "generated_answer": "Based on the retrieved context, here's a detailed analysis for creating an instance owner named **\"instanceowner\"** on **RHEL** (Red Hat Enterprise Linux):\n\n---\n\n### **1. Naming Rules for Instance Owners**\n- **Allowed Characters**:  \n  - Alphanumeric characters (`A-Z`, `a-z`, `0-9`) and underscores (`_`).  \n  - Must **not** include accented characters or special symbols.  \n  - **Must begin with a letter** (`A-Z` or `a-z`).  \n  - **Case-sensitive**: On Linux (including RHEL), the user ID must match exactly (e.g., `instanceowner` ≠ `Instanceowner`).  \n\n  ✅ **\"instanceowner\"** complies with these rules (starts with lowercase `i`, no invalid characters).\n\n- **Restricted Names**:  \n  - Cannot be `USERS`, `ADMINS`, `GUESTS`, `PUBLIC`, `LOCAL`, or `idsldap`.  \n  - Cannot start with `IBM`, `SQL`, or `SYS`.  \n\n  ✅ **\"instanceowner\"** avoids all restricted names and prefixes.\n\n---\n\n### **2. User and Group Requirements**\n- **Primary Group**:  \n  - On **Linux/RHEL**, the primary group of the instance owner must be valid.  \n  - The instance owner must be a member of the `idsldap` group (as per **Chunk 8** and **Chunk 17**).  \n\n  📌 **Action Required**:  \n  - Ensure the primary group (e.g., `employees` or another valid group) exists.  \n  - Add `instanceowner` to the `idsldap` group explicitly or via the `-G` and `-w` options during creation.  \n\n- **User Creation**:  \n  - Use the `idsadduser` command to create the user. Example:  \n    ```bash\n    idsadduser -u instanceowner -g <primary_group> -w <password> -l /home/instanceowner\n    ```  \n    Replace `<primary_group>` and `<password>` with valid values.  \n\n  - On RHEL, ensure the home directory (`/home/instanceowner`) has sufficient space and permissions.  \n\n---\n\n### **3. Group Membership and Permissions**\n- **Directory Server Instance Owner**:  \n  - Must be a member of the **primary group** of the **database instance owner** (as per **Chunk 8** and **Chunk 17**).  \n  - If the database instance owner is also `instanceowner`, ensure the primary group is consistent.  \n\n- **Permissions**:  \n  - The directory where the instance is created must have **read, write, and execute permissions** for the primary group of the instance owner (as per **Chunk 19**).  \n\n---\n\n### **4. Additional Considerations**\n- **Case Sensitivity**:  \n  - On RHEL (Linux), user IDs are case-sensitive. Ensure `instanceowner` is specified exactly as created.  \n\n- **DB2 Integration**:  \n  - If using DB2, the instance owner must be a member of the `DB2ADMNS` or `DB2GROUPS` groups (as per **Chunk 2**).  \n\n- **Error Handling**:  \n  - If errors occur (e.g., `GLPICR098E` or `GLPICR100E`), verify:  \n    - The user ID exists.  \n    - The primary group is valid.  \n    - The user is a member of required groups (`idsldap`, `DB2ADMNS`, etc.).  \n\n---\n\n### **5. Example Command**\nTo create the user `instanceowner` on RHEL:  \n```bash\nidsadduser -u instanceowner -g employees -w password -l /home/instanceowner\n```\n- Replace `employees` with a valid primary group.  \n- Ensure `instanceowner` is added to `idsldap` and other required groups.  \n\n---\n\n### **Conclusion**\nYes, you can create an instance owner named **\"instanceowner\"** on RHEL, provided:  \n1. The name adheres to naming rules (case-sensitive, no invalid characters).  \n2. The primary group exists and is valid.  \n3. The user is added to required groups (`idsldap`, `DB2ADMNS`, etc.).  \n4. Permissions for the home directory and directories are correctly set.  \n\nAlways validate the user and group configuration using the `idsadduser` command and check for errors like `GLPICR098E` or `GLPICR100E` during setup.",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 897,
+          "generated_length": 3608,
+          "length_ratio": 4.022296544035674,
+          "response_time_seconds": 42.353373765945435,
+          "semantic_similarity": 0.8124222159385681,
+          "rouge_1_f": 0.28013029315960913,
+          "rouge_1_p": 0.1787941787941788,
+          "rouge_1_r": 0.6466165413533834,
+          "rouge_2_f": 0.08823529411764706,
+          "rouge_2_p": 0.05625,
+          "rouge_2_r": 0.20454545454545456,
+          "rouge_l_f": 0.15309446254071662,
+          "rouge_l_p": 0.09771309771309772,
+          "rouge_l_r": 0.3533834586466165,
+          "bleu_score": 0.031130850771726,
+          "tfidf_similarity": 0.5296429040828802
+        },
+        {
+          "question_id": 2,
+          "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+          "reference_answer": " The correct switch for specifying a keystore when using idsldapsearch for encrypted connections is the **`-K`** switch. **Syntax:** ``` idsldapsearch -K keyfile [other options] ``` **Details:** - The `-K` switch specifies the name of the SSL or TLS key database file - The default file extension is `.kdb` (key database) - If the key database file is not in the current directory, you must specify the fully qualified path to the key database file name - When using `-K`, you typically also need the `-P` switch to specify the key database password - The `-Z` switch is used to enable TLS (Transport Layer Security) for the connection **Example usage:** ``` idsldapsearch -K /path/to/keystore.kdb -P keystorepassword -Z -h hostname -p 636 -D \"cn=admin\" -w password -b \"o=company\" \"objectclass=*\" ``` **Related switches:** - `-P keyfilepw`: Specifies the key database password (required if the keystore is encrypted) - `-Z`: Enables secure LDAP connection using TLS (only supported when GSKit is installed) - `-Y`: Alternative for using secure LDAP connection with TLS",
+          "generated_answer": "The correct switch for specifying a keystore when using `idsldapsearch` for encrypted connections is **`-K`**. This parameter specifies the name of the SSL or TLS key database file (with a default extension of `.kdb`). Here's a detailed breakdown:\n\n### Key Details from Context:\n1. **`-K` Switch**:\n   - **Purpose**: Specifies the SSL/TLS key database file required for secure connections.\n   - **Usage**: If the key database file is not in the current directory, provide the fully qualified path.\n   - **Example**:  \n     ```bash\n     idsldapsearch -K /path/to/keystore.kdb ...\n     ```\n   - **Related Parameters**:  \n     - `-P` (keyfile password) if a password is required to access the key database.  \n     - `-Z` (secure LDAP connection via SSL/TLS) or `-Y` (startTLS) for encrypted communication.\n\n2. **Keystore Type**:\n   - The keystore type (e.g., `jks`) is specified with **`-sN`** (for supplier servers) or **`-cN`** (for consumer servers).  \n   - Example:  \n     ```bash\n     idsldapsearch -sN jks -K /path/to/keystore.kdb ...\n     ```\n\n3. **Encrypted Connections**:\n   - Use **`-Z`** for SSL/TLS connections (requires `-K` and `-sN`/`-cN` for keystore type).  \n   - Example:  \n     ```bash\n     idsldapsearch -Z -K /path/to/keystore.kdb -sN jks ...\n     ```\n\n### Notes:\n- The `-K` parameter is critical for encrypted connections, as it points to the keystore containing SSL/TLS credentials.  \n- Always ensure the keystore file is accessible and the password (via `-P`) is correctly provided if required.  \n- Contextual references (e.g., `Chunk 9`, `Chunk 1`, `Chunk 17`) consistently tie `-K` to SSL/TLS key database configuration.  \n\nFor precise usage, combine `-K` with other relevant flags (e.g., `-Z`, `-sN`, `-P`) depending on your server setup.",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1068,
+          "generated_length": 1762,
+          "length_ratio": 1.649812734082397,
+          "response_time_seconds": 46.11050462722778,
+          "semantic_similarity": 0.9575371742248535,
+          "rouge_1_f": 0.562962962962963,
+          "rouge_1_p": 0.4672131147540984,
+          "rouge_1_r": 0.7080745341614907,
+          "rouge_2_f": 0.2729528535980149,
+          "rouge_2_p": 0.22633744855967078,
+          "rouge_2_r": 0.34375,
+          "rouge_l_f": 0.36049382716049383,
+          "rouge_l_p": 0.29918032786885246,
+          "rouge_l_r": 0.453416149068323,
+          "bleu_score": 0.1847263147710172,
+          "tfidf_similarity": 0.7163041332657328
+        }
+      ],
+      "aggregate_stats": {
+        "semantic_similarity": {
+          "mean": 0.8849796950817108,
+          "median": 0.8849796950817108,
+          "std": 0.0725574791431427,
+          "min": 0.8124222159385681,
+          "max": 0.9575371742248535,
+          "count": 2
+        },
+        "rouge_1_f": {
+          "mean": 0.42154662806128607,
+          "median": 0.42154662806128607,
+          "std": 0.14141633490167693,
+          "min": 0.28013029315960913,
+          "max": 0.562962962962963,
+          "count": 2
+        },
+        "rouge_1_p": {
+          "mean": 0.3230036467741386,
+          "median": 0.3230036467741386,
+          "std": 0.1442094679799598,
+          "min": 0.1787941787941788,
+          "max": 0.4672131147540984,
+          "count": 2
+        },
+        "rouge_1_r": {
+          "mean": 0.6773455377574371,
+          "median": 0.6773455377574371,
+          "std": 0.030728996404053632,
+          "min": 0.6466165413533834,
+          "max": 0.7080745341614907,
+          "count": 2
+        },
+        "rouge_2_f": {
+          "mean": 0.180594073857831,
+          "median": 0.180594073857831,
+          "std": 0.09235877974018392,
+          "min": 0.08823529411764706,
+          "max": 0.2729528535980149,
+          "count": 2
+        },
+        "rouge_2_p": {
+          "mean": 0.1412937242798354,
+          "median": 0.1412937242798354,
+          "std": 0.08504372427983539,
+          "min": 0.05625,
+          "max": 0.22633744855967078,
+          "count": 2
+        },
+        "rouge_2_r": {
+          "mean": 0.2741477272727273,
+          "median": 0.2741477272727273,
+          "std": 0.06960227272727272,
+          "min": 0.20454545454545456,
+          "max": 0.34375,
+          "count": 2
+        },
+        "rouge_l_f": {
+          "mean": 0.25679414485060525,
+          "median": 0.25679414485060525,
+          "std": 0.1036996823098886,
+          "min": 0.15309446254071662,
+          "max": 0.36049382716049383,
+          "count": 2
+        },
+        "rouge_l_p": {
+          "mean": 0.1984467127909751,
+          "median": 0.1984467127909751,
+          "std": 0.10073361507787737,
+          "min": 0.09771309771309772,
+          "max": 0.29918032786885246,
+          "count": 2
+        },
+        "rouge_l_r": {
+          "mean": 0.40339980385746976,
+          "median": 0.40339980385746976,
+          "std": 0.05001634521085324,
+          "min": 0.3533834586466165,
+          "max": 0.453416149068323,
+          "count": 2
+        },
+        "bleu_score": {
+          "mean": 0.1079285827713716,
+          "median": 0.1079285827713716,
+          "std": 0.0767977319996456,
+          "min": 0.031130850771726,
+          "max": 0.1847263147710172,
+          "count": 2
+        },
+        "tfidf_similarity": {
+          "mean": 0.6229735186743065,
+          "median": 0.6229735186743065,
+          "std": 0.09333061459142633,
+          "min": 0.5296429040828802,
+          "max": 0.7163041332657328,
+          "count": 2
+        },
+        "length_ratio": {
+          "mean": 2.8360546390590358,
+          "median": 2.8360546390590358,
+          "std": 1.1862419049766386,
+          "min": 1.649812734082397,
+          "max": 4.022296544035674,
+          "count": 2
+        },
+        "response_time_seconds": {
+          "mean": 44.23193919658661,
+          "median": 44.23193919658661,
+          "std": 1.8785654306411743,
+          "min": 42.353373765945435,
+          "max": 46.11050462722778,
+          "count": 2
+        }
+      }
+    },
+    {
+      "session_number": 2,
+      "inference_index": -2,
+      "session_name": "test_session_Qwen3-8B-Q5_K_M_20251121_121533",
+      "total_questions_evaluated": 2,
+      "per_question_results": [
+        {
+          "question_id": 1,
+          "question": "Can I make an instance owner with the name \"instanceowner\" on RHEL?",
+          "reference_answer": " No, you cannot make an instance owner with the name \"instanceowner\" on RHEL (Red Hat Enterprise Linux). The instance name \"instanceowner\" violates a critical naming constraint. According to the IBM Security Verify Directory documentation, the instance name must meet the following requirements: - **Maximum length: 8 characters** - The instance name must be an existing user ID on the system - The instance name must not be greater than eight characters in length The name \"instanceowner\" contains 13 characters, which exceeds the 8-character maximum. Therefore, it cannot be used as an instance owner name on RHEL or any other Linux system. **Valid naming examples** would be names like: - \"nrinst1\" (7 characters) - \"testinst\" (8 characters) - \"myinst\" (6 characters) These constraints apply to both AIX and Linux systems (including RHEL), as documented in the instance creation procedures. ---",
+          "generated_answer": "Based on the retrieved context, here's a detailed analysis for creating an instance owner named **\"instanceowner\"** on **RHEL** (Red Hat Enterprise Linux):\n\n---\n\n### **1. Naming Rules for Instance Owners**\n- **Allowed Characters**:  \n  - Alphanumeric characters (`A-Z`, `a-z`, `0-9`) and underscores (`_`).  \n  - Must **not** include accented characters or special symbols.  \n  - **Must begin with a letter** (`A-Z` or `a-z`).  \n  - **Case-sensitive**: On Linux (including RHEL), the user ID must match exactly (e.g., `instanceowner` ≠ `Instanceowner`).  \n\n  ✅ **\"instanceowner\"** complies with these rules (starts with lowercase `i`, no invalid characters).\n\n- **Restricted Names**:  \n  - Cannot be `USERS`, `ADMINS`, `GUESTS`, `PUBLIC`, `LOCAL`, or `idsldap`.  \n  - Cannot start with `IBM`, `SQL`, or `SYS`.  \n\n  ✅ **\"instanceowner\"** avoids all restricted names and prefixes.\n\n---\n\n### **2. User and Group Requirements**\n- **Primary Group**:  \n  - On **Linux/RHEL**, the primary group of the instance owner must be valid.  \n  - The instance owner must be a member of the `idsldap` group (as per **Chunk 8** and **Chunk 17**).  \n\n  📌 **Action Required**:  \n  - Ensure the primary group (e.g., `employees` or another valid group) exists.  \n  - Add `instanceowner` to the `idsldap` group explicitly or via the `-G` and `-w` options during creation.  \n\n- **User Creation**:  \n  - Use the `idsadduser` command to create the user. Example:  \n    ```bash\n    idsadduser -u instanceowner -g <primary_group> -w <password> -l /home/instanceowner\n    ```  \n    Replace `<primary_group>` and `<password>` with valid values.  \n\n  - On RHEL, ensure the home directory (`/home/instanceowner`) has sufficient space and permissions.  \n\n---\n\n### **3. Group Membership and Permissions**\n- **Directory Server Instance Owner**:  \n  - Must be a member of the **primary group** of the **database instance owner** (as per **Chunk 8** and **Chunk 17**).  \n  - If the database instance owner is also `instanceowner`, ensure the primary group is consistent.  \n\n- **Permissions**:  \n  - The directory where the instance is created must have **read, write, and execute permissions** for the primary group of the instance owner (as per **Chunk 19**).  \n\n---\n\n### **4. Additional Considerations**\n- **Case Sensitivity**:  \n  - On RHEL (Linux), user IDs are case-sensitive. Ensure `instanceowner` is specified exactly as created.  \n\n- **DB2 Integration**:  \n  - If using DB2, the instance owner must be a member of the `DB2ADMNS` or `DB2GROUPS` groups (as per **Chunk 2**).  \n\n- **Error Handling**:  \n  - If errors occur (e.g., `GLPICR098E` or `GLPICR100E`), verify:  \n    - The user ID exists.  \n    - The primary group is valid.  \n    - The user is a member of required groups (`idsldap`, `DB2ADMNS`, etc.).  \n\n---\n\n### **5. Example Command**\nTo create the user `instanceowner` on RHEL:  \n```bash\nidsadduser -u instanceowner -g employees -w password -l /home/instanceowner\n```\n- Replace `employees` with a valid primary group.  \n- Ensure `instanceowner` is added to `idsldap` and other required groups.  \n\n---\n\n### **Conclusion**\nYes, you can create an instance owner named **\"instanceowner\"** on RHEL, provided:  \n1. The name adheres to naming rules (case-sensitive, no invalid characters).  \n2. The primary group exists and is valid.  \n3. The user is added to required groups (`idsldap`, `DB2ADMNS`, etc.).  \n4. Permissions for the home directory and directories are correctly set.  \n\nAlways validate the user and group configuration using the `idsadduser` command and check for errors like `GLPICR098E` or `GLPICR100E` during setup.",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 897,
+          "generated_length": 3608,
+          "length_ratio": 4.022296544035674,
+          "response_time_seconds": 41.79087567329407,
+          "semantic_similarity": 0.8124222159385681,
+          "rouge_1_f": 0.28013029315960913,
+          "rouge_1_p": 0.1787941787941788,
+          "rouge_1_r": 0.6466165413533834,
+          "rouge_2_f": 0.08823529411764706,
+          "rouge_2_p": 0.05625,
+          "rouge_2_r": 0.20454545454545456,
+          "rouge_l_f": 0.15309446254071662,
+          "rouge_l_p": 0.09771309771309772,
+          "rouge_l_r": 0.3533834586466165,
+          "bleu_score": 0.031130850771726,
+          "tfidf_similarity": 0.5296429040828802
+        },
+        {
+          "question_id": 2,
+          "question": "What is the correct switch for specifying a keystore when using idsldapsearch? (For encrypted connections)",
+          "reference_answer": " The correct switch for specifying a keystore when using idsldapsearch for encrypted connections is the **`-K`** switch. **Syntax:** ``` idsldapsearch -K keyfile [other options] ``` **Details:** - The `-K` switch specifies the name of the SSL or TLS key database file - The default file extension is `.kdb` (key database) - If the key database file is not in the current directory, you must specify the fully qualified path to the key database file name - When using `-K`, you typically also need the `-P` switch to specify the key database password - The `-Z` switch is used to enable TLS (Transport Layer Security) for the connection **Example usage:** ``` idsldapsearch -K /path/to/keystore.kdb -P keystorepassword -Z -h hostname -p 636 -D \"cn=admin\" -w password -b \"o=company\" \"objectclass=*\" ``` **Related switches:** - `-P keyfilepw`: Specifies the key database password (required if the keystore is encrypted) - `-Z`: Enables secure LDAP connection using TLS (only supported when GSKit is installed) - `-Y`: Alternative for using secure LDAP connection with TLS",
+          "generated_answer": "The correct switch for specifying a keystore when using `idsldapsearch` for encrypted connections is **`-K`**. Here's the detailed explanation based on the context:\n\n---\n\n### **Switch: `-K`**\n- **Purpose**: Specifies the name of the SSL or TLS key database file.  \n- **Default Extension**: `.kdb` (key database file).  \n- **Usage**:  \n  - If the key database file is not in the current directory, provide the fully qualified file name.  \n  - This parameter is required for secure LDAP connections (SSL/TLS).  \n\n---\n\n### **Key Details from Context**:\n1. **Relevance to `idsldapsearch`**:  \n   - The `-K` parameter is explicitly mentioned in the context for tools like `idsldapsearch` (Chunk 9).  \n   - Example:  \n     ```bash\n     idsldapsearch -K /path/to/keystore.kdb ...\n     ```\n\n2. **Security Requirements**:  \n   - The keystore must contain the SSL certificate and private key for the LDAP server.  \n   - If using self-signed certificates, ensure the keystore is properly configured (Chunk 8, Chunk 17).  \n\n3. **Password Protection**:  \n   - The keystore password is specified via `-P` (Chunk 11), which is required if the keystore is encrypted.  \n\n4. **Secure Connection**:  \n   - The `-Z` switch enables SSL/TLS for secure LDAP communication (Chunk 1, Chunk 9).  \n   - Combining `-K` with `-Z` ensures encrypted connections using the specified keystore.  \n\n---\n\n### **Example Command**:\n```bash\nidsldapsearch -Z -K /opt/ibm/keystore.kdb -P your_keystore_password ...\n```\n\n---\n\n### **Notes**:\n- **Avoid `-sK`**: This switch is specific to tools like `idsldapdiff` (Chunk 1, Chunk 2) and not applicable to `idsldapsearch`.  \n- **Password Handling**: Use `-P` for the keystore password and ensure the keystore file permissions are secure (Chunk 7).  \n\nAlways verify the keystore configuration and ensure cryptographic synchronization between servers if applicable (Chunk 6).",
+          "model_name": "Qwen3-8B-Q5_K_M",
+          "reference_length": 1068,
+          "generated_length": 1878,
+          "length_ratio": 1.7584269662921348,
+          "response_time_seconds": 31.29916739463806,
+          "semantic_similarity": 0.9399983882904053,
+          "rouge_1_f": 0.5644768856447689,
+          "rouge_1_p": 0.464,
+          "rouge_1_r": 0.7204968944099379,
+          "rouge_2_f": 0.28850855745721277,
+          "rouge_2_p": 0.23694779116465864,
+          "rouge_2_r": 0.36875,
+          "rouge_l_f": 0.38442822384428227,
+          "rouge_l_p": 0.316,
+          "rouge_l_r": 0.4906832298136646,
+          "bleu_score": 0.1933329418538391,
+          "tfidf_similarity": 0.7312181472238624
+        }
+      ],
+      "aggregate_stats": {
+        "semantic_similarity": {
+          "mean": 0.8762103021144867,
+          "median": 0.8762103021144867,
+          "std": 0.06378808617591858,
+          "min": 0.8124222159385681,
+          "max": 0.9399983882904053,
+          "count": 2
+        },
+        "rouge_1_f": {
+          "mean": 0.42230358940218904,
+          "median": 0.42230358940218904,
+          "std": 0.1421732962425799,
+          "min": 0.28013029315960913,
+          "max": 0.5644768856447689,
+          "count": 2
+        },
+        "rouge_1_p": {
+          "mean": 0.32139708939708944,
+          "median": 0.32139708939708944,
+          "std": 0.1426029106029106,
+          "min": 0.1787941787941788,
+          "max": 0.464,
+          "count": 2
+        },
+        "rouge_1_r": {
+          "mean": 0.6835567178816606,
+          "median": 0.6835567178816606,
+          "std": 0.036940176528277247,
+          "min": 0.6466165413533834,
+          "max": 0.7204968944099379,
+          "count": 2
+        },
+        "rouge_2_f": {
+          "mean": 0.18837192578742992,
+          "median": 0.18837192578742992,
+          "std": 0.10013663166978284,
+          "min": 0.08823529411764706,
+          "max": 0.28850855745721277,
+          "count": 2
+        },
+        "rouge_2_p": {
+          "mean": 0.14659889558232933,
+          "median": 0.14659889558232933,
+          "std": 0.09034889558232932,
+          "min": 0.05625,
+          "max": 0.23694779116465864,
+          "count": 2
+        },
+        "rouge_2_r": {
+          "mean": 0.2866477272727273,
+          "median": 0.2866477272727273,
+          "std": 0.08210227272727273,
+          "min": 0.20454545454545456,
+          "max": 0.36875,
+          "count": 2
+        },
+        "rouge_l_f": {
+          "mean": 0.26876134319249945,
+          "median": 0.26876134319249945,
+          "std": 0.11566688065178282,
+          "min": 0.15309446254071662,
+          "max": 0.38442822384428227,
+          "count": 2
+        },
+        "rouge_l_p": {
+          "mean": 0.20685654885654886,
+          "median": 0.20685654885654886,
+          "std": 0.10914345114345114,
+          "min": 0.09771309771309772,
+          "max": 0.316,
+          "count": 2
+        },
+        "rouge_l_r": {
+          "mean": 0.42203334423014055,
+          "median": 0.42203334423014055,
+          "std": 0.06864988558352403,
+          "min": 0.3533834586466165,
+          "max": 0.4906832298136646,
+          "count": 2
+        },
+        "bleu_score": {
+          "mean": 0.11223189631278255,
+          "median": 0.11223189631278255,
+          "std": 0.08110104554105654,
+          "min": 0.031130850771726,
+          "max": 0.1933329418538391,
+          "count": 2
+        },
+        "tfidf_similarity": {
+          "mean": 0.6304305256533713,
+          "median": 0.6304305256533713,
+          "std": 0.10078762157049109,
+          "min": 0.5296429040828802,
+          "max": 0.7312181472238624,
+          "count": 2
+        },
+        "length_ratio": {
+          "mean": 2.8903617551639043,
+          "median": 2.8903617551639043,
+          "std": 1.1319347888717697,
+          "min": 1.7584269662921348,
+          "max": 4.022296544035674,
+          "count": 2
+        },
+        "response_time_seconds": {
+          "mean": 36.545021533966064,
+          "median": 36.545021533966064,
+          "std": 5.245854139328003,
+          "min": 31.29916739463806,
+          "max": 41.79087567329407,
+          "count": 2
+        }
+      }
+    }
+  ]
+}

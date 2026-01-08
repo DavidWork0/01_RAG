@@ -446,14 +446,14 @@ col1, col2, col3 = st.columns([1, 6, 1])
 with col2:
     st.markdown("""
     <div class="main-header">
-        <h1>💬 AUDI RAG Chat</h1>
+        <h1>💬 RAG Chat</h1>
         <p style="color: #8b949e; font-size: 1.1rem;">Ask anything about your documents</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col3:
-    # Clear Chat Button
-    if st.button("🗑️ Clear", use_container_width=True, key="clear_chat"):
+    # Clear Chat Button called "New Session"
+    if st.button("New session", use_container_width=True, key="clear_chat"):
         st.session_state.chat_history = []
         st.session_state.uploaded_images = []
         st.rerun()
@@ -477,7 +477,7 @@ with input_container:
         value="",
         height=100,
         max_chars=1000,
-        on_change=None,  # "" to reset input after sending but it rolls back to the top of the
+        on_change=None,  # "" to reset input after sending but it rolls back to the top so this is not implemented
         placeholder="Ask me anything about documents...",
         key="message_input",
         disabled=False,
@@ -540,7 +540,7 @@ if send_button and user_input.strip():
         # Add warning if no context
         final_answer = parsed_response['answer']
         #if no_relevant_context:
-            #final_answer = f"⚠️ **No relevant information found in knowledge base** - Answer based on general knowledge:\n\n{final_answer}"
+        #    final_answer = f"[⚠️] No relevant information found in knowledge base - Answer based on general knowledge:\n\n{final_answer}"
         
         # Add assistant message
         assistant_message = {

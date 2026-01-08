@@ -1,0 +1,147 @@
+pipeline {
+    agent {
+        docker {
+            // Use the project's existing image which has all dependencies and CUDA support
+            image 'linux_with_cuda_complete:latest'
+            // Pass GPU access to the container
+            args '--gpus all --entrypoint="" -v /var/jenkins_home/local_repo/data/output:/mnt/databases:ro'
+            reuseNode true
+        }
+    }
+
+    environment {
+        // Ensure all huggingface caches resolve to the baked-in models
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+        HF_HOME = '/app/01_RAG/models/huggingface'
+        HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+        TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+        RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+        RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+        RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+        WORKDIR = '/app/01_RAG/tests'
+        
+        // Neptune.ai configuration (optional - comment out if not using)
+        NEPTUNE_API_TOKEN = credentials('neptune-api-token')
+        NEPTUNE_PROJECT = 'davidwork0/rag-tests'
+        NEPTUNE_UPLOAD_MODE = 'latest'  // Options: 'latest', 'all', 'inference'
+        
+        // Evaluation file path (will be set dynamically)
+        EVAL_FILE = ''
+    }
+
+    
+    stages {
+        stage('Setup Databases') {
+            steps {
+                script {
+                    echo '[...] Copying databases into workspace...'
+                    sh '''
+                        rm -rf data/output
+                        mkdir -p data/output
+                        cp -r /var/jenkins_home/local_repo/data/output/* data/output/
+                        echo "[OK] Databases copied: $(ls -1 data/output/ | grep -c chroma_db)"
+                    '''
+                }
+            }
+        }
+        stage('Install rouge-score') {
+            steps {
+                script {
+                    echo 'Installing rouge-score package...'
+                    sh '/app/01_RAG/.venv/bin/pip install rouge-score'
+                }
+            }
+        }
+        stage('Install Neptune') {
+            steps {
+                script {
+                    echo 'Installing Neptune.ai package...'
+                    sh '/app/01_RAG/.venv/bin/pip install neptune'
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    echo 'Running tests inside linux_with_cuda_complete container...'
+                    sh '/app/01_RAG/.venv/bin/python tests/test_inference.py --model Qwen3-4B-Instruct-2507-Q8_0 --mode all --include-environment'
+                }
+            }
+        }
+        
+        stage('Evaluate Answers') {
+            steps {
+                script {
+                    echo "Evaluating answers..."
+                    def timestamp = sh(script: 'date +%Y%m%d_%H%M%S', returnStdout: true).trim()
+                    env.EVAL_FILE = "tests/logs/answer_evaluation_results_${timestamp}.json"
+                    
+                    sh """
+                        /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
+                            --gold-standard data/test/sonar_pro_gold_standard_dataset.json \
+                            --inference-log tests/logs/inference_log.jsonl \
+                            --num-inference-eval 1 \
+                            --max-questions 10 \
+                            --output-json ${env.EVAL_FILE}
+                    """
+                    
+                    echo '[OK] Answer evaluation completed'
+                }
+            }
+        }
+        
+        stage('Upload to Neptune') {
+            // This stage uploads test results and evaluation metrics to Neptune.ai for visualization
+            // See docs/neptune_integration.md for details
+            when {
+                expression { 
+                    return env.NEPTUNE_API_TOKEN != null && env.NEPTUNE_PROJECT != null 
+                }
+            }
+            steps {
+                script {
+                    echo 'Uploading test results and evaluation metrics to Neptune.ai...'
+                    
+                    try {
+                        // Upload inference test results
+                        sh 'bash jenkins_neptune_upload.sh'
+                        
+                        // Upload answer evaluation metrics
+                        sh """
+                            /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+                                --upload-evaluation \
+                                --evaluation-file ${env.EVAL_FILE} \
+                                --tags jenkins manual_db_eval evaluation build_${env.BUILD_NUMBER} fixed_size_Qwen3_0.6B_1024_500_150
+                        """
+                        echo '[OK] Neptune upload completed successfully'
+
+                    } catch (Exception e) {
+                        echo "[!] Warning: Neptune upload failed: ${e.message}"
+                        echo "   Tests completed successfully, but results were not uploaded."
+                        echo "   Check Neptune configuration in environment section."
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                echo 'Cleaning up...'
+                // Archive test logs and evaluation results as Jenkins artifacts
+                archiveArtifacts artifacts: 'tests/logs/**/*.log', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.csv', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/answer_evaluation_results.json', allowEmptyArchive: true
+            }
+        }
+        success {
+            echo '[OK] Pipeline completed successfully!'
+        }
+        failure {
+            echo '[x] Pipeline failed. Check logs for details.'
+        }
+    }
+}

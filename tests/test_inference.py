@@ -21,6 +21,7 @@ Date: November 6, 2025
 """
 
 import sys
+import io
 from pathlib import Path
 import argparse
 import json
@@ -28,6 +29,17 @@ import time
 import re
 import hashlib
 from typing import Dict, List, Optional
+
+# Fix Windows console encoding to support Unicode characters (emojis in LLM responses)
+if sys.platform == 'win32':
+    # Reconfigure stdout and stderr to use UTF-8 encoding
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    else:
+        # Fallback for older Python versions
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 
 # Add project root and src to path
 project_root = Path(__file__).parent.parent
@@ -44,7 +56,7 @@ try:
     HARDWARE_INFO_AVAILABLE = True
 except ImportError:
     HARDWARE_INFO_AVAILABLE = False
-    print("⚠️  Warning: hardware_info module not available. Hardware information will not be logged.")
+    print("[WARNING] hardware_info module not available. Hardware information will not be logged.")
 
 # Import environment collector module
 try:
@@ -57,7 +69,7 @@ try:
     ENVIRONMENT_COLLECTOR_AVAILABLE = True
 except ImportError:
     ENVIRONMENT_COLLECTOR_AVAILABLE = False
-    print("⚠️  Warning: environment_collector module not available. Environment information will not be logged.")
+    print("[WARNING] environment_collector module not available. Environment information will not be logged.")
 
 # Import shared configuration
 from src.model_config import (
@@ -90,6 +102,7 @@ from src.rag_config import (
     CHUNK_SIZE_MAX_BY_SENTENCE,
     EMBEDDING_DIMENSION,
     COLLECTION_NAME,
+    get_collection_name,
     BATCH_SIZE,
     DEFAULT_TOP_K,
     MIN_SIMILARITY_THRESHOLD,
@@ -184,6 +197,46 @@ def get_python_file_hashes() -> Dict[str, str]:
     return file_hashes
 
 
+def get_collection_name_from_db_path(db_path: str) -> str:
+    """
+    Extract chunking parameters from database path and generate correct collection name.
+    
+    Database path format: chroma_db_{strategy}_{model}_{dim}_{chunk_size}_{overlap}_{suffix}
+    
+    Args:
+        db_path: Path to the database directory
+        
+    Returns:
+        Collection name string, or default COLLECTION_NAME if cannot parse
+    """
+    from pathlib import Path
+    
+    db_name = Path(db_path).name
+    
+    # Parse database name
+    if 'fixed_size' in db_name:
+        parts = db_name.split('_')
+        numbers = [p for p in parts if p.isdigit()]
+        
+        if len(numbers) >= 3:
+            # numbers[0] = embed_dim, numbers[1] = chunk_size, numbers[2] = overlap
+            chunk_size = int(numbers[1])
+            overlap = int(numbers[2])
+            return get_collection_name(chunk_strategy='fixed_size', chunk_size=chunk_size, overlap=overlap)
+    
+    elif 'by_sentence' in db_name:
+        parts = db_name.split('_')
+        numbers = [p for p in parts if p.isdigit()]
+        
+        if len(numbers) >= 2:
+            # numbers[0] = embed_dim, numbers[1] = chunk_size
+            chunk_size = int(numbers[1])
+            return get_collection_name(chunk_strategy='by_sentence', chunk_size=chunk_size, overlap=None)
+    
+    # If cannot parse, return default
+    return COLLECTION_NAME
+
+
 def load_test_questions(questions_path: str) -> List[Dict]:
     """Load test questions from JSON file."""
     try:
@@ -191,26 +244,54 @@ def load_test_questions(questions_path: str) -> List[Dict]:
             data = json.load(f)
             return data.get('test_questions', [])
     except Exception as e:
-        print(f"❌ Error loading test questions: {e}")
+        print(f"[ERROR] Error loading test questions: {e}")
         return []
 
 
-def create_session_log_file(model_name: str) -> tuple[Path, str]:
+def create_session_log_file(model_name: str, db_path: str = None, top_k: int = None, similarity_threshold: float = None, test_questions_path: str = None) -> tuple[Path, str]:
     """
     Create a detailed log file for the current test session.
     
     Args:
         model_name: Name of the model being tested
+        db_path: Path to database (for tagging)
+        top_k: Top K results parameter (for tagging)
+        similarity_threshold: Similarity threshold (for tagging)
+        test_questions_path: Path to test questions (for tagging)
     
     Returns:
-        Tuple of (Path to the created log file, session name)
+        Tuple of (Path to the created log file, session name with tags)
     """
     timestamp = time.strftime("%Y%m%d_%H%M%S")
+    
+    # Use defaults if not provided
+    db_path = db_path or DEFAULT_DB_PATH
+    top_k = top_k or TOP_K_RESULTS
+    similarity_threshold = similarity_threshold or SIMILARITY_THRESHOLD
+    test_questions_path = test_questions_path or TEST_QUESTIONS_PATH
+    
+    # Create session name with configuration tags
     session_name = f"test_session_{model_name}_{timestamp}"
+    
+    # Store tags in metadata (will be used by Neptune uploader)
+    session_tags = {
+        'model': model_name,
+        'db_path': db_path,
+        'top_k': top_k,
+        'similarity_threshold': similarity_threshold,
+        'test_questions_path': test_questions_path
+    }
+    
     log_dir = project_root / "tests" / "logs" / "sessions"
     log_dir.mkdir(parents=True, exist_ok=True)
     
     log_file = log_dir / f"{session_name}.log"
+    
+    # Write tags to a separate JSON file for Neptune uploader to read
+    tags_file = log_dir / f"{session_name}_tags.json"
+    with open(tags_file, 'w', encoding='utf-8') as f:
+        json.dump(session_tags, f, indent=2)
+    
     return log_file, session_name
 
 
@@ -334,9 +415,9 @@ def write_log_header(log_file: Path, model_name: str, args, include_environment:
                 f.write(f"\n")
                 
             except Exception as e:
-                f.write(f"⚠️  Error collecting hardware information: {str(e)}\n\n")
+                f.write(f"[WARNING] Error collecting hardware information: {str(e)}\n\n")
         else:
-            f.write("⚠️  Hardware information module not available.\n\n")
+            f.write("[WARNING] Hardware information module not available.\n\n")
         
         # =====================================================================
         # FILE INTEGRITY (SHA256 HASHES)
@@ -732,18 +813,18 @@ def run_single_test(
     try:
         # Search for relevant chunks
         if verbose:
-            print(f"🔍 Searching knowledge base...")
+            print(f"[*] Searching knowledge base...")
         results = rag_system.search(query=q_text, top_k=TOP_K_RESULTS)
         
         if verbose:
-            print(f"✓ Found {len(results)} relevant chunks")
+            print(f"[+] Found {len(results)} relevant chunks")
         
         # Format context for LLM
         context = rag_system.format_for_llm(results, max_chunks=None)
         
         # Generate response
         if verbose:
-            print(f"🤖 Generating response with {model_name}...")
+            print(f"[*] Generating response with {model_name}...")
         raw_response = generate_llm_response(llm_model, q_text, context, model_name, max_tokens)
         
         # Parse response
@@ -753,14 +834,14 @@ def run_single_test(
         
         if verbose:
             if parsed_response['has_thinking']:
-                print(f"✓ Response generated with thinking process")
+                print(f"[+] Response generated with thinking process")
             else:
-                print(f"✓ Response generated")
+                print(f"[+] Response generated")
         
     except Exception as e:
         error_msg = str(e)
         if verbose:
-            print(f"❌ Error: {error_msg}")
+            print(f"[ERROR] {error_msg}")
     
     response_time = time.time() - start_time
     
@@ -778,7 +859,7 @@ def run_single_test(
         session_name=session_name
     )
     
-    # Add raw response and chunks to log entry for session logging
+    # Add other data to log entry for session logging
     log_entry['raw_response'] = raw_response or ""
     log_entry['chunks'] = results or []
     
@@ -787,13 +868,13 @@ def run_single_test(
         append_test_result(log_file, question, log_entry, raw_response or "", results or [])
     
     if verbose:
-        print(f"\n📊 Results:")
-        print(f"   ⏱️  Response time: {response_time:.2f}s")
-        print(f"   📚 Chunks used: {len(results) if results else 0}")
-        print(f"   ✅ Success: {error_msg is None}")
+        print(f"\n[Results]")
+        print(f"   Response time: {response_time:.2f}s")
+        print(f"   Chunks used: {len(results) if results else 0}")
+        print(f"   Success: {error_msg is None}")
         
         if answer and not error_msg:
-            print(f"\n💬 Answer ({len(answer)} chars):")
+            print(f"\n[Answer] ({len(answer)} chars):")
             print(f"   {answer}")
     
     return log_entry
@@ -874,14 +955,14 @@ def run_all_tests(
     # Write log footer if log file provided
     if log_file and log_file.exists():
         write_log_footer(log_file, stats, total_time)
-        print(f"\n📄 Detailed session log saved to: {log_file}")
+        print(f"\n[+] Detailed session log saved to: {log_file}")
     
-    print(f"\n📊 Summary:")
+    print(f"\n[Summary]")
     print(f"   Total tests: {len(results)}")
-    print(f"   ✅ Successful: {successful} ({successful/len(results)*100:.1f}%)")
-    print(f"   ❌ Failed: {failed}")
-    print(f"   ⏱️  Avg response time: {avg_time:.2f}s")
-    print(f"   🕐 Total time: {total_time:.2f}s")
+    print(f"   [+] Successful: {successful} ({successful/len(results)*100:.1f}%)")
+    print(f"   [-] Failed: {failed}")
+    print(f"   Avg response time: {avg_time:.2f}s")
+    print(f"   Total time: {total_time:.2f}s")
     
     return results
 
@@ -900,18 +981,18 @@ def show_statistics(logger: InferenceLogger, model_name: Optional[str] = None):
         print("No inference tests logged yet.")
         return
     
-    print(f"📊 Overall Statistics:")
+    print(f"[Overall Statistics]")
     print(f"   Total inferences: {stats['total_inferences']}")
     print(f"   Successful: {stats['successful_inferences']}")
     print(f"   Failed: {stats['failed_inferences']}")
     print(f"   Success rate: {stats['success_rate']:.1f}%")
-    print(f"\n⏱️  Response Time:")
+    print(f"\n[Response Time]")
     print(f"   Average: {stats['avg_response_time']:.2f}s")
     print(f"   Min: {stats['min_response_time']:.2f}s")
     print(f"   Max: {stats['max_response_time']:.2f}s")
-    print(f"\n📚 Chunks:")
+    print(f"\n[Chunks]")
     print(f"   Average retrieved: {stats['avg_chunks_retrieved']:.1f}")
-    print(f"\n💬 Answers:")
+    print(f"\n[Answers]")
     print(f"   Average length: {stats['avg_answer_length']:.0f} chars")
     
     # Model comparison
@@ -939,9 +1020,9 @@ def export_report(logger: InferenceLogger, output_path: Optional[str] = None):
     
     try:
         logger.export_to_excel(str(output_path))
-        print(f"\n✅ Report exported to: {output_path}")
+        print(f"\n[+] Report exported to: {output_path}")
     except Exception as e:
-        print(f"\n❌ Export failed: {e}")
+        print(f"\n[ERROR] Export failed: {e}")
 
 
 # =============================================================================
@@ -1055,49 +1136,60 @@ Examples:
     questions = load_test_questions(str(questions_path))
     
     if not questions:
-        print("❌ No test questions loaded. Exiting.")
+        print("[ERROR] No test questions loaded. Exiting.")
         sys.exit(1)
     
-    print(f"✓ Loaded {len(questions)} test questions")
+    print(f"[+] Loaded {len(questions)} test questions")
     
     # Initialize RAG system
-    print(f"\n🔧 Initializing RAG system...")
+    print(f"\n[*] Initializing RAG system...")
     db_path = project_root / args.db_path
+    
+    # Detect correct collection name from database path
+    collection_name = get_collection_name_from_db_path(str(db_path))
+    print(f"[*] Using collection: {collection_name}")
     
     try:
         rag_system = HybridRAGQwen3_Module(
             embedding_model=EMBEDDING_MODEL,
             db_path=str(db_path),
+            collection_name=collection_name,
             device='cuda',
-            verbose=False
+            verbose=True
         )
-        print(f"✅ RAG system initialized")
+        print(f"[+] RAG system initialized")
     except Exception as e:
-        print(f"❌ Failed to initialize RAG system: {e}")
+        print(f"[ERROR] Failed to initialize RAG system: {e}")
         sys.exit(1)
     
     # Load LLM model using shared function
-    print(f"\n🤖 Loading LLM model: {args.model}...")
+    print(f"\n[*] Loading LLM model: {args.model}...")
     try:
         llm_model = load_llm_model(args.model, project_root)
-        print(f"✅ Model loaded: {args.model}")
+        print(f"[+] Model loaded: {args.model}")
     except FileNotFoundError as e:
-        print(f"❌ {e}")
+        print(f"[ERROR] {e}")
         sys.exit(1)
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        print(f"[ERROR] Failed to load model: {e}")
         sys.exit(1)
     
     # Create session log file
-    log_file, session_name = create_session_log_file(args.model)
+    log_file, session_name = create_session_log_file(
+        model_name=args.model,
+        db_path=args.db_path,
+        top_k=TOP_K_RESULTS,
+        similarity_threshold=SIMILARITY_THRESHOLD,
+        test_questions_path=TEST_QUESTIONS_PATH
+    )
     write_log_header(log_file, args.model, args, include_environment=args.include_environment)
-    print(f"📄 Session log created: {log_file}")
-    print(f"📋 Session name: {session_name}")
+    print(f"[+] Session log created: {log_file}")
+    print(f"[+] Session name: {session_name}")
     
     # Create separate environment report if requested
     if args.include_environment and ENVIRONMENT_COLLECTOR_AVAILABLE:
         env_report_file = log_file.parent / f"{log_file.stem}_environment.txt"
-        print(f"📝 Generating detailed environment report...")
+        print(f"[*] Generating detailed environment report...")
         write_environment_report(
             output_path=env_report_file,
             include_env_vars=True,
@@ -1106,14 +1198,14 @@ Examples:
             include_pip_freeze=True,
             filter_sensitive=True
         )
-        print(f"✅ Environment report saved: {env_report_file}")
+        print(f"[+] Environment report saved: {env_report_file}")
     
     # Run tests
     if args.mode == 'single':
         # Find the question
         question = next((q for q in questions if q['id'] == args.question_id), None)
         if not question:
-            print(f"❌ Question ID {args.question_id} not found")
+            print(f"[ERROR] Question ID {args.question_id} not found")
             sys.exit(1)
         
         session_start = time.time()
@@ -1152,9 +1244,9 @@ Examples:
         if len(quick_questions) != len(quick_test_ids):
             found_ids = [q['id'] for q in quick_questions]
             missing_ids = [qid for qid in quick_test_ids if qid not in found_ids]
-            print(f"⚠️  Warning: Could not find questions with IDs: {missing_ids}")
+            print(f"[WARNING] Could not find questions with IDs: {missing_ids}")
         
-        print(f"\n🚀 Quick test mode: Running {len(quick_questions)} selected questions")
+        print(f"\n[*] Quick test mode: Running {len(quick_questions)} selected questions")
         print(f"   Question IDs: {[q['id'] for q in quick_questions]}")
         
         results = run_all_tests(
@@ -1180,8 +1272,8 @@ Examples:
             session_name=session_name
         )
     
-    print(f"\n✅ Tests complete. Results logged to: {logger.log_dir}")
-    print(f"📄 Detailed session log: {log_file}")
+    print(f"\n[+] Tests complete. Results logged to: {logger.log_dir}")
+    print(f"[+] Detailed session log: {log_file}")
     print(f"\nTo view statistics, run:")
     print(f"  python test_inference.py --show-stats --model {args.model}")
     print(f"\nTo export report, run:")

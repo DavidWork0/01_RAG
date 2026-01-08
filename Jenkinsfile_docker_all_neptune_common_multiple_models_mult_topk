@@ -1,0 +1,224 @@
+pipeline {
+    agent {
+        docker {
+            image 'linux_with_cuda_complete:latest'
+            args '--gpus all --entrypoint=""'
+            reuseNode true
+        }
+    }
+
+    environment {
+        GIT_CONFIG_PARAMETERS = 'core.autocrlf=false'
+        HF_HOME = '/app/01_RAG/models/huggingface'
+        HUGGINGFACE_HUB_CACHE = '/app/01_RAG/models/huggingface'
+        TRANSFORMERS_CACHE = '/app/01_RAG/models/huggingface'
+        RAG_MODEL_CACHE_DIR = '/app/01_RAG/models/huggingface'
+        RAG_PROJECT_ROOT_OVERRIDE = '/app/01_RAG'
+        RAG_LLM_MODELS_DIR = '/app/01_RAG/models/llamacpp'
+        WORKDIR = '/app/01_RAG/tests'
+        
+        NEPTUNE_API_TOKEN = credentials('neptune-api-token')
+        NEPTUNE_PROJECT = 'davidwork0/rag-tests'
+        NEPTUNE_UPLOAD_MODE = 'latest'
+    }
+
+    stages {
+        stage('Install rouge-score') {
+            steps {
+                script {
+                    echo 'Installing rouge-score package...'
+                    sh '/app/01_RAG/.venv/bin/pip install rouge-score'
+                }
+            }
+        }
+
+        stage('TOP_K Sweep Testing') {
+            steps {
+                script {
+                    // Define TOP_K values to test
+                    def topKValues = [5, 10, 15, 20]
+                    
+                    // Define models to test
+                    def models = [
+                        'Qwen3-8B-Q5_K_M',
+                        'InternVL3_5-2B-Q6_K',
+                        'InternVL3_5-2B-Q8_0',
+                        'InternVL3_5-8B-Q4_K_M',
+                        'InternVL3-2B-Instruct-Q5_K_M',
+                        'Qwen3-4B-Instruct-2507-UD-Q6_K_XL',
+                        'OpenGVLab_InternVL3_5-8B-Q6_K',
+                        'Qwen3-4B-Instruct-2507-Q8_0'
+                    ]
+                    
+                    def totalTests = topKValues.size() * models.size()
+                    def currentTest = 0
+                    
+                    echo "=========================================="
+                    echo "Starting TOP_K Sweep Testing Pipeline"
+                    echo "TOP_K values: ${topKValues}"
+                    echo "Models: ${models.size()}"
+                    echo "Total test combinations: ${totalTests}"
+                    echo "=========================================="
+                    
+                    def testResults = [:]
+                    def failedTests = []
+                    
+                    // Nested loop: for each TOP_K value, test all models
+                    for (int k = 0; k < topKValues.size(); k++) {
+                        def topK = topKValues[k]
+                        
+                        echo "\n"
+                        echo "=========================================="
+                        echo "TOP_K = ${topK} (${k + 1}/${topKValues.size()})"
+                        echo "=========================================="
+                        
+                        for (int m = 0; m < models.size(); m++) {
+                            def model = models[m]
+                            currentTest++
+                            def testId = "topk${topK}_${model}"
+                            
+                            echo "\n"
+                            echo "==========================================  "
+                            echo "Test ${currentTest}/${totalTests}"
+                            echo "TOP_K: ${topK} | Model: ${model}"
+                            echo "=========================================="
+                            
+                            try {
+                                // Stage 1: Update TOP_K_RESULTS in model_config.py
+                                stage("${currentTest}. Config - TOP_K=${topK}") {
+                                    echo "Updating TOP_K_RESULTS to ${topK}..."
+                                    sh """
+                                        sed -i 's/^TOP_K_RESULTS = .*/TOP_K_RESULTS = ${topK}/' src/model_config.py
+                                        echo "Current TOP_K_RESULTS:"
+                                        grep "^TOP_K_RESULTS" src/model_config.py
+                                    """
+                                    echo "[OK] Configuration updated"
+                                }
+                                
+                                // Stage 2: Run Inference Tests
+                                stage("${currentTest}. Inference - ${model}") {
+                                    echo "Running inference with TOP_K=${topK}, Model=${model}..."
+                                    sh "/app/01_RAG/.venv/bin/python tests/test_inference.py --model ${model} --mode all --include-environment"
+                                    echo "[OK] Inference completed"
+                                }
+                                
+                                // Stage 3: Evaluate Answers
+                                stage("${currentTest}. Evaluate - ${model}") {
+                                    echo "Evaluating answers..."
+                                    
+                                    // Generate timestamp for unique filename
+                                    def timestamp = sh(script: 'date +%Y%m%d_%H%M%S', returnStdout: true).trim()
+                                    def evalFile = "tests/logs/answer_evaluation_results_topk${topK}_${model}_${timestamp}.json"
+                                    
+                                    sh """
+                                        /app/01_RAG/.venv/bin/python src/answer_evaluator.py \
+                                            --gold-standard data/test/sonar_pro_gold_standard_dataset.json \
+                                            --inference-log tests/logs/inference_log.jsonl \
+                                            --num-inference-eval 1 \
+                                            --max-questions 10 \
+                                            --output-json ${evalFile}
+                                    """
+                                    echo "[OK] Evaluation completed: ${evalFile}"
+                                    
+                                    // Store eval file path for use in upload stage
+                                    testResults["${testId}_evalfile"] = evalFile
+                                }
+                                
+                                // Stage 4: Upload to Neptune
+                                stage("${currentTest}. Upload - ${model}") {
+                                    if (env.NEPTUNE_API_TOKEN != null && env.NEPTUNE_PROJECT != null) {
+                                        echo "Uploading results to Neptune.ai..."
+                                        
+                                        try {
+                                            // Upload inference test results
+                                            sh 'bash jenkins_neptune_upload.sh'
+                                            
+                                            // Get the evaluation file path from previous stage
+                                            def evalFile = testResults["${testId}_evalfile"]
+                                            
+                                            // Upload answer evaluation metrics with TOP_K tag
+                                            sh """
+                                                /app/01_RAG/.venv/bin/python src/neptune_uploader.py \
+                                                    --upload-evaluation \
+                                                    --evaluation-file ${evalFile} \
+                                                    --tags jenkins evaluation build-${BUILD_NUMBER} model-${model} topk-${topK}
+                                            """
+                                            
+                                            echo "[OK] Neptune upload completed"
+                                        } catch (Exception uploadError) {
+                                            echo "[!] Warning: Neptune upload failed: ${uploadError.message}"
+                                            echo "Continuing with pipeline..."
+                                        }
+                                    } else {
+                                        echo "[!] Neptune credentials not configured, skipping upload"
+                                    }
+                                }
+                                
+                                testResults[testId] = "SUCCESS"
+                                echo "[OK] Test ${testId} completed successfully"
+                                
+                            } catch (Exception e) {
+                                testResults[testId] = "FAILED"
+                                failedTests.add(testId)
+                                echo "[x] Failed test ${testId}: ${e.message}"
+                                echo "Continuing with next test..."
+                            }
+                        }
+                    }
+                    
+                    // Print final summary
+                    echo "\n"
+                    echo "=========================================="
+                    echo "TOP_K SWEEP TESTING SUMMARY"
+                    echo "=========================================="
+                    echo "Total tests: ${totalTests}"
+                    echo "Successful: ${testResults.count { it.value == 'SUCCESS' }}"
+                    echo "Failed: ${failedTests.size()}"
+                    echo ""
+                    
+                    if (failedTests.size() > 0) {
+                        echo "Failed tests:"
+                        failedTests.each { test ->
+                            echo "  [x] ${test}"
+                        }
+                        echo ""
+                        echo "[!] Some tests failed but pipeline completed"
+                    } else {
+                        echo "[OK] All tests passed successfully!"
+                    }
+                    echo "=========================================="
+                    
+                    // Detailed results (exclude _evalfile entries)
+                    echo "\nDetailed Results:"
+                    testResults.each { test, status ->
+                        if (!test.endsWith('_evalfile')) {
+                            def icon = status == "SUCCESS" ? "[OK]" : "[x]"
+                            echo "${icon} ${test}: ${status}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                echo 'Cleaning up and archiving artifacts...'
+                
+                // Archive all test results
+                archiveArtifacts artifacts: 'tests/logs/**/*.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/**/*.jsonl', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'tests/logs/sessions/**/*', allowEmptyArchive: true
+                
+                echo 'Cleanup completed'
+            }
+        }
+        success {
+            echo '[OK] TOP_K Sweep Pipeline completed successfully!'
+        }
+        failure {
+            echo '[x] TOP_K Sweep Pipeline failed. Check logs for details.'
+        }
+    }
+}
